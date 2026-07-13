@@ -87,6 +87,7 @@ color:var(--ink);font-size:22px;font-weight:600}
   <div class="card hero">
     <div class="lab">Balance now</div>
     <div class="bal" id="bal"></div>
+    <div class="mut" id="asof"></div>
     <div class="row">
       <div class="chip"><div class="n" id="days"></div><div class="t" id="paylab">days to payday</div></div>
       <div class="chip"><div class="n" style="color:var(--green)" id="safe"></div><div class="t">safe / day</div></div>
@@ -115,6 +116,9 @@ color:var(--ink);font-size:22px;font-weight:600}
     <div class="sec-title">Payday split — detail</div>
     <table class="tbl" id="split"></table>
   </div>
+
+  <button class="askbtn" onclick="location.href='https://claude.ai'">🔄 Update my numbers — open Claude & say "update my app"</button>
+  <div class="note" style="text-align:center">Claude reads your SAR transaction emails, recomputes everything, and pushes the new version here automatically.</div>
 </div></div>
 
 <div class="view" id="v-spend"><div class="wrap">
@@ -159,7 +163,7 @@ color:var(--ink);font-size:22px;font-weight:600}
 </div>
 
 <script>
-/* ================= DATA — Claude updates this block on each sync ================= */
+/*DATA-START*/
 const DATA={
  asOf:"2026-07-13",
  balance:1400, salary:27932, cushion:200,
@@ -182,7 +186,7 @@ const DATA={
    {n:"Spend under salary this month",cur:0,tgt:27932,col:"#2dd4bf",sub:"Stay below 27,932"}
  ]
 };
-/* ================================================================================ */
+/*DATA-END*/
 const f=n=>Math.round(n).toLocaleString('en-US');
 
 // --- payday engine: 27th; Friday → day before; Saturday → day after ---
@@ -200,6 +204,7 @@ const weekly=avail/weeksLeft, daily=avail/days;
 
 document.getElementById('mo').textContent=now.toLocaleDateString('en-US',{month:'long',year:'numeric'});
 document.getElementById('bal').innerHTML=f(DATA.balance)+' <span class="sar">SAR</span>';
+document.getElementById('asof').textContent='updated '+DATA.asOf;
 document.getElementById('days').textContent=days;
 document.getElementById('paylab').textContent='days to payday ('+pd.toLocaleDateString('en-US',{day:'numeric',month:'short'})+')';
 document.getElementById('safe').textContent=f(daily);
