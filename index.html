@@ -1,0 +1,271 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Saad Money">
+<meta name="theme-color" content="#0d1520">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<title>Saad Money</title>
+<style>
+:root{--bg:#0d1520;--card:#172433;--ink:#eaf1f8;--sub:#9fb2c4;--line:#28394d;
+--teal:#2dd4bf;--red:#f87171;--amber:#fbbf24;--green:#34d399;--violet:#a78bfa;}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);
+color:var(--ink);line-height:1.45;padding-bottom:84px;max-width:520px;margin:0 auto}
+.wrap{padding:16px}
+.top{display:flex;justify-content:space-between;align-items:center;padding:16px 16px 4px}
+.top h1{font-size:19px;font-weight:750}
+.top .mo{font-size:12px;color:var(--sub)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:12px}
+.hero{background:linear-gradient(150deg,#1a2c40,#152232);text-align:center;padding:22px 16px}
+.hero .lab{font-size:12px;color:var(--sub);text-transform:uppercase;letter-spacing:.6px}
+.hero .bal{font-size:40px;font-weight:800;letter-spacing:-1px;margin:2px 0}
+.hero .sar{font-size:16px;color:var(--sub);font-weight:600}
+.hero .row{display:flex;gap:10px;margin-top:14px}
+.chip{flex:1;background:#0f1c2a;border:1px solid var(--line);border-radius:12px;padding:10px}
+.chip .n{font-size:19px;font-weight:750}.chip .t{font-size:11px;color:var(--sub);margin-top:1px}
+.sec-title{font-size:13px;color:var(--sub);font-weight:650;text-transform:uppercase;letter-spacing:.5px;margin:6px 2px 8px}
+.rowline{display:flex;align-items:center;gap:10px;margin:9px 0}
+.rowline .nm{flex:1;font-size:14px}
+.rowline .amt{font-variant-numeric:tabular-nums;font-weight:650;font-size:14px}
+.bar{height:8px;border-radius:6px;background:#0f1c2a;overflow:hidden;margin-top:5px}
+.bar>i{display:block;height:100%;border-radius:6px}
+.note{font-size:11.5px;color:var(--sub);line-height:1.5;margin-top:8px}
+.tbl{width:100%;border-collapse:collapse;font-size:13.5px}
+.tbl td{padding:7px 2px;border-bottom:1px solid var(--line)}
+.tbl td:last-child{text-align:right;font-variant-numeric:tabular-nums;font-weight:650}
+.tot td{font-weight:800;border-top:2px solid var(--line);border-bottom:none;padding-top:10px}
+.askbtn{display:block;width:100%;background:linear-gradient(135deg,#2dd4bf,#1f9e8f);color:#062a26;
+border:none;border-radius:14px;padding:14px;font-size:15px;font-weight:750;margin-top:4px}
+.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:520px;
+background:rgba(15,24,36,.94);backdrop-filter:blur(12px);border-top:1px solid var(--line);
+display:flex;justify-content:space-around;padding:8px 4px calc(8px + env(safe-area-inset-bottom))}
+.nav button{background:none;border:none;color:var(--sub);font-size:10.5px;display:flex;flex-direction:column;
+align-items:center;gap:3px;padding:4px 10px;font-weight:600}
+.nav button.on{color:var(--teal)}
+.nav .ic{font-size:19px}
+.view{display:none}.view.on{display:block;animation:f .25s ease}
+@keyframes f{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.goal{margin:14px 0}
+.goal .g-top{display:flex;justify-content:space-between;align-items:baseline}
+.goal .g-nm{font-size:14px;font-weight:600}.goal .g-pct{font-size:13px;font-weight:700}
+.goal .g-sub{font-size:11.5px;color:var(--sub);margin-top:2px}
+.week{border-radius:14px;padding:14px;margin-bottom:12px;border:1px solid var(--line)}
+.week.g{background:#10281f;border-color:#1f5c46}.week.y{background:#2a2412;border-color:#5a4d1a}
+.week.r{background:#2a1414;border-color:#5c2323}
+.week .wk-n{font-size:30px;font-weight:800}
+.week .wk-t{font-size:12px;color:var(--sub)}
+.week .wk-s{font-size:12.5px;margin-top:6px;font-weight:600}
+/* PIN lock */
+#lock{position:fixed;inset:0;background:var(--bg);z-index:99;display:flex;flex-direction:column;
+align-items:center;justify-content:center;gap:18px}
+#lock h2{font-size:20px}#lock .sub2{color:var(--sub);font-size:13px;text-align:center;padding:0 30px}
+.dots{display:flex;gap:14px}.dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--sub)}
+.dot.f{background:var(--teal);border-color:var(--teal)}
+.pad{display:grid;grid-template-columns:repeat(3,72px);gap:12px;margin-top:8px}
+.pad button{height:64px;border-radius:50%;border:1px solid var(--line);background:var(--card);
+color:var(--ink);font-size:22px;font-weight:600}
+.pad button:active{background:#22374d}
+</style></head><body>
+
+<div id="lock">
+  <h2>💰 Saad Money</h2>
+  <div class="sub2" id="lockmsg">Enter your PIN</div>
+  <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+  <div class="pad">
+    <button>1</button><button>2</button><button>3</button><button>4</button><button>5</button>
+    <button>6</button><button>7</button><button>8</button><button>9</button>
+    <span></span><button>0</button><button style="font-size:14px">⌫</button>
+  </div>
+</div>
+
+<div class="top"><h1>💰 Saad Money</h1><div class="mo" id="mo"></div></div>
+
+<div class="view on" id="v-home"><div class="wrap">
+  <div class="card hero">
+    <div class="lab">Balance now</div>
+    <div class="bal" id="bal"></div>
+    <div class="row">
+      <div class="chip"><div class="n" id="days"></div><div class="t" id="paylab">days to payday</div></div>
+      <div class="chip"><div class="n" style="color:var(--green)" id="safe"></div><div class="t">safe / day</div></div>
+    </div>
+  </div>
+
+  <div class="week" id="weekcard">
+    <div class="wk-t">THIS WEEK'S MONEY</div>
+    <div class="wk-n" id="wk-amt"></div>
+    <div class="wk-s" id="wk-status"></div>
+    <div class="note">Formula: (balance − 200 cushion − unpaid commitments) ÷ weeks to payday. Under-spend → 50% rolls over, 50% goes to Eman.</div>
+  </div>
+
+  <div class="card">
+    <div class="sec-title">The 47 / 30 / 23 split (payday)</div>
+    <div class="rowline"><div class="nm">🏠 Commitments</div><div class="amt">13,085</div></div>
+    <div class="bar"><i style="width:47%;background:var(--violet)"></i></div>
+    <div class="rowline"><div class="nm">🚀 Future You (debts + buffer)</div><div class="amt">8,500</div></div>
+    <div class="bar"><i style="width:30%;background:var(--teal)"></i></div>
+    <div class="rowline"><div class="nm">😊 Living (yours)</div><div class="amt">6,347</div></div>
+    <div class="bar"><i style="width:23%;background:var(--amber)"></i></div>
+    <div class="note">Salary 27,932 → every riyal assigned the hour it lands. Weekly living ≈ 1,475.</div>
+  </div>
+
+  <div class="card">
+    <div class="sec-title">Payday split — detail</div>
+    <table class="tbl" id="split"></table>
+  </div>
+</div></div>
+
+<div class="view" id="v-spend"><div class="wrap">
+  <div class="card"><div class="sec-title">Where money goes — avg / month</div><div id="cats"></div></div>
+  <div class="card"><div class="sec-title">Active subscriptions</div><table class="tbl" id="subs"></table></div>
+</div></div>
+
+<div class="view" id="v-debt"><div class="wrap">
+  <div class="card"><div class="sec-title">Debts</div><table class="tbl" id="debts"></table></div>
+  <div class="card"><div class="sec-title">Plan — E. first, then smallest</div>
+    <ol style="padding-left:18px;font-size:13.5px;line-height:1.7">
+      <li>No BNPL (Tamara/Tabby). Deleted, stays deleted.</li>
+      <li>Buffer to 28,000 (2,000/mo).</li>
+      <li><b>Sister E. — 4,000/mo → clear in ~7–8 months.</b></li>
+      <li>Credit card next, then finish Sister A.</li>
+      <li>Bank loan acceleration comes last.</li>
+    </ol>
+  </div>
+</div></div>
+
+<div class="view" id="v-goals"><div class="wrap">
+  <div class="card"><div class="sec-title">Goals</div><div id="goals"></div></div>
+</div></div>
+
+<div class="view" id="v-month"><div class="wrap">
+  <div class="card"><div class="sec-title" id="mtitle"></div>
+    <div class="rowline"><div class="nm">Balance now</div><div class="amt" id="m-bal"></div></div>
+    <div class="rowline"><div class="nm">Days to payday</div><div class="amt" id="m-days"></div></div>
+    <div class="rowline"><div class="nm">This week's money</div><div class="amt" id="m-wk"></div></div>
+    <div class="rowline"><div class="nm">Biggest leak</div><div class="amt" style="color:var(--amber)">Food + STC</div></div>
+    <div class="note">For the full written review: open Claude → project "Saad Finance" → say <b>"how was my stand this month?"</b></div>
+  </div>
+  <button class="askbtn" onclick="alert('Open Claude → Saad Finance project → ask: how was my stand this month?')">Ask Claude for the full review</button>
+</div></div>
+
+<div class="nav">
+  <button class="on" data-v="home"><span class="ic">🏠</span>Home</button>
+  <button data-v="spend"><span class="ic">📈</span>Spend</button>
+  <button data-v="debt"><span class="ic">💳</span>Debts</button>
+  <button data-v="goals"><span class="ic">🎯</span>Goals</button>
+  <button data-v="month"><span class="ic">📊</span>Month</button>
+</div>
+
+<script>
+/* ================= DATA — Claude updates this block on each sync ================= */
+const DATA={
+ asOf:"2026-07-13",
+ balance:1400, salary:27932, cushion:200,
+ // commitments still UNPAID before next payday (edit as they get paid)
+ unpaidCommitments:0,
+ split:[["Bank loan (auto)",7027],["Phone / telecom",1720],["Housemaid (Musaned)",1500],
+   ["Groceries → wife",1000],["Electricity",500],["Subscriptions",1028],["Car-insurance fund",310],
+   ["★ Sister E. payoff",4000],["Sister A.",1000],["Credit-card paydown",1500],
+   ["★ Emergency buffer",2000],["Living (weekly envelope)",6347]],
+ cats:[["Everyday: food, coffee, groceries",7959,"#e9a23b"],["→ STC (subs, housemaid, transfers)",6489,"#e07a5f"],
+   ["Bank loan",7027,"#3d5a80"],["Family transfers",2000,"#5e81ac"],["Shopping",1588,"#a78bfa"],
+   ["Credit-card settlement",1505,"#b56576"],["Phone/telecom",1385,"#6fb1a0"],["Travel",1028,"#7c9cbf"],
+   ["BNPL",979,"#c9455b"],["Car insurance",738,"#a3a380"],["Bills",512,"#8d99ae"]],
+ subs:[["Claude (Max)",500],["GymNation",209],["Apple/iTunes",192],["Netflix",72],["Xbox",31],["Spotify",24]],
+ debts:[["Bank loan (Tawarruq)",290801],["Sister E.",30030],["Sister A.",24800],["Credit card",20000],["BNPL",4000],["Apartment (father) — long-term",1400000]],
+ goals:[
+   {n:"Emergency buffer (1 month)",cur:0,tgt:28000,col:"#34d399",sub:"Ends the payday panic"},
+   {n:"Clear Sister E.",cur:0,tgt:30030,col:"#fbbf24",sub:"Priority · ~7–8 months at 4,000/mo"},
+   {n:"Clear credit card",cur:0,tgt:20000,col:"#f87171",sub:"After E."},
+   {n:"Spend under salary this month",cur:0,tgt:27932,col:"#2dd4bf",sub:"Stay below 27,932"}
+ ]
+};
+/* ================================================================================ */
+const f=n=>Math.round(n).toLocaleString('en-US');
+
+// --- payday engine: 27th; Friday → day before; Saturday → day after ---
+function paydayAfter(d){
+  let y=d.getFullYear(),m=d.getMonth();
+  function adj(y,m){let p=new Date(y,m,27);const dow=p.getDay();
+    if(dow===5)p=new Date(y,m,26); if(dow===6)p=new Date(y,m,28); return p;}
+  let p=adj(y,m); if(p<=d){m++; if(m>11){m=0;y++;} p=adj(y,m);} return p;
+}
+const now=new Date(); const pd=paydayAfter(now);
+const days=Math.max(1,Math.ceil((pd-now)/86400000));
+const weeksLeft=Math.max(1,days/7);
+const avail=Math.max(0,DATA.balance-DATA.cushion-DATA.unpaidCommitments);
+const weekly=avail/weeksLeft, daily=avail/days;
+
+document.getElementById('mo').textContent=now.toLocaleDateString('en-US',{month:'long',year:'numeric'});
+document.getElementById('bal').innerHTML=f(DATA.balance)+' <span class="sar">SAR</span>';
+document.getElementById('days').textContent=days;
+document.getElementById('paylab').textContent='days to payday ('+pd.toLocaleDateString('en-US',{day:'numeric',month:'short'})+')';
+document.getElementById('safe').textContent=f(daily);
+document.getElementById('wk-amt').textContent=f(weekly)+' SAR';
+const wc=document.getElementById('weekcard'), ws=document.getElementById('wk-status');
+if(weekly>=1300){wc.classList.add('g');ws.textContent='🟢 Green week — normal envelope. Enjoy it, guilt-free.';ws.style.color='var(--green)';}
+else if(weekly>=800){wc.classList.add('y');ws.textContent='🟡 Careful week — home food, skip delivery.';ws.style.color='var(--amber)';}
+else {wc.classList.add('r');ws.textContent='🔴 Tight week — essentials only. Payday is close.';ws.style.color='var(--red)';}
+
+let st="";DATA.split.forEach(([n,v])=>{const s=n.startsWith("★");
+ st+=`<tr><td>${s?'<span style="color:var(--amber)">'+n.slice(2)+'</span>':n}</td><td>${f(v)}</td></tr>`});
+st+=`<tr class="tot"><td>Total</td><td>${f(DATA.split.reduce((a,[,v])=>a+v,0))}</td></tr>`;
+document.getElementById('split').innerHTML=st;
+
+const cmax=Math.max(...DATA.cats.map(c=>c[1]));let ct="";
+DATA.cats.forEach(([n,v,c])=>{ct+=`<div class="rowline" style="flex-wrap:wrap"><div class="nm">${n}</div><div class="amt">${f(v)}</div><div style="flex-basis:100%"><div class="bar"><i style="width:${Math.max(4,v/cmax*100)}%;background:${c}"></i></div></div></div>`});
+document.getElementById('cats').innerHTML=ct;
+
+let s2="";DATA.subs.forEach(([n,v])=>s2+=`<tr><td>${n}</td><td>${f(v)}</td></tr>`);
+s2+=`<tr class="tot"><td>Active / month</td><td>${f(DATA.subs.reduce((a,[,v])=>a+v,0))}</td></tr>`;
+document.getElementById('subs').innerHTML=s2;
+
+let dt="";DATA.debts.forEach(([n,v])=>dt+=`<tr><td>${n}</td><td>${f(v)}</td></tr>`);
+const cons=DATA.debts.filter(d=>!d[0].includes('Apartment')).reduce((a,[,v])=>a+v,0);
+dt+=`<tr class="tot"><td>Consumer debt</td><td>${f(cons)}</td></tr>`;
+document.getElementById('debts').innerHTML=dt;
+
+let gt="";DATA.goals.forEach(g=>{const p=Math.min(100,Math.round(g.cur/g.tgt*100));
+ gt+=`<div class="goal"><div class="g-top"><div class="g-nm">${g.n}</div><div class="g-pct" style="color:${g.col}">${p}%</div></div>
+ <div class="bar"><i style="width:${p}%;background:${g.col}"></i></div>
+ <div class="g-sub">${f(g.cur)} / ${f(g.tgt)} SAR — ${g.sub}</div></div>`});
+document.getElementById('goals').innerHTML=gt;
+
+document.getElementById('mtitle').textContent=now.toLocaleDateString('en-US',{month:'long',year:'numeric'})+' — your stand';
+document.getElementById('m-bal').textContent=f(DATA.balance);
+document.getElementById('m-days').textContent=days;
+document.getElementById('m-wk').textContent=f(weekly);
+
+document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>{
+ document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('on'));
+ document.querySelectorAll('.view').forEach(x=>x.classList.remove('on'));
+ b.classList.add('on');document.getElementById('v-'+b.dataset.v).classList.add('on');window.scrollTo(0,0);});
+
+// --- PIN lock (localStorage with in-memory fallback) ---
+let store={get:k=>{try{return localStorage.getItem(k)}catch(e){return null}},
+           set:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}}};
+let entered="",setting=!store.get('pin'),firstPin="";
+const msg=document.getElementById('lockmsg'),dots=document.querySelectorAll('.dot');
+if(setting)msg.textContent="Create a 4-digit PIN for your app";
+function paint(){dots.forEach((d,i)=>d.classList.toggle('f',i<entered.length));}
+document.querySelectorAll('.pad button').forEach(b=>b.onclick=()=>{
+ const t=b.textContent;
+ if(t==='⌫'){entered=entered.slice(0,-1);paint();return;}
+ if(entered.length>=4)return; entered+=t;paint();
+ if(entered.length===4){
+   setTimeout(()=>{
+     if(setting){
+       if(!firstPin){firstPin=entered;entered="";paint();msg.textContent="Repeat the PIN to confirm";}
+       else if(firstPin===entered){store.set('pin',entered);unlock();}
+       else{firstPin="";entered="";paint();msg.textContent="Didn't match — create a 4-digit PIN";}
+     } else {
+       if(entered===store.get('pin'))unlock();
+       else{entered="";paint();msg.textContent="Wrong PIN — try again";}
+     }
+   },120);
+ }
+});
+function unlock(){document.getElementById('lock').style.display='none';}
+</script></body></html>
