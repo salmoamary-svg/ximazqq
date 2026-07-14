@@ -1,24 +1,26 @@
 #!/usr/bin/env python3
 """
-Saad Money — daily autopilot.
-Runs inside GitHub Actions. Reads Gmail via IMAP (app password), then:
- 1) BALANCE SYNC: newest email from saaddata96@gmail.com that contains a
-    BSF balance -> updates DATA.balance + DATA.asOf in index.html.
- 2) FULL DATA OVERRIDE: newest email from Saad himself with subject
-    'SAADMONEY-DATA' whose body contains a JSON object -> replaces the whole
-    DATA block (this is how Claude ships monthly deep updates: Claude creates
-    a Gmail draft, Saad taps Send, robot applies it overnight).
-Privacy: nothing from email bodies is stored in the repo except the balance
-number and timestamps. No merchant text, no names.
+Saad Money - daily autopilot (v2, deduction model).
+BSF transaction SMS emails do NOT include a running balance, so the robot
+tracks it by deduction: start from the known balance in data/state.json and
+apply each new transaction email from saaddata96@gmail.com.
+  - amount = first number before SAR / riyal (Arabic digits ok)
+  - credit if text has incoming/salary/deposit/refund keywords, else debit
+Also: full DATA override via self-email with subject SAADMONEY-DATA whose
+body contains JSON -> replaces the /*DATA-START*/.../*DATA-END*/ block.
+Privacy: repo stores only balance, cursor, message-ids. No merchant text.
 """
 import imaplib, email, re, json, os, sys, subprocess
-from email.header import decode_header
 from datetime import datetime, timezone, timedelta
 
 USER = os.environ["GMAIL_USER"]
-PW   = os.environ["GMAIL_APP_PASSWORD"]
+PW = os.environ["GMAIL_APP_PASSWORD"]
 INDEX = "index.html"
 STATE = "data/state.json"
+
+AR = str.maketrans("٠١٢٣٤٥٦٧٨٩", "0123456789")
+AMOUNT_RX = re.compile(r"([\d٠-٩][\d٠-٩,]*(?:\.[\d٠-٩]{1,2})?)\s*(?:SAR|ريال|ر\.س)", re.I)
+CREDIT_RX = re.compile(r"وارد|راتب|إيداع|ايداع|مسترد|استرداد|refund|salary|deposit|credited|incoming", re.I)
 
 def log(*a): print("[saadmoney]", *a, flush=True)
 
@@ -37,92 +39,90 @@ def body_text(msg):
         except Exception:
             pass
     t = "\n".join(parts)
-    return re.sub(r"<[^>]+>", " ", t)  # crude html strip is fine for SMS bodies
-
-# Balance extraction: BSF SMS usually carries remaining balance.
-# Match Arabic & English variants; tolerant of formatting.
-BAL_RES = [
-    re.compile(r"(?:الرصيد|رصيدك|رصيد)\D{0,12}?([\d١٢٣٤٥٦٧٨٩٠,]+(?:\.\d{1,2})?)"),
-    re.compile(r"(?:Balance|Avail(?:able)?\.? ?Bal(?:ance)?)\D{0,12}?([\d,]+(?:\.\d{1,2})?)", re.I),
-]
-AR_DIGITS = str.maketrans("٠١٢٣٤٥٦٧٨٩", "0123456789")
-BSF_MARK = re.compile(r"(BSF|فرنسي|الفرنسي|FRANSI)", re.I)
-
-def extract_balance(text):
-    if not BSF_MARK.search(text):
-        return None
-    for rx in BAL_RES:
-        m = rx.search(text)
-        if m:
-            raw = m.group(1).translate(AR_DIGITS).replace(",", "")
-            try:
-                v = float(raw)
-                if 0 <= v < 10_000_000:
-                    return v
-            except ValueError:
-                pass
-    return None
+    return re.sub(r"<[^>]+>", " ", t)
 
 def load_state():
-    try:
-        return json.load(open(STATE))
-    except Exception:
-        return {"processed": [], "last_balance": None, "last_data_msgid": None}
+    return json.load(open(STATE))
 
 def save_state(st):
     os.makedirs("data", exist_ok=True)
     st["processed"] = st["processed"][-500:]
     json.dump(st, open(STATE, "w"), indent=1)
 
+def msg_date(msg):
+    try:
+        d = email.utils.parsedate_to_datetime(msg.get("Date"))
+        if d.tzinfo is None:
+            d = d.replace(tzinfo=timezone.utc)
+        return d
+    except Exception:
+        return datetime.now(timezone.utc)
+
 def main():
     st = load_state()
+    balance = float(st["balance"])
+    cursor = datetime.fromisoformat(st["cursor"].replace("Z", "+00:00"))
+    changed = False
+
     M = imaplib.IMAP4_SSL("imap.gmail.com")
     M.login(USER, PW)
     M.select('"[Gmail]/All Mail"', readonly=True)
-    since = (datetime.now(timezone.utc) - timedelta(days=7)).strftime("%d-%b-%Y")
+    since = (cursor - timedelta(days=1)).strftime("%d-%b-%Y")
 
-    changed = False
     html = open(INDEX, encoding="utf-8").read()
     today = datetime.now(timezone.utc).astimezone(timezone(timedelta(hours=3))).strftime("%Y-%m-%d")
 
-    # ---- 1) balance sync from saaddata96 ----
+    # ---- 1) deduction sync from saaddata96 transaction emails ----
+    txns = []
     typ, ids = M.search(None, f'(FROM "saaddata96@gmail.com" SINCE {since})')
-    best = None  # (datetime, balance, msgid)
     for i in (ids[0].split() if typ == "OK" else []):
         typ2, data = M.fetch(i, "(RFC822)")
-        if typ2 != "OK": continue
+        if typ2 != "OK":
+            continue
         msg = email.message_from_bytes(data[0][1])
         mid = msg.get("Message-ID", i.decode())
-        try:
-            d = email.utils.parsedate_to_datetime(msg.get("Date"))
-        except Exception:
-            d = datetime.now(timezone.utc)
-        bal = extract_balance(body_text(msg))
-        if bal is not None and (best is None or d > best[0]):
-            best = (d, bal, mid)
-    if best and best[2] not in st["processed"]:
-        new_bal = best[1]
-        html2 = re.sub(r"(balance\s*:\s*)[\d_.,]+", rf"\g<1>{new_bal:g}", html, count=1)
+        if mid in st["processed"]:
+            continue
+        d = msg_date(msg)
+        if d <= cursor:
+            continue
+        text = body_text(msg)
+        m = AMOUNT_RX.search(text)
+        if not m:
+            st["processed"].append(mid)
+            changed = True
+            log(f"skipped (no amount) email dated {d:%Y-%m-%d %H:%M}")
+            continue
+        amt = float(m.group(1).translate(AR).replace(",", ""))
+        sign = 1 if CREDIT_RX.search(text) else -1
+        txns.append((d, sign * amt, mid))
+
+    txns.sort(key=lambda t: t[0])
+    for d, delta, mid in txns:
+        balance += delta
+        st["processed"].append(mid)
+        if d > cursor:
+            cursor = d
+        changed = True
+        log(f"{delta:+.2f} on {d:%Y-%m-%d %H:%M} -> balance {balance:.2f}")
+
+    if txns:
+        html2 = re.sub(r"(balance\s*:\s*)[\d_.,]+", rf"\g<1>{balance:.2f}", html, count=1)
         html2 = re.sub(r'(asOf\s*:\s*")[^"]*(")', rf"\g<1>{today}\g<2>", html2, count=1)
-        if html2 != html:
-            html = html2; changed = True
-            st["processed"].append(best[2]); st["last_balance"] = new_bal
-            log(f"balance -> {new_bal} (from email dated {best[0]:%Y-%m-%d %H:%M})")
-    else:
-        log("no new BSF balance found in last 7 days")
+        html = html2
+    st["balance"] = round(balance, 2)
+    st["cursor"] = cursor.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
 
     # ---- 2) full DATA override from Saad (subject SAADMONEY-DATA) ----
     typ, ids = M.search(None, f'(FROM "{USER}" SUBJECT "SAADMONEY-DATA" SINCE {since})')
     latest = None
     for i in (ids[0].split() if typ == "OK" else []):
         typ2, data = M.fetch(i, "(RFC822)")
-        if typ2 != "OK": continue
+        if typ2 != "OK":
+            continue
         msg = email.message_from_bytes(data[0][1])
         mid = msg.get("Message-ID", i.decode())
-        try:
-            d = email.utils.parsedate_to_datetime(msg.get("Date"))
-        except Exception:
-            d = datetime.now(timezone.utc)
+        d = msg_date(msg)
         if latest is None or d > latest[0]:
             latest = (d, body_text(msg), mid)
     if latest and latest[2] != st.get("last_data_msgid"):
@@ -133,7 +133,8 @@ def main():
                 block = "/*DATA-START*/\nconst DATA=" + json.dumps(obj, ensure_ascii=False) + ";\n/*DATA-END*/"
                 html2 = re.sub(r"/\*DATA-START\*/.*?/\*DATA-END\*/", block, html, flags=re.S)
                 if html2 != html:
-                    html = html2; changed = True
+                    html = html2
+                    changed = True
                     st["last_data_msgid"] = latest[2]
                     log("full DATA override applied")
             except json.JSONDecodeError as e:
@@ -148,9 +149,8 @@ def main():
         subprocess.run(["git", "add", INDEX, STATE], check=True)
         subprocess.run(["git", "commit", "-m", f"auto-update {today}"], check=True)
         subprocess.run(["git", "push"], check=True)
-        log("pushed.")
+        log(f"pushed. balance {balance:.2f}")
     else:
-        save_state(st)
         log("nothing to update.")
 
 if __name__ == "__main__":
