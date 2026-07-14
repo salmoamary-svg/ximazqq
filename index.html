@@ -274,3 +274,25 @@ document.querySelectorAll('.pad button').forEach(b=>b.onclick=()=>{
 });
 function unlock(){document.getElementById('lock').style.display='none';}
 </script></body></html>
+<script>
+(function(){
+var b=document.createElement('button');
+b.id='robotBtn';
+b.textContent='⟳ Update';
+b.style.cssText='position:fixed;right:14px;bottom:96px;z-index:9999;background:linear-gradient(135deg,#2dd4bf,#1f9e8f);color:#062a26;border:none;border-radius:22px;padding:10px 16px;font-size:14px;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.4)';
+b.onclick=async function(){
+ var t=localStorage.getItem('saad_money_gh_pat');
+ if(!t){t=prompt('Paste your GitHub token (same one as the update-button page)');if(!t)return;localStorage.setItem('saad_money_gh_pat',t.trim());}
+ b.textContent='⏳ Robot running…';b.disabled=true;
+ try{
+  var r=await fetch('https://api.github.com/repos/salmoamary-svg/ximazqq/actions/workflows/update.yml/dispatches',
+   {method:'POST',headers:{'Authorization':'Bearer '+t,'Accept':'application/vnd.github+json'},
+    body:JSON.stringify({ref:'main'})});
+  if(r.status===204){b.textContent='✅ Updating — refreshing in 90s';setTimeout(function(){location.reload()},90000);}
+  else if(r.status===401||r.status===403){b.textContent='🔑 Token problem — tap to re-enter';localStorage.removeItem('saad_money_gh_pat');b.disabled=false;}
+  else{b.textContent='✗ Error '+r.status;b.disabled=false;}
+ }catch(e){b.textContent='✗ No internet?';b.disabled=false;}
+};
+document.body.appendChild(b);
+})();
+</script>
