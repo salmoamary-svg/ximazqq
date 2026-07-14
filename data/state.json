@@ -1,9 +1,12 @@
 {
-  "balance": 1398.50,
-  "cursor": "2026-07-14T08:55:07Z",
-  "processed": [
-    "19f608fdeb7e975c",
-    "19f5f316076ffc28"
-  ],
-  "last_data_msgid": null
+ "balance": 989.21,
+ "cursor": "2026-07-14T15:00:02Z",
+ "processed": [
+  "19f608fdeb7e975c",
+  "19f5f316076ffc28",
+  "<39306B9C-4C51-4F9F-B84B-F75A3183F6A7@gmail.com>",
+  "<31314BA7-19A5-4FA8-AFA5-71DE9AB4D7E6@gmail.com>",
+  "<10BC028F-6534-4DE2-9CD3-B532741E3E69@gmail.com>"
+ ],
+ "last_data_msgid": null
 }
