@@ -296,3 +296,67 @@ b.onclick=async function(){
 document.body.appendChild(b);
 })();
 </script>
+<script>
+(function(){
+var API='https://api.github.com/repos/salmoamary-svg/ximazqq';
+function fmt(n){return n.toLocaleString('en-US')}
+function patch(bal){
+ try{
+  var el=document.getElementById('bal');
+  if(el)el.innerHTML=fmt(bal)+' <span class="sar">SAR</span>';
+  var m=document.getElementById('m-bal');if(m)m.textContent=fmt(bal);
+  if(typeof DATA!=='undefined')DATA.balance=bal;
+ }catch(e){}
+}
+async function freshBalance(t){
+ var h={'Accept':'application/vnd.github.raw'};
+ if(t)h['Authorization']='Bearer '+t;
+ try{
+  var r=await fetch(API+'/contents/data/state.json?ref=main&_='+Date.now(),{headers:h});
+  if(!r.ok)return null;
+  var s=await r.json();
+  return (typeof s.balance==='number')?s.balance:null;
+ }catch(e){return null}
+}
+freshBalance(null).then(function(b){if(b!=null)patch(b)});
+var old=document.getElementById('robotBtn');if(old)old.remove();
+var b=document.createElement('button');
+b.id='robotBtn';b.textContent='⟳ Update';
+b.style.cssText='position:fixed;right:14px;bottom:96px;z-index:9999;background:linear-gradient(135deg,#2dd4bf,#1f9e8f);color:#062a26;border:none;border-radius:22px;padding:10px 16px;font-size:14px;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.4)';
+b.onclick=async function(){
+ var t=localStorage.getItem('saad_money_gh_pat');
+ if(!t){t=prompt('Paste your GitHub token');if(!t)return;t=t.trim();localStorage.setItem('saad_money_gh_pat',t);}
+ b.disabled=true;b.textContent='⏳ starting…';
+ var H={'Authorization':'Bearer '+t,'Accept':'application/vnd.github+json'};
+ var WF=API+'/actions/workflows/update.yml';
+ try{
+  var prev=null;
+  try{var p=await(await fetch(WF+'/runs?per_page=1',{headers:H})).json();prev=(p.workflow_runs&&p.workflow_runs[0])?p.workflow_runs[0].id:null;}catch(e){}
+  var d=await fetch(WF+'/dispatches',{method:'POST',headers:H,body:JSON.stringify({ref:'main'})});
+  if(d.status===401||d.status===403){localStorage.removeItem('saad_money_gh_pat');b.textContent='🔑 token problem — tap again';b.disabled=false;return;}
+  if(d.status!==204){b.textContent='✗ error '+d.status;b.disabled=false;return;}
+  var t0=Date.now();
+  var timer=setInterval(async function(){
+   var secs=Math.round((Date.now()-t0)/1000);
+   b.textContent='🤖 robot working… '+secs+'s';
+   if(secs>180){clearInterval(timer);b.textContent='⌛ slow — check Actions';b.disabled=false;return;}
+   try{
+    var j=await(await fetch(WF+'/runs?per_page=1&_='+Date.now(),{headers:H})).json();
+    var run=j.workflow_runs&&j.workflow_runs[0];
+    if(run&&run.id!==prev&&run.status==='completed'){
+     clearInterval(timer);
+     if(run.conclusion==='success'){
+      var nb=await freshBalance(t);
+      if(nb!=null)patch(nb);
+      b.textContent='✅ up to date';
+      b.disabled=false;
+      setTimeout(function(){location.reload()},60000);
+     }else{b.textContent='✗ robot failed — check Actions';b.disabled=false;}
+    }
+   }catch(e){}
+  },5000);
+ }catch(e){b.textContent='✗ no internet?';b.disabled=false;}
+};
+document.body.appendChild(b);
+})();
+</script>
