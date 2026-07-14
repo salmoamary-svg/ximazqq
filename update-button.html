@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saad Money — Update Now</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .balance-display {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .balance-label {
+            font-size: 12px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .balance-amount {
+            font-size: 36px;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .setup-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f0f4ff;
+            border-radius: 12px;
+            display: none;
+        }
+
+        .setup-section.show {
+            display: block;
+        }
+
+        .setup-section h3 {
+            font-size: 14px;
+            color: #667eea;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .setup-section p {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .setup-section a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .setup-section a:hover {
+            text-decoration: underline;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 13px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            background: white;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            flex: 1;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            flex: 1;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 13px;
+            display: none;
+            text-align: center;
+        }
+
+        .status.show {
+            display: block;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status.loading {
+            background: #e2e3e5;
+            color: #383d41;
+            border: 1px solid #d6d8db;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .help {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            font-size: 12px;
+            color: #999;
+            text-align: center;
+        }
+
+        .help a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .help a:hover {
+            text-decoration: underline;
+        }
+
+        .time-badge {
+            display: inline-block;
+            background: #e8f0ff;
+            color: #667eea;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💰 Saad Money</h1>
+            <p>One-Click App Update</p>
+        </div>
+
+        <div class="balance-display">
+            <div class="balance-label">Current Balance</div>
+            <div class="balance-amount" id="balance">—</div>
+            <div class="time-badge" id="lastUpdate" style="display:none;">Just now</div>
+        </div>
+
+        <div class="setup-section" id="setupSection">
+            <h3>⚙️ First Time Setup</h3>
+            <p>You need a GitHub Personal Access Token (PAT) to trigger instant updates.</p>
+            <p>
+                <strong>Get a token:</strong> <a href="https://github.com/settings/tokens?type=beta" target="_blank">Create new fine-grained PAT</a>
+            </p>
+            <p style="font-size: 11px; color: #999;">
+                Required permissions: <code>contents: read/write</code>, <code>actions: read/write</code> for repo <code>ximazqq</code> only. No expiration recommended.
+            </p>
+            <div class="input-group">
+                <label for="patInput">GitHub PAT:</label>
+                <input type="password" id="patInput" placeholder="ghp_..." />
+            </div>
+            <div class="button-group">
+                <button class="btn-secondary" onclick="clearSetup()">Clear</button>
+                <button class="btn-primary" onclick="savePAT()">Save Token</button>
+            </div>
+        </div>
+
+        <button class="btn-primary" id="updateBtn" onclick="triggerUpdate()">
+            ⚡ UPDATE APP NOW
+        </button>
+
+        <div class="status" id="status"></div>
+
+        <div class="help">
+            <p>🔒 Token stored locally. Never shared with servers.</p>
+            <p style="margin-top: 10px;">
+                <a href="#" onclick="showSetup(); return false;">Reset Token</a> • 
+                <a href="https://github.com/salmoamary-svg/ximazqq/actions" target="_blank">View Logs</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        const GITHUB_OWNER = 'salmoamary-svg';
+        const GITHUB_REPO = 'ximazqq';
+        const WORKFLOW_NAME = 'Update Saad Money';
+        const PAT_STORAGE_KEY = 'saad_money_gh_pat';
+        const BALANCE_STORAGE_KEY = 'saad_money_balance';
+        const LAST_UPDATE_STORAGE_KEY = 'saad_money_last_update';
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const pat = localStorage.getItem(PAT_STORAGE_KEY);
+            const patInput = document.getElementById('patInput');
+            const setupSection = document.getElementById('setupSection');
+            const updateBtn = document.getElementById('updateBtn');
+
+            if (pat) {
+                setupSection.classList.remove('show');
+                updateBtn.disabled = false;
+            } else {
+                setupSection.classList.add('show');
+                updateBtn.disabled = true;
+            }
+
+            // Restore stored balance
+            const storedBalance = localStorage.getItem(BALANCE_STORAGE_KEY);
+            const lastUpdate = localStorage.getItem(LAST_UPDATE_STORAGE_KEY);
+            
+            if (storedBalance) {
+                document.getElementById('balance').textContent = storedBalance;
+            }
+
+            if (lastUpdate) {
+                const updateTime = new Date(lastUpdate);
+                const now = new Date();
+                const diffSeconds = Math.floor((now - updateTime) / 1000);
+                
+                if (diffSeconds < 60) {
+                    document.getElementById('lastUpdate').textContent = 'Just now';
+                    document.getElementById('lastUpdate').style.display = 'inline-block';
+                } else if (diffSeconds < 3600) {
+                    const mins = Math.floor(diffSeconds / 60);
+                    document.getElementById('lastUpdate').textContent = `${mins}m ago`;
+                    document.getElementById('lastUpdate').style.display = 'inline-block';
+                }
+            }
+        });
+
+        function showSetup() {
+            document.getElementById('setupSection').classList.add('show');
+        }
+
+        function savePAT() {
+            const pat = document.getElementById('patInput').value.trim();
+            
+            if (!pat) {
+                showStatus('Please enter a PAT', 'error');
+                return;
+            }
+
+            localStorage.setItem(PAT_STORAGE_KEY, pat);
+            document.getElementById('setupSection').classList.remove('show');
+            document.getElementById('updateBtn').disabled = false;
+            showStatus('✅ Token saved! Ready to update.', 'success');
+        }
+
+        function clearSetup() {
+            localStorage.removeItem(PAT_STORAGE_KEY);
+            document.getElementById('patInput').value = '';
+            document.getElementById('updateBtn').disabled = true;
+            showStatus('Token cleared', 'error');
+        }
+
+        function showStatus(message, type) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status show ${type}`;
+        }
+
+        async function triggerUpdate() {
+            const pat = localStorage.getItem(PAT_STORAGE_KEY);
+            
+            if (!pat) {
+                showSetup();
+                return;
+            }
+
+            const btn = document.getElementById('updateBtn');
+            btn.disabled = true;
+
+            showStatus('⏳ Triggering update...', 'loading');
+
+            try {
+                // Get workflow ID
+                const workflowsResponse = await fetch(
+                    `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/actions/workflows`,
+                    {
+                        headers: {
+                            'Authorization': `token ${pat}`,
+                            'Accept': 'application/vnd.github.v3+json'
+                        }
+                    }
+                );
+
+                if (!workflowsResponse.ok) {
+                    throw new Error('Failed to fetch workflows. Check your token.');
+                }
+
+                const workflowsData = await workflowsResponse.json();
+                const workflow = workflowsData.workflows.find(w => w.name === WORKFLOW_NAME);
+
+                if (!workflow) {
+                    throw new Error(`Workflow "${WORKFLOW_NAME}" not found`);
+                }
+
+                // Trigger workflow
+                showStatus('⚡ Running robot...', 'loading');
+                const dispatchResponse = await fetch(
+                    `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/actions/workflows/${workflow.id}/dispatches`,
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `token ${pat}`,
+                            'Accept': 'application/vnd.github.v3+json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            ref: 'main'
+                        })
+                    }
+                );
+
+                if (!dispatchResponse.ok) {
+                    throw new Error(`Dispatch failed: ${dispatchResponse.statusText}`);
+                }
+
+                // Poll for job completion (with timeout)
+                let attempt = 0;
+                const maxAttempts = 40; // 20 seconds max
+                let jobComplete = false;
+
+                while (attempt < maxAttempts && !jobComplete) {
+                    await sleep(500);
+                    attempt++;
+
+                    const runsResponse = await fetch(
+                        `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/actions/workflows/${workflow.id}/runs?per_page=1`,
+                        {
+                            headers: {
+                                'Authorization': `token ${pat}`,
+                                'Accept': 'application/vnd.github.v3+json'
+                            }
+                        }
+                    );
+
+                    if (runsResponse.ok) {
+                        const runsData = await runsResponse.json();
+                        if (runsData.workflow_runs.length > 0) {
+                            const latestRun = runsData.workflow_runs[0];
+                            
+                            if (latestRun.status === 'completed') {
+                                jobComplete = true;
+                                if (latestRun.conclusion === 'success') {
+                                    // Store timestamp
+                                    localStorage.setItem(LAST_UPDATE_STORAGE_KEY, new Date().toISOString());
+                                    showStatus('✅ Update complete! App refreshed.', 'success');
+                                    setTimeout(() => location.reload(), 1500);
+                                } else {
+                                    showStatus(`⚠️ Job failed: ${latestRun.conclusion}. Check logs.`, 'error');
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (!jobComplete) {
+                    showStatus('⏳ Update running... (check GitHub Actions)', 'loading');
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                showStatus(`❌ ${error.message}`, 'error');
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+    </script>
+</body>
+</html>
