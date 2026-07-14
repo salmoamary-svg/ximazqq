@@ -9,18 +9,10 @@ Saad Money — Robot v2.3 (with all queued fixes)
 import os
 import re
 import json
-import base64
 from datetime import datetime, timedelta
-from google.auth.transport.requests import Request
-from google.oauth2.service_account import Credentials
-from google.auth.oauthlib.flow import InstalledAppFlow
-from google.cloud import secretmanager
 import imaplib
 import email
 from email.header import decode_header
- 
-# Gmail API scopes
-SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
  
 # Regex patterns
 AMOUNT_RX = r'([0-9]+(?:\.[0-9]+)?)\s*(?:SAR|ريال|SR)'
@@ -30,7 +22,7 @@ OTP_RX = r'(?:رمز التحقق|OTP|verification code|لا تشارك|do not s
 BALANCE_RX = r'("?balance"?\s*:\s*)([0-9]+(?:\.[0-9]+)?)'  # FIX #2: accept optional quotes
  
 def get_gmail_credentials():
-    """Get Gmail API credentials from environment secrets."""
+    """Get Gmail credentials from environment variables."""
     gmail_user = os.getenv('GMAIL_USER')
     gmail_app_password = os.getenv('GMAIL_APP_PASSWORD')
     
@@ -109,7 +101,7 @@ def process_emails(repo_path):
     search_since = (cursor_date - timedelta(days=1)).strftime('%d-%b-%Y')
     
     status, messages = imap.search(None, f'FROM saaddata96@gmail.com SINCE {search_since}')
-    msg_ids = messages[0].split()
+    msg_ids = messages[0].split() if messages[0] else []
     
     processed_count = 0
     for msg_id in msg_ids:
@@ -163,35 +155,40 @@ def process_emails(repo_path):
         st['last_data_msgid'] = msg_id_str
         processed_count += 1
     
+    imap.close()
+    imap.logout()
+    
     # Cap processed list to 500
     if len(st['processed']) > 500:
         st['processed'] = st['processed'][-500:]
     
-    imap.close()
-    imap.logout()
-    
     # FIX #2: Check for SAADMONEY-DATA override
-    status, override_msgs = imap.search(None, 'SUBJECT "SAADMONEY-DATA"')
-    if override_msgs[0]:
+    try:
         imap = connect_imap()
         imap.select("All Mail")
-        status, msg_data = imap.fetch(override_msgs[0].split()[-1], '(RFC822)')
-        msg = email.message_from_bytes(msg_data[0][1])
-        text = body_text(msg)
+        status, override_msgs = imap.search(None, 'SUBJECT "SAADMONEY-DATA"')
         
-        # Parse JSON override
-        try:
-            json_match = re.search(r'\{.*\}', text, re.DOTALL)
-            if json_match:
-                obj = json.loads(json_match.group())
-                if 'balance' in obj:
-                    st['balance'] = obj['balance']
-                    print(f"[OVERRIDE] Balance set to {st['balance']} from SAADMONEY-DATA")
-        except Exception as e:
-            print(f"[OVERRIDE ERROR] {e}")
+        if override_msgs[0]:
+            msg_id = override_msgs[0].split()[-1]
+            status, msg_data = imap.fetch(msg_id, '(RFC822)')
+            msg = email.message_from_bytes(msg_data[0][1])
+            text = body_text(msg)
+            
+            # Parse JSON override
+            try:
+                json_match = re.search(r'\{.*\}', text, re.DOTALL)
+                if json_match:
+                    obj = json.loads(json_match.group())
+                    if 'balance' in obj:
+                        st['balance'] = obj['balance']
+                        print(f"[OVERRIDE] Balance set to {st['balance']} from SAADMONEY-DATA")
+            except Exception as e:
+                print(f"[OVERRIDE ERROR] {e}")
         
         imap.close()
         imap.logout()
+    except Exception as e:
+        print(f"[OVERRIDE SEARCH ERROR] {e}")
     
     return st, processed_count
  
