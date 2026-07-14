@@ -21,6 +21,8 @@ STATE = "data/state.json"
 AR = str.maketrans("٠١٢٣٤٥٦٧٨٩", "0123456789")
 AMOUNT_RX = re.compile(r"([\d٠-٩][\d٠-٩,]*(?:\.[\d٠-٩]{1,2})?)\s*(?:SAR|ريال|ر\.س)", re.I)
 CREDIT_RX = re.compile(r"وارد|راتب|إيداع|ايداع|مسترد|استرداد|refund|salary|deposit|credited|incoming", re.I)
+OTP_RX = re.compile(r"رمز التحقق|لا تشارك|one.?time|OTP|verification", re.I)
+AMOUNT_AFTER_RX = re.compile(r"(?:SAR|ريال)\s*([\d٠-٩][\d٠-٩,]*(?:\.[\d٠-٩]{1,2})?)")
 
 def log(*a): print("[saadmoney]", *a, flush=True)
 
@@ -87,13 +89,22 @@ def main():
         if d <= cursor:
             continue
         text = body_text(msg)
-        m = AMOUNT_RX.search(text)
-        if not m:
+        if OTP_RX.search(text):
             st["processed"].append(mid)
             changed = True
-            log(f"skipped (no amount) email dated {d:%Y-%m-%d %H:%M}")
+            log(f"skipped OTP email dated {d:%Y-%m-%d %H:%M}")
             continue
-        amt = float(m.group(1).translate(AR).replace(",", ""))
+        m = AMOUNT_RX.search(text)
+        if m:
+            amt = float(m.group(1).translate(AR).replace(",", ""))
+        else:
+            parts = AMOUNT_AFTER_RX.findall(text)
+            if not parts:
+                st["processed"].append(mid)
+                changed = True
+                log(f"skipped (no amount) email dated {d:%Y-%m-%d %H:%M}")
+                continue
+            amt = sum(float(p.translate(AR).replace(",", "")) for p in parts)
         sign = 1 if CREDIT_RX.search(text) else -1
         txns.append((d, sign * amt, mid))
 
