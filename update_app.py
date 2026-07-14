@@ -118,7 +118,7 @@ def main():
         log(f"{delta:+.2f} on {d:%Y-%m-%d %H:%M} -> balance {balance:.2f}")
 
     if txns:
-        html2 = re.sub(r"(balance\s*:\s*)[\d_.,]+", rf"\g<1>{balance:.2f}", html, count=1)
+        html2 = re.sub(r"(balance\s*:\s*)[0-9]+(?:\.[0-9]+)?", rf"\g<1>{balance:.2f}", html, count=1)
         html2 = re.sub(r'(asOf\s*:\s*")[^"]*(")', rf"\g<1>{today}\g<2>", html2, count=1)
         html = html2
     st["balance"] = round(balance, 2)
