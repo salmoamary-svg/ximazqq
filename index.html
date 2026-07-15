@@ -121,7 +121,7 @@ padding:10px 16px;font-size:14px;font-weight:700;box-shadow:0 4px 14px rgba(0,0,
     <div class="wk-t">THIS WEEK'S MONEY</div>
     <div class="wk-n" id="wk-amt">—</div>
     <div class="wk-s" id="wk-status"></div>
-    <div class="note">(balance − 200 cushion − unpaid commitments) ÷ weeks to payday. Tick commitments as you pay them and this updates.</div>
+    <div class="note">(balance − 200 cushion) ÷ weeks left until payday. Moves as your balance changes.</div>
   </div>
  
   <div class="card">
@@ -242,7 +242,7 @@ function render(){
  const days=Math.max(1,Math.ceil((pd-now)/86400000));
  const weeksLeft=Math.max(1,days/7);
  const unpaid=commits.filter(c=>!c.paid&&c.id!=='living').reduce((a,c)=>a+Number(c.amount),0);
- const avail=Math.max(0,bal-cushion-unpaid);
+ const avail=Math.max(0,bal-cushion);
  const weekly=avail/weeksLeft, daily=avail/days;
  
  document.getElementById('mo').textContent=now.toLocaleDateString('en-US',{month:'long',year:'numeric'});
