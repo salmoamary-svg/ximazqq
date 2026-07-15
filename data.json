@@ -1,0 +1,257 @@
+{
+ "asOf": "2026-07-15 04:30 AM",
+ "balance": 1198.21,
+ "salary": 27932,
+ "cushion": 200,
+ "cycleStart": "2026-06-28",
+ "cursor": "2026-07-15T00:00:00Z",
+ "processed": [],
+ "last_data_msgid": null,
+ "commitments": [
+  {
+   "id": "loan",
+   "name": "Bank loan (auto)",
+   "amount": 7027,
+   "paid": false,
+   "grp": "commit"
+  },
+  {
+   "id": "phone",
+   "name": "Phone / telecom",
+   "amount": 1720,
+   "paid": false,
+   "grp": "commit"
+  },
+  {
+   "id": "maid",
+   "name": "Housemaid (Musaned)",
+   "amount": 1500,
+   "paid": false,
+   "grp": "commit"
+  },
+  {
+   "id": "groc",
+   "name": "Groceries → wife",
+   "amount": 1000,
+   "paid": false,
+   "grp": "commit"
+  },
+  {
+   "id": "elec",
+   "name": "Electricity",
+   "amount": 500,
+   "paid": false,
+   "grp": "commit"
+  },
+  {
+   "id": "subs",
+   "name": "Subscriptions",
+   "amount": 1028,
+   "paid": false,
+   "grp": "commit"
+  },
+  {
+   "id": "carins",
+   "name": "Car-insurance fund",
+   "amount": 310,
+   "paid": false,
+   "grp": "commit"
+  },
+  {
+   "id": "sisE",
+   "name": "Sister E. payoff",
+   "amount": 4000,
+   "paid": false,
+   "star": true,
+   "grp": "future"
+  },
+  {
+   "id": "sisA",
+   "name": "Sister A.",
+   "amount": 1000,
+   "paid": false,
+   "grp": "future"
+  },
+  {
+   "id": "cc",
+   "name": "Credit-card paydown",
+   "amount": 1500,
+   "paid": false,
+   "grp": "future"
+  },
+  {
+   "id": "buffer",
+   "name": "Emergency buffer",
+   "amount": 2000,
+   "paid": false,
+   "star": true,
+   "grp": "future"
+  },
+  {
+   "id": "living",
+   "name": "Living (weekly envelope)",
+   "amount": 6347,
+   "paid": false,
+   "noreset": false,
+   "grp": "living"
+  }
+ ],
+ "debts": [
+  {
+   "id": "loan",
+   "name": "Bank loan (Tawarruq)",
+   "total": 330000,
+   "remaining": 290801
+  },
+  {
+   "id": "sisE",
+   "name": "Sister E.",
+   "total": 30030,
+   "remaining": 30030
+  },
+  {
+   "id": "sisA",
+   "name": "Sister A.",
+   "total": 50000,
+   "remaining": 24800
+  },
+  {
+   "id": "cc",
+   "name": "Credit card",
+   "total": 20000,
+   "remaining": 20000
+  },
+  {
+   "id": "bnpl",
+   "name": "BNPL",
+   "total": 4000,
+   "remaining": 4000
+  },
+  {
+   "id": "apt",
+   "name": "Apartment (father) — long-term",
+   "total": 1400000,
+   "remaining": 1400000,
+   "longterm": true
+  }
+ ],
+ "goals": [
+  {
+   "id": "buffer",
+   "name": "Emergency buffer (1 month)",
+   "cur": 0,
+   "tgt": 28000,
+   "col": "#34d399",
+   "sub": "Ends the payday panic"
+  },
+  {
+   "id": "sisE",
+   "name": "Clear Sister E.",
+   "cur": 0,
+   "tgt": 30030,
+   "col": "#fbbf24",
+   "sub": "Priority · ~7–8 months at 4,000/mo"
+  },
+  {
+   "id": "cc",
+   "name": "Clear credit card",
+   "cur": 0,
+   "tgt": 20000,
+   "col": "#f87171",
+   "sub": "After E."
+  },
+  {
+   "id": "under",
+   "name": "Spend under salary this cycle",
+   "cur": 0,
+   "tgt": 27932,
+   "col": "#2dd4bf",
+   "sub": "Stay below 27,932"
+  }
+ ],
+ "spendCats": {},
+ "lastCycleCats": {},
+ "catMeta": [
+  [
+   "everyday",
+   "Everyday: food, coffee, groceries",
+   "#e9a23b"
+  ],
+  [
+   "stc",
+   "→ STC (subs, housemaid, transfers)",
+   "#e07a5f"
+  ],
+  [
+   "loan",
+   "Bank loan",
+   "#3d5a80"
+  ],
+  [
+   "family",
+   "Family transfers",
+   "#5e81ac"
+  ],
+  [
+   "shopping",
+   "Shopping",
+   "#a78bfa"
+  ],
+  [
+   "cc",
+   "Credit-card settlement",
+   "#b56576"
+  ],
+  [
+   "phone",
+   "Phone/telecom",
+   "#6fb1a0"
+  ],
+  [
+   "travel",
+   "Travel",
+   "#7c9cbf"
+  ],
+  [
+   "bnpl",
+   "BNPL",
+   "#c9455b"
+  ],
+  [
+   "carins",
+   "Car insurance",
+   "#a3a380"
+  ],
+  [
+   "bills",
+   "Bills",
+   "#8d99ae"
+  ]
+ ],
+ "subs": [
+  [
+   "Claude (Max)",
+   500
+  ],
+  [
+   "GymNation",
+   209
+  ],
+  [
+   "Apple/iTunes",
+   192
+  ],
+  [
+   "Netflix",
+   72
+  ],
+  [
+   "Xbox",
+   31
+  ],
+  [
+   "Spotify",
+   24
+  ]
+ ]
+}
