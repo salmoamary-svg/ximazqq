@@ -86,6 +86,18 @@ align-items:center;justify-content:center;gap:18px}
 .pad button{height:64px;border-radius:50%;border:1px solid var(--line);background:var(--card);
 color:var(--ink);font-size:22px;font-weight:600}
 .pad button:active{background:#22374d}
+.wk-cmp{margin:8px 0}
+.wk-cmp .wk-cat{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;margin-bottom:2px;gap:8px}
+.wk-cmp .wk-cat .d-up{color:var(--red);font-weight:650}
+.wk-cmp .wk-cat .d-down{color:var(--green);font-weight:650}
+.tl-day{margin:10px 0}
+.tl-day .tl-date{font-size:12px;color:var(--sub);font-weight:650;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px}
+.tl-row{display:flex;justify-content:space-between;font-size:13.5px;padding:5px 2px;border-bottom:1px solid var(--line)}
+.tl-row .tl-cat{color:var(--sub)}
+.mcmp{display:flex;gap:10px;margin-top:10px}
+.mcmp .mc{flex:1;background:#0f1c2a;border:1px solid var(--line);border-radius:12px;padding:10px;text-align:center}
+.mcmp .mc .n{font-size:17px;font-weight:750}.mcmp .mc .t{font-size:11px;color:var(--sub);margin-top:1px}
+.trend{font-size:13px;font-weight:700;margin-top:8px;text-align:center}
 #robotBtn{position:fixed;right:14px;bottom:calc(96px + env(safe-area-inset-bottom));z-index:9999;
 background:linear-gradient(135deg,#2dd4bf,#1f9e8f);color:#062a26;border:none;border-radius:22px;
 padding:10px 16px;font-size:14px;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.4)}
@@ -140,7 +152,9 @@ padding:10px 16px;font-size:14px;font-weight:700;box-shadow:0 4px 14px rgba(0,0,
 </div></div>
  
 <div class="view" id="v-spend"><div class="wrap">
-  <div class="card"><div class="sec-title">Where money goes — this cycle</div><div id="cats"></div></div>
+  <div class="card"><div class="sec-title">This week vs last week</div><div id="weekcmp"></div></div>
+<div class="card"><div class="sec-title">Daily spending — last 14 days</div><div id="daytl"></div></div>
+<div class="card"><div class="sec-title">Where money goes — this cycle</div><div id="cats"></div></div>
   <div class="card"><div class="sec-title">Active subscriptions</div><table class="tbl" id="subs"></table></div>
 </div></div>
  
@@ -168,6 +182,8 @@ padding:10px 16px;font-size:14px;font-weight:700;box-shadow:0 4px 14px rgba(0,0,
     <div class="rowline"><div class="nm">This week's money</div><div class="amt" id="m-wk"></div></div>
     <div class="rowline"><div class="nm">Spent this cycle</div><div class="amt" id="m-spent"></div></div>
     <div class="rowline"><div class="nm">Biggest leak</div><div class="amt" style="color:var(--amber)" id="m-leak"></div></div>
+<div class="mcmp"><div class="mc"><div class="n" id="m-this">—</div><div class="t">This cycle spent</div></div><div class="mc"><div class="n" id="m-last">—</div><div class="t">Last cycle spent</div></div></div>
+<div class="trend" id="m-trend"></div>
     <div class="note">For the full written review: open Claude → project "Saad Finance" → say <b>"how was my stand this month?"</b></div>
   </div>
 </div></div>
@@ -274,11 +290,13 @@ function render(){
  document.getElementById('commits').innerHTML=commits.map(c=>{
    const shown=c.paid?(c.actual!=null?c.actual:c.amount):c.amount;
    const hint=(c.paid&&c.actual!=null&&Number(c.actual)!==Number(c.amount))?` <span style="color:var(--sub);font-weight:400">· plan ${f(c.amount)}</span>`:'';
-   return `<div class="crow ${c.paid?'paid':''}">
+   return `<div class="crow ${c.paid?'paid':''}" style="flex-wrap:wrap;border-bottom:none;margin-bottom:2px">
      <span class="ck ${c.paid?'on':''}" onclick="toggleCommit('${c.id}')">${c.paid?'✓':''}</span>
      <span class="cn" onclick="toggleCommit('${c.id}')">${c.star?'⭐ ':''}${c.name}${hint}</span>
-     <span class="ca" onclick="toggleCommit('${c.id}')">${f(shown)}</span>
-     <span class="pen" onclick="editCommit('${c.id}')">✏️</span></div>`;}).join('')
+     <span class="ca" onclick="toggleCommit('${c.id}')">${f(shown)} / ${f(c.amount)}</span>
+     <span class="pen" onclick="editCommit('${c.id}')">✏️</span>
+<div style="flex-basis:100%;padding-left:33px"><div class="bar" style="margin-top:2px"><i style="width:${c.paid?100:0}%;background:${c.paid?'var(--green)':'var(--line)'}"></i></div></div>
+</div>`;}).join('')
   +`<div class="addrow" onclick="addCommit()">＋ Add commitment</div>`;
  document.getElementById('setupline').textContent='Salary '+f(salary)+' · cushion '+f(cushion)+' — tap to edit';
  
@@ -326,8 +344,57 @@ function render(){
  document.getElementById('m-wk').textContent=f(weekly);
  document.getElementById('m-spent').textContent=f(spent);
  document.getElementById('m-leak').textContent=leak;
+const thisTotal=spent, lastTotal=Object.values(DATA.lastCycleCats||{}).reduce((a,v)=>a+Number(v),0);
+document.getElementById('m-this').textContent=f(thisTotal)+' SAR';
+document.getElementById('m-last').textContent=f(lastTotal)+' SAR';
+const mt=document.getElementById('m-trend');
+if(lastTotal>0){const diff=thisTotal-lastTotal,pct=Math.abs(Math.round(diff/lastTotal*100));
+if(diff<0){mt.textContent='↓ '+pct+'% less than last cycle so far';mt.style.color='var(--green)';}
+else if(diff>0){mt.textContent='↑ '+pct+'% more than last cycle so far';mt.style.color='var(--red)';}
+else{mt.textContent='Same as last cycle so far';mt.style.color='var(--sub)';}}
+else{mt.textContent='';}
+renderWeekly();renderDaily();
 }
  
+function catLabel(id){const m=(DATA.catMeta||[]).find(x=>x[0]===id);return m?m[1]:id;}
+function renderWeekly(){
+const el=document.getElementById('weekcmp');if(!el)return;
+const tx=DATA.transactions||[];
+if(tx.length===0){el.innerHTML='<div class="note">No day-by-day data yet — this fills in as new transactions are logged from today onward.</div>';return;}
+const now=new Date(),day=86400000;
+const startThis=now.getTime()-7*day,startLast=now.getTime()-14*day;
+const thisWk={},lastWk={};
+tx.forEach(([iso,cat,amt])=>{const t=new Date(iso).getTime();
+if(t>=startThis)thisWk[cat]=(thisWk[cat]||0)+Number(amt);
+else if(t>=startLast)lastWk[cat]=(lastWk[cat]||0)+Number(amt);});
+const cats=Array.from(new Set([...Object.keys(thisWk),...Object.keys(lastWk)]));
+if(cats.length===0){el.innerHTML='<div class="note">No spending logged in the last 14 days yet.</div>';return;}
+cats.sort((a,b)=>(thisWk[b]||0)-(thisWk[a]||0));
+el.innerHTML=cats.map(c=>{
+const a=thisWk[c]||0,b=lastWk[c]||0,diff=a-b;
+const arrow=diff>0?`<span class="d-up">↑ ${f(Math.abs(diff))}</span>`:diff<0?`<span class="d-down">↓ ${f(Math.abs(diff))}</span>`:'<span>–</span>';
+return `<div class="wk-cmp"><div class="wk-cat"><div>${catLabel(c)}</div><div>${f(a)} <span style="color:var(--sub)">(was ${f(b)})</span> ${arrow}</div></div></div>`;
+}).join('');
+const totThis=Object.values(thisWk).reduce((a,v)=>a+v,0),totLast=Object.values(lastWk).reduce((a,v)=>a+v,0);
+el.innerHTML+=`<div class="rowline tot" style="margin-top:8px;border-top:2px solid var(--line);padding-top:8px"><div class="nm"><b>Total</b></div><div class="amt">${f(totThis)} <span style="color:var(--sub);font-weight:500">(was ${f(totLast)})</span></div></div>`;
+}
+function renderDaily(){
+const el=document.getElementById('daytl');if(!el)return;
+const tx=DATA.transactions||[];
+if(tx.length===0){el.innerHTML='<div class="note">No transaction-level data yet — this list starts filling in as new transactions are logged from today onward.</div>';return;}
+const now=new Date(),cutoff=now.getTime()-14*86400000;
+const byDay={};
+tx.forEach(([iso,cat,amt])=>{const t=new Date(iso);if(t.getTime()<cutoff)return;const key=isoDate(t);
+byDay[key]=byDay[key]||[];byDay[key].push([cat,Number(amt)]);});
+const days=Object.keys(byDay).sort().reverse();
+if(days.length===0){el.innerHTML='<div class="note">No spending logged in the last 14 days yet.</div>';return;}
+el.innerHTML=days.map(dstr=>{
+const items=byDay[dstr],tot=items.reduce((a,[,v])=>a+v,0);
+const dlabel=new Date(dstr+'T12:00:00').toLocaleDateString('en-US',{weekday:'short',day:'numeric',month:'short'});
+const rows=items.map(([c,v])=>`<div class="tl-row"><div class="tl-cat">${catLabel(c)}</div><div>${f(v)}</div></div>`).join('');
+return `<div class="tl-day"><div class="tl-date">${dlabel} · ${f(tot)} SAR</div>${rows}</div>`;
+}).join('');
+}
 function uid(p){return p+Math.random().toString(36).slice(2,7);}
 function num(x){return parseFloat(String(x).replace(/,/g,''));}
  
