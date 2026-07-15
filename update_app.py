@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -131,7 +130,7 @@ def main():
     pay=latest_payday(today).isoformat()
     if d.get("cycleStart") != pay:
         d["lastCycleCats"]=dict(d.get("spendCats",{}))
-        for c in d["commitments"]: c["paid"]=False
+        for c in d["commitments"]: c["paid"]=False; c.pop("actual",None)
         d["spendCats"]={}
         g=find(d["goals"],"id","under")
         if g: g["cur"]=0
@@ -182,12 +181,12 @@ def main():
             # auto-attribution (conservative)
             if cat=="cc":
                 cm=find(d["commitments"],"id","cc")
-                if cm: cm["paid"]=True
+                if cm: cm["paid"]=True; cm["actual"]=amt
                 db=find(d["debts"],"id","cc")
                 if db: db["remaining"]=max(0,round(db["remaining"]-amt,2))
             if cat=="phone":
                 cm=find(d["commitments"],"id","phone")
-                if cm: cm["paid"]=True
+                if cm: cm["paid"]=True; cm["actual"]=amt
             log("-%.2f [%s] -> %.2f" % (amt,cat,balance))
  
         d["processed"].append(mid)
