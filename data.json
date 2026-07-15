@@ -19,7 +19,7 @@
    "id": "phone",
    "name": "Phone / telecom",
    "amount": 1720,
-   "paid": false,
+   "paid": true,
    "grp": "commit"
   },
   {
