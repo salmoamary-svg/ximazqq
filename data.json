@@ -40,7 +40,7 @@
    "id": "elec",
    "name": "Electricity",
    "amount": 500,
-   "paid": false,
+   "paid": true,
    "grp": "commit"
   },
   {
