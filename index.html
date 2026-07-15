@@ -208,19 +208,26 @@ async function loadData(){
 async function saveData(mut){
  let t=token();if(!t){t=prompt('Paste your GitHub token to save changes');if(!t)return;t=t.trim();localStorage.setItem(TKEY,t);}
  const h={'Authorization':'Bearer '+t,'Accept':'application/vnd.github+json'};
- try{
-  const g=await fetch(API+'/contents/data.json?ref=main&_='+Date.now(),{headers:h});
-  if(g.status===401||g.status===403){localStorage.removeItem(TKEY);alert('Token problem — tap again to re-enter.');return;}
-  if(!g.ok){alert('Save failed (read '+g.status+')');return;}
-  const gj=await g.json();
-  const cur=JSON.parse(decodeURIComponent(escape(atob(gj.content.replace(/\s/g,'')))));
-  mut(cur);cur.asOf=riyadhStamp();
-  const enc=btoa(unescape(encodeURIComponent(JSON.stringify(cur,null,1))));
-  const p=await fetch(API+'/contents/data.json',{method:'PUT',headers:h,
-   body:JSON.stringify({message:'app edit '+cur.asOf,content:enc,sha:gj.sha,branch:'main'})});
-  if(p.ok){DATA=cur;render();}
-  else{alert('Save failed '+p.status);}
- }catch(e){alert('Save error: '+e.message);}
+ // Try up to 5 times. On a 409/422 conflict (robot wrote at the same moment),
+ // silently re-fetch the freshest file, re-apply this change, and resend.
+ for(let attempt=0;attempt<5;attempt++){
+  try{
+   const g=await fetch(API+'/contents/data.json?ref=main&_='+Date.now(),{headers:h});
+   if(g.status===401||g.status===403){localStorage.removeItem(TKEY);alert('Token problem — tap again to re-enter.');return;}
+   if(!g.ok){alert('Save failed (read '+g.status+')');return;}
+   const gj=await g.json();
+   const cur=JSON.parse(decodeURIComponent(escape(atob(gj.content.replace(/\s/g,'')))));
+   mut(cur);cur.asOf=riyadhStamp();
+   const enc=btoa(unescape(encodeURIComponent(JSON.stringify(cur,null,1))));
+   const p=await fetch(API+'/contents/data.json',{method:'PUT',headers:h,
+    body:JSON.stringify({message:'app edit '+cur.asOf,content:enc,sha:gj.sha,branch:'main'})});
+   if(p.ok){DATA=cur;render();return;}
+   if(p.status===409||p.status===422){await new Promise(r=>setTimeout(r,400));continue;} // conflict — retry
+   if(p.status===401||p.status===403){localStorage.removeItem(TKEY);alert('Token problem — tap again to re-enter.');return;}
+   alert('Save failed '+p.status);return;
+  }catch(e){if(attempt===4){alert('Save error: '+e.message);return;}await new Promise(r=>setTimeout(r,400));}
+ }
+ alert('The robot was busy saving — please tap once more.');
 }
  
 function render(){
