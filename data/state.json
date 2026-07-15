@@ -1,13 +1,15 @@
 {
- "balance": 1085.71,
- "cursor": "2026-07-15T04:56:08Z",
+ "balance": 1190.34,
+ "cursor": "2026-07-15T06:11:20Z",
  "processed": [
   "19f608fdeb7e975c",
   "19f5f316076ffc28",
   "<39306B9C-4C51-4F9F-B84B-F75A3183F6A7@gmail.com>",
   "<31314BA7-19A5-4FA8-AFA5-71DE9AB4D7E6@gmail.com>",
   "<10BC028F-6534-4DE2-9CD3-B532741E3E69@gmail.com>",
-  "<2DC306D6-6CA2-4CB0-9C27-C5ECFE45BBB9@gmail.com>"
+  "<2DC306D6-6CA2-4CB0-9C27-C5ECFE45BBB9@gmail.com>",
+  "<F426FD56-F93A-48AE-950E-611323195261@gmail.com>",
+  "<6E30D814-87E1-4833-AEF7-20D9CA83E6A5@gmail.com>"
  ],
  "last_data_msgid": null
 }
