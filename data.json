@@ -12,7 +12,7 @@
    "id": "loan",
    "name": "Bank loan (auto)",
    "amount": 7027,
-   "paid": true,
+   "paid": false,
    "grp": "commit"
   },
   {
