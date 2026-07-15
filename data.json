@@ -61,7 +61,7 @@
    "id": "sisE",
    "name": "Sister E. payoff",
    "amount": 4000,
-   "paid": false,
+   "paid": true,
    "star": true,
    "grp": "future"
   },
