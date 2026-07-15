@@ -56,6 +56,8 @@ align-items:center;justify-content:center;font-size:13px;color:#062a26;flex:0 0 
 .drow .dn{font-size:14px}.drow .dr{font-variant-numeric:tabular-nums;font-weight:750;font-size:15px}
 .drow .ds{font-size:11px;color:var(--sub);margin-top:2px}
 .edit{font-size:11px;color:var(--teal);font-weight:600}
+.addrow{color:var(--teal);font-size:13px;font-weight:650;padding:12px 2px 2px;text-align:center;cursor:pointer}
+.pen{font-size:13px;margin-left:8px;opacity:.7;cursor:pointer;flex:0 0 auto}
 .nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:520px;
 background:rgba(15,24,36,.94);backdrop-filter:blur(12px);border-top:1px solid var(--line);
 display:flex;justify-content:space-around;padding:8px 4px calc(8px + env(safe-area-inset-bottom))}
@@ -128,6 +130,7 @@ padding:10px 16px;font-size:14px;font-weight:700;box-shadow:0 4px 14px rgba(0,0,
     <div class="sec-title">The 47 / 30 / 23 split (payday)</div>
     <div id="splitbars"></div>
     <div class="note" id="paidnote"></div>
+    <div class="note" id="setupline" style="cursor:pointer"></div>
   </div>
  
   <div class="card">
@@ -264,15 +267,20 @@ function render(){
  const bars=[['🏠 Commitments',grp.commit,'var(--violet)'],['🚀 Future You (debts + buffer)',grp.future,'var(--teal)'],['😊 Living (yours)',grp.living,'var(--amber)']];
  document.getElementById('splitbars').innerHTML=bars.map(([n,v,c])=>
   `<div class="rowline"><div class="nm">${n}</div><div class="amt">${f(v)}</div></div><div class="bar"><i style="width:${Math.min(100,v/salary*100)}%;background:${c}"></i></div>`).join('');
- const paid=commits.filter(c=>c.paid).reduce((a,c)=>a+Number(c.amount),0);
+ const paid=commits.filter(c=>c.paid).reduce((a,c)=>a+Number(c.actual!=null?c.actual:c.amount),0);
  document.getElementById('paidnote').textContent='Paid so far this cycle: '+f(paid)+' of '+f(salary)+' SAR.';
  
- // commitments (tap to toggle)
- document.getElementById('commits').innerHTML=commits.map(c=>
-  `<div class="crow ${c.paid?'paid':''}" onclick="toggleCommit('${c.id}')">
-     <span class="ck ${c.paid?'on':''}">${c.paid?'✓':''}</span>
-     <span class="cn">${c.star?'⭐ ':''}${c.name}</span>
-     <span class="ca">${f(c.amount)}</span></div>`).join('');
+ // commitments (tap row to mark paid + enter actual, pencil to edit plan, + to add)
+ document.getElementById('commits').innerHTML=commits.map(c=>{
+   const shown=c.paid?(c.actual!=null?c.actual:c.amount):c.amount;
+   const hint=(c.paid&&c.actual!=null&&Number(c.actual)!==Number(c.amount))?` <span style="color:var(--sub);font-weight:400">· plan ${f(c.amount)}</span>`:'';
+   return `<div class="crow ${c.paid?'paid':''}">
+     <span class="ck ${c.paid?'on':''}" onclick="toggleCommit('${c.id}')">${c.paid?'✓':''}</span>
+     <span class="cn" onclick="toggleCommit('${c.id}')">${c.star?'⭐ ':''}${c.name}${hint}</span>
+     <span class="ca" onclick="toggleCommit('${c.id}')">${f(shown)}</span>
+     <span class="pen" onclick="editCommit('${c.id}')">✏️</span></div>`;}).join('')
+  +`<div class="addrow" onclick="addCommit()">＋ Add commitment</div>`;
+ document.getElementById('setupline').textContent='Salary '+f(salary)+' · cushion '+f(cushion)+' — tap to edit';
  
  // spend cats (this cycle)
  const meta=DATA.catMeta||[];
@@ -283,7 +291,8 @@ function render(){
    `<div class="rowline" style="flex-wrap:wrap"><div class="nm">${n}</div><div class="amt">${f(v)}</div>
     <div style="flex-basis:100%"><div class="bar"><i style="width:${Math.max(4,v/cmax*100)}%;background:${c}"></i></div></div></div>`).join('');}
  
- let s2='';(DATA.subs||[]).forEach(([n,v])=>s2+=`<tr><td>${n}</td><td>${f(v)}</td></tr>`);
+ let s2=(DATA.subs||[]).map((row,i)=>`<tr onclick="editSub(${i})"><td>${row[0]}</td><td>${f(row[1])}</td></tr>`).join('');
+ s2+=`<tr><td colspan="2" onclick="addSub()" style="color:var(--teal);font-weight:650;text-align:center;border-bottom:none">＋ Add subscription</td></tr>`;
  s2+=`<tr class="tot"><td>Active / month</td><td>${f((DATA.subs||[]).reduce((a,[,v])=>a+v,0))}</td></tr>`;
  document.getElementById('subs').innerHTML=s2;
  
@@ -297,6 +306,7 @@ function render(){
     <div class="ds">${f(total-rem)} paid of ${f(total)} · <span class="edit">tap to update</span></div></div>`;}).join('');
  const cons=(DATA.debts||[]).filter(d=>!d.longterm).reduce((a,d)=>a+Number(d.remaining),0);
  document.getElementById('debts').innerHTML+=`<div class="rowline tot" style="margin-top:10px;border-top:2px solid var(--line);padding-top:10px"><div class="nm"><b>Consumer debt left</b></div><div class="amt">${f(cons)}</div></div>`;
+ document.getElementById('debts').innerHTML+=`<div class="addrow" onclick="addDebt()">＋ Add debt</div>`;
  
  // goals (tap to edit)
  document.getElementById('goals').innerHTML=(DATA.goals||[]).map(g=>{
@@ -304,7 +314,8 @@ function render(){
   return `<div class="goal" onclick="editGoal('${g.id}')"><div class="g-top"><div class="g-nm">${g.name}</div>
    <div class="g-pct" style="color:${g.col}">${p}%</div></div>
    <div class="bar"><i style="width:${p}%;background:${g.col}"></i></div>
-   <div class="g-sub">${f(g.cur)} / ${f(g.tgt)} SAR — ${g.sub} · <span class="edit">tap to edit</span></div></div>`;}).join('');
+   <div class="g-sub">${f(g.cur)} / ${f(g.tgt)} SAR — ${g.sub} · <span class="edit">tap to edit</span></div></div>`;}).join('')
+  +`<div class="addrow" onclick="addGoal()">＋ Add goal</div>`;
  
  // month
  const spent=Object.values(cats).reduce((a,v)=>a+Number(v),0);
@@ -317,25 +328,97 @@ function render(){
  document.getElementById('m-leak').textContent=leak;
 }
  
-function toggleCommit(id){saveData(cur=>{const c=(cur.commitments||[]).find(x=>x.id===id);if(c)c.paid=!c.paid;});}
+function uid(p){return p+Math.random().toString(36).slice(2,7);}
+function num(x){return parseFloat(String(x).replace(/,/g,''));}
+ 
+function toggleCommit(id){
+ const c=(DATA.commitments||[]).find(x=>x.id===id);if(!c)return;
+ if(c.paid){ // already paid -> untick and clear the actual
+  saveData(cur=>{const x=cur.commitments.find(y=>y.id===id);if(x){x.paid=false;delete x.actual;}});
+  return;
+ }
+ const a=prompt('How much did you actually pay for "'+c.name+'"?  (plan is '+f(c.amount)+')',c.amount);
+ if(a===null)return; // cancelled -> leave unpaid
+ const an=num(a);if(isNaN(an)){alert('Numbers only');return;}
+ saveData(cur=>{const x=cur.commitments.find(y=>y.id===id);if(x){x.paid=true;x.actual=an;}});
+}
+ 
+function editCommit(id){
+ const c=(DATA.commitments||[]).find(x=>x.id===id);if(!c)return;
+ const nm=prompt('Name  (clear the box + OK to DELETE this item):',c.name);if(nm===null)return;
+ if(nm.trim()===''){if(confirm('Delete "'+c.name+'"?'))saveData(cur=>{cur.commitments=cur.commitments.filter(y=>y.id!==id);});return;}
+ const am=prompt('Monthly amount (SAR):',c.amount);if(am===null)return;
+ const an=num(am);if(isNaN(an)){alert('Numbers only');return;}
+ saveData(cur=>{const x=cur.commitments.find(y=>y.id===id);if(x){x.name=nm;x.amount=an;}});
+}
+function addCommit(){
+ const nm=prompt('New commitment name:');if(!nm)return;
+ const am=prompt('Monthly amount (SAR):');if(am===null)return;
+ const an=num(am);if(isNaN(an)){alert('Numbers only');return;}
+ let grp=prompt('Group?  type one:  commit  /  future  /  living','commit');if(grp===null)return;
+ grp=grp.trim().toLowerCase();if(!['commit','future','living'].includes(grp))grp='commit';
+ saveData(cur=>{cur.commitments=cur.commitments||[];cur.commitments.push({id:uid('c'),name:nm,amount:an,paid:false,grp:grp});});
+}
+ 
 function editDebt(id){
  const db=(DATA.debts||[]).find(x=>x.id===id);if(!db)return;
- const r=prompt('Remaining on "'+db.name+'" (SAR):',db.remaining);if(r===null)return;
+ const nm=prompt('Debt name  (clear + OK to DELETE):',db.name);if(nm===null)return;
+ if(nm.trim()===''){if(confirm('Delete "'+db.name+'"?'))saveData(cur=>{cur.debts=cur.debts.filter(y=>y.id!==id);});return;}
+ const r=prompt('Remaining (SAR):',db.remaining);if(r===null)return;
  const t=prompt('Total original (SAR):',db.total!=null?db.total:db.remaining);if(t===null)return;
- const rn=parseFloat(String(r).replace(/,/g,'')),tn=parseFloat(String(t).replace(/,/g,''));
- if(isNaN(rn)||isNaN(tn)){alert('Numbers only');return;}
- saveData(cur=>{const x=cur.debts.find(y=>y.id===id);if(x){x.remaining=rn;x.total=tn;}});
+ const rn=num(r),tn=num(t);if(isNaN(rn)||isNaN(tn)){alert('Numbers only');return;}
+ saveData(cur=>{const x=cur.debts.find(y=>y.id===id);if(x){x.name=nm;x.remaining=rn;x.total=tn;}});
 }
+function addDebt(){
+ const nm=prompt('New debt name:');if(!nm)return;
+ const r=prompt('Remaining (SAR):');if(r===null)return;
+ const t=prompt('Total original (SAR):',r);if(t===null)return;
+ const rn=num(r),tn=num(t);if(isNaN(rn)||isNaN(tn)){alert('Numbers only');return;}
+ saveData(cur=>{cur.debts=cur.debts||[];cur.debts.push({id:uid('d'),name:nm,remaining:rn,total:tn});});
+}
+ 
 function editGoal(id){
  const g=(DATA.goals||[]).find(x=>x.id===id);if(!g)return;
- const c=prompt('Progress on "'+g.name+'" (SAR saved/paid):',g.cur);if(c===null)return;
+ const nm=prompt('Goal name  (clear + OK to DELETE):',g.name);if(nm===null)return;
+ if(nm.trim()===''){if(confirm('Delete "'+g.name+'"?'))saveData(cur=>{cur.goals=cur.goals.filter(y=>y.id!==id);});return;}
+ const c=prompt('Progress so far (SAR saved/paid):',g.cur);if(c===null)return;
  const t=prompt('Target (SAR):',g.tgt);if(t===null)return;
- const cn=parseFloat(String(c).replace(/,/g,'')),tn=parseFloat(String(t).replace(/,/g,''));
- if(isNaN(cn)||isNaN(tn)){alert('Numbers only');return;}
- saveData(cur=>{const x=cur.goals.find(y=>y.id===id);if(x){x.cur=cn;x.tgt=tn;}});
+ const cn=num(c),tn=num(t);if(isNaN(cn)||isNaN(tn)){alert('Numbers only');return;}
+ saveData(cur=>{const x=cur.goals.find(y=>y.id===id);if(x){x.name=nm;x.cur=cn;x.tgt=tn;}});
 }
+function addGoal(){
+ const nm=prompt('New goal name:');if(!nm)return;
+ const t=prompt('Target (SAR):');if(t===null)return;
+ const c=prompt('Progress so far (SAR):','0');if(c===null)return;
+ const cn=num(c),tn=num(t);if(isNaN(cn)||isNaN(tn)){alert('Numbers only');return;}
+ const sub=prompt('Short note (optional):','')||'';
+ saveData(cur=>{cur.goals=cur.goals||[];cur.goals.push({id:uid('g'),name:nm,cur:cn,tgt:tn,col:'#2dd4bf',sub:sub});});
+}
+ 
+function editSub(i){
+ const s=(DATA.subs||[])[i];if(!s)return;
+ const nm=prompt('Subscription  (clear + OK to DELETE):',s[0]);if(nm===null)return;
+ if(nm.trim()===''){if(confirm('Delete "'+s[0]+'"?'))saveData(cur=>{cur.subs.splice(i,1);});return;}
+ const am=prompt('Monthly amount (SAR):',s[1]);if(am===null)return;
+ const an=num(am);if(isNaN(an)){alert('Numbers only');return;}
+ saveData(cur=>{cur.subs[i]=[nm,an];});
+}
+function addSub(){
+ const nm=prompt('New subscription name:');if(!nm)return;
+ const am=prompt('Monthly amount (SAR):');if(am===null)return;
+ const an=num(am);if(isNaN(an)){alert('Numbers only');return;}
+ saveData(cur=>{cur.subs=cur.subs||[];cur.subs.push([nm,an]);});
+}
+ 
+function editSetup(){
+ const s=prompt('Monthly salary (SAR):',DATA.salary);if(s===null)return;
+ const c=prompt('Cushion to always keep untouched (SAR):',DATA.cushion);if(c===null)return;
+ const sn=num(s),cn=num(c);if(isNaN(sn)||isNaN(cn)){alert('Numbers only');return;}
+ saveData(cur=>{cur.salary=sn;cur.cushion=cn;});
+}
+ 
 function setBalance(){
- const v=parseFloat(String(document.getElementById('balbox').value).replace(/,/g,''));
+ const v=num(document.getElementById('balbox').value);
  if(isNaN(v)){alert('Enter a number');return;}
  if(!confirm('Set your real balance to '+money(v)+' SAR?'))return;
  saveData(cur=>{cur.balance=v;cur.cursor=cursorNow();});
