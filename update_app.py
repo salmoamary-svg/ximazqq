@@ -118,6 +118,7 @@ def main():
     d.setdefault("spendCats",{})
     d.setdefault("commitments",[]); d.setdefault("debts",[]); d.setdefault("goals",[])
     d.setdefault("processed",[]); d.setdefault("lastCycleCats",{})
+    d.setdefault("transactions",[])
     balance=float(d["balance"])
     cursor=datetime.fromisoformat(d["cursor"].replace("Z","+00:00"))
     changed=False
@@ -178,6 +179,9 @@ def main():
             balance-=amt
             cat=categorize(text)
             d["spendCats"][cat]=round(d["spendCats"].get(cat,0)+amt,2)
+            d["transactions"]=d.get("transactions",[])
+            d["transactions"].append([dt.astimezone(timezone.utc).isoformat().replace("+00:00","Z"),cat,amt])
+            d["transactions"]=d["transactions"][-200:]
             # auto-attribution (conservative)
             if cat=="cc":
                 cm=find(d["commitments"],"id","cc")
