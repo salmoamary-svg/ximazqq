@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head>
+!DOCTYPE html><html lang="en"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -104,96 +104,96 @@ padding:10px 16px;font-size:14px;font-weight:700;box-shadow:0 4px 14px rgba(0,0,
 </style></head><body>
  
 <div id="lock">
-  <h2>💰 Saad Money</h2>
-  <div class="sub2" id="lockmsg">Enter your PIN</div>
-  <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
-  <div class="pad">
-    <button>1</button><button>2</button><button>3</button><button>4</button><button>5</button>
-    <button>6</button><button>7</button><button>8</button><button>9</button>
-    <span></span><button>0</button><button style="font-size:14px">⌫</button>
-  </div>
+<h2>💰 Saad Money</h2>
+<div class="sub2" id="lockmsg">Enter your PIN</div>
+<div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+<div class="pad">
+<button>1</button><button>2</button><button>3</button><button>4</button><button>5</button>
+<button>6</button><button>7</button><button>8</button><button>9</button>
+<span></span><button>0</button><button style="font-size:14px">⌫</button>
+</div>
 </div>
  
 <div class="top"><h1>💰 Saad Money</h1><div class="mo" id="mo"></div></div>
  
 <div class="view on" id="v-home"><div class="wrap">
-  <div class="card hero">
-    <div class="lab">Balance now</div>
-    <div class="bal" id="bal">—</div>
-    <div class="mut" id="asof"></div>
-    <div class="row">
-      <div class="chip"><div class="n" id="days">—</div><div class="t" id="paylab">days to payday</div></div>
-      <div class="chip"><div class="n" style="color:var(--green)" id="safe">—</div><div class="t">safe / day</div></div>
-    </div>
-    <div class="setbox">
-      <input id="balbox" inputmode="decimal" placeholder="Set real balance…">
-      <button onclick="setBalance()">Set</button>
-    </div>
-  </div>
+<div class="card hero">
+<div class="lab">Balance now</div>
+<div class="bal" id="bal">—</div>
+<div class="mut" id="asof"></div>
+<div class="row">
+<div class="chip"><div class="n" id="days">—</div><div class="t" id="paylab">days to payday</div></div>
+<div class="chip"><div class="n" style="color:var(--green)" id="safe">—</div><div class="t">safe / day</div></div>
+</div>
+<div class="setbox">
+<input id="balbox" inputmode="decimal" placeholder="Set real balance…">
+<button onclick="setBalance()">Set</button>
+</div>
+</div>
  
-  <div class="week" id="weekcard">
-    <div class="wk-t">THIS WEEK'S MONEY</div>
-    <div class="wk-n" id="wk-amt">—</div>
-    <div class="wk-s" id="wk-status"></div>
-    <div class="note">(balance − 200 cushion) ÷ weeks left until payday. Moves as your balance changes.</div>
-  </div>
+<div class="week" id="weekcard">
+<div class="wk-t">THIS WEEK'S MONEY</div>
+<div class="wk-n" id="wk-amt">—</div>
+<div class="wk-s" id="wk-status"></div>
+<div class="note" id="wk-note">Resets every Sunday. Leftover carries to next week; overspend borrows from it. At payday, whatever's left goes to Sister E.</div>
+</div>
  
-  <div class="card">
-    <div class="sec-title">The 47 / 30 / 23 split (payday)</div>
-    <div id="splitbars"></div>
-    <div class="note" id="paidnote"></div>
-    <div class="note" id="setupline" style="cursor:pointer"></div>
-  </div>
+<div class="card">
+<div class="sec-title">The 47 / 30 / 23 split (payday)</div>
+<div id="splitbars"></div>
+<div class="note" id="paidnote"></div>
+<div class="note" id="setupline" style="cursor:pointer"></div>
+</div>
  
-  <div class="card">
-    <div class="sec-title">Commitments — tap to mark paid</div>
-    <div id="commits"></div>
-  </div>
+<div class="card">
+<div class="sec-title">Commitments — tap to mark paid</div>
+<div id="commits"></div>
+</div>
 </div></div>
  
 <div class="view" id="v-spend"><div class="wrap">
-  <div class="card"><div class="sec-title">This week vs last week</div><div id="weekcmp"></div></div>
+<div class="card"><div class="sec-title">This week vs last week</div><div id="weekcmp"></div></div>
 <div class="card"><div class="sec-title">Daily spending — last 14 days</div><div id="daytl"></div></div>
 <div class="card"><div class="sec-title">Where money goes — this cycle</div><div id="cats"></div></div>
-  <div class="card"><div class="sec-title">Active subscriptions</div><table class="tbl" id="subs"></table></div>
+<div class="card"><div class="sec-title">Active subscriptions</div><table class="tbl" id="subs"></table></div>
 </div></div>
  
 <div class="view" id="v-debt"><div class="wrap">
-  <div class="card"><div class="sec-title">Debts — tap to update</div><div id="debts"></div></div>
-  <div class="card"><div class="sec-title">Plan — E. first, then smallest</div>
-    <ol style="padding-left:18px;font-size:13.5px;line-height:1.7">
-      <li>No BNPL (Tamara/Tabby). Deleted, stays deleted.</li>
-      <li>Buffer to 28,000 (2,000/mo).</li>
-      <li><b>Sister E. — 4,000/mo → clear in ~7–8 months.</b></li>
-      <li>Credit card next, then finish Sister A.</li>
-      <li>Bank loan acceleration comes last.</li>
-    </ol>
-  </div>
+<div class="card"><div class="sec-title">Debts — tap to update</div><div id="debts"></div></div>
+<div class="card"><div class="sec-title">Plan — E. first, then smallest</div>
+<ol style="padding-left:18px;font-size:13.5px;line-height:1.7">
+<li>No BNPL (Tamara/Tabby). Deleted, stays deleted.</li>
+<li>Buffer to 28,000 (2,000/mo).</li>
+<li><b>Sister E. — 4,000/mo → clear in ~7–8 months.</b></li>
+<li>Credit card next, then finish Sister A.</li>
+<li>Bank loan acceleration comes last.</li>
+</ol>
+</div>
 </div></div>
  
 <div class="view" id="v-goals"><div class="wrap">
-  <div class="card"><div class="sec-title">Goals — tap to edit</div><div id="goals"></div></div>
+<div class="card"><div class="sec-title">Goals — tap to edit</div><div id="goals"></div></div>
 </div></div>
  
 <div class="view" id="v-month"><div class="wrap">
-  <div class="card"><div class="sec-title" id="mtitle"></div>
-    <div class="rowline"><div class="nm">Balance now</div><div class="amt" id="m-bal"></div></div>
-    <div class="rowline"><div class="nm">Days to payday</div><div class="amt" id="m-days"></div></div>
-    <div class="rowline"><div class="nm">This week's money</div><div class="amt" id="m-wk"></div></div>
-    <div class="rowline"><div class="nm">Spent this cycle</div><div class="amt" id="m-spent"></div></div>
-    <div class="rowline"><div class="nm">Biggest leak</div><div class="amt" style="color:var(--amber)" id="m-leak"></div></div>
+<div class="card"><div class="sec-title" id="mtitle"></div>
+<div class="rowline"><div class="nm">Balance now</div><div class="amt" id="m-bal"></div></div>
+<div class="rowline"><div class="nm">Days to payday</div><div class="amt" id="m-days"></div></div>
+<div class="rowline"><div class="nm">This week's money</div><div class="amt" id="m-wk"></div></div>
+<div class="rowline"><div class="nm">Spent this cycle</div><div class="amt" id="m-spent"></div></div>
+<div class="rowline"><div class="nm">Biggest leak</div><div class="amt" style="color:var(--amber)" id="m-leak"></div></div>
 <div class="mcmp"><div class="mc"><div class="n" id="m-this">—</div><div class="t">This cycle spent</div></div><div class="mc"><div class="n" id="m-last">—</div><div class="t">Last cycle spent</div></div></div>
 <div class="trend" id="m-trend"></div>
-    <div class="note">For the full written review: open Claude → project "Saad Finance" → say <b>"how was my stand this month?"</b></div>
-  </div>
+<div class="note">For the full written review: open Claude → project "Saad Finance" → say <b>"how was my stand this month?"</b></div>
+</div>
 </div></div>
  
 <div class="nav">
-  <button class="on" data-v="home"><span class="ic">🏠</span>Home</button>
-  <button data-v="spend"><span class="ic">📈</span>Spend</button>
-  <button data-v="debt"><span class="ic">💳</span>Debts</button>
-  <button data-v="goals"><span class="ic">🎯</span>Goals</button>
-  <button data-v="month"><span class="ic">📊</span>Month</button>
+<button class="on" data-v="home"><span class="ic">🏠</span>Home</button>
+<button data-v="spend"><span class="ic">📈</span>Spend</button>
+<button data-v="debt"><span class="ic">💳</span>Debts</button>
+<button data-v="goals"><span class="ic">🎯</span>Goals</button>
+<button data-v="month"><span class="ic">📊</span>Month</button>
 </div>
  
 <button id="robotBtn" onclick="runRobot()">⟳ Update</button>
@@ -208,8 +208,8 @@ const money=n=>Number(n).toLocaleString('en-US',{minimumFractionDigits:Number.is
 function token(){try{return localStorage.getItem(TKEY)}catch(e){return null}}
  
 function riyadhStamp(){const d=new Date();const r=new Date(d.getTime()+d.getTimezoneOffset()*60000+3*3600000);
- let h=r.getHours();const ap=h>=12?'PM':'AM';h=h%12||12;const p=n=>String(n).padStart(2,'0');
- return r.getFullYear()+'-'+p(r.getMonth()+1)+'-'+p(r.getDate())+' '+p(h)+':'+p(r.getMinutes())+' '+ap;}
+let h=r.getHours();const ap=h>=12?'PM':'AM';h=h%12||12;const p=n=>String(n).padStart(2,'0');
+return r.getFullYear()+'-'+p(r.getMonth()+1)+'-'+p(r.getDate())+' '+p(h)+':'+p(r.getMinutes())+' '+ap;}
 function cursorNow(){return new Date().toISOString().replace(/\.\d+Z$/,'Z');}
  
 // payday: 27th; Fri->26th; Sat->28th
@@ -217,133 +217,218 @@ function adjPay(y,m){let p=new Date(y,m,27);const d=p.getDay();if(d===5)p=new Da
 function paydayAfter(dt){let y=dt.getFullYear(),m=dt.getMonth();let p=adjPay(y,m);if(p<=dt){m++;if(m>11){m=0;y++;}p=adjPay(y,m);}return p;}
 function latestPayday(dt){let y=dt.getFullYear(),m=dt.getMonth();let p=adjPay(y,m);if(p>dt){m--;if(m<0){m=11;y--;}p=adjPay(y,m);}return p;}
 function isoDate(d){const p=n=>String(n).padStart(2,'0');return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());}
+function dOnly(d){return new Date(d.getFullYear(),d.getMonth(),d.getDate());}
+function addDays(d,n){const nd=new Date(d);nd.setDate(nd.getDate()+n);return nd;}
+function sunday(d){const nd=dOnly(d);nd.setDate(nd.getDate()-nd.getDay());return nd;} // most recent Sunday (getDay()===0)
+ 
+// ---- Weekly envelope ledger: fixed Sun–Sat weeks, rollover both ways, cycle-end sweep to Eman ----
+function sumTx(tx,start,end){ // sums transactions in [start,end)
+return (tx||[]).reduce((a,row)=>{const t=new Date(row[0]);return (t>=start&&t<end)?a+Number(row[2]):a;},0);
+}
+function computeEnvelope(){ // current spendable pot: balance minus the untouchable cushion
+const bal=Number(DATA.balance)||0, cushion=Number(DATA.cushion)||200;
+return Math.max(0,bal-cushion);
+}
+// Advances a persisted weekly-ledger state forward to "now", crossing as many Sunday
+// and payday boundaries as needed. Pure function of (state, transactions, now) so it's easy to reason about.
+function advanceWeekly(state,tx,now){
+let weekStart=new Date(state.weekStart+'T00:00:00');
+let startAmount=state.startAmount;
+let cycleEnd=new Date(state.cycleEnd+'T00:00:00');
+let dailyRate=state.dailyRate;
+let selfDebt=state.selfDebt||0;
+let emanPayment=0;
+const today=dOnly(now);
+let guard=0;
+while(true){
+guard++;if(guard>1000)break; // safety valve, should never trigger in practice
+const nextSun=addDays(weekStart,7);
+const boundary=nextSun<cycleEnd?nextSun:cycleEnd;
+if(boundary>today)break;
+const spent=sumTx(tx,weekStart,boundary);
+const leftover=startAmount-spent;
+if(boundary.getTime()===cycleEnd.getTime()){
+// payday: whatever's left (or short) leaves the weekly system entirely
+if(leftover>=0){emanPayment+=leftover;}else{selfDebt+=-leftover;}
+const newCycleStart=cycleEnd;
+const newCycleEnd=paydayAfter(newCycleStart);
+const cycleDays=Math.max(1,Math.round((newCycleEnd-newCycleStart)/86400000));
+const envelope=Math.max(0,computeEnvelope()-selfDebt);
+selfDebt=0;
+dailyRate=envelope/cycleDays;
+cycleEnd=newCycleEnd;
+weekStart=boundary;
+const nextB=addDays(weekStart,7)<cycleEnd?addDays(weekStart,7):cycleEnd;
+const days=Math.max(1,Math.round((nextB-weekStart)/86400000));
+startAmount=dailyRate*days; // nothing carries across a payday sweep
+}else{
+weekStart=boundary;
+const nextB=addDays(weekStart,7)<cycleEnd?addDays(weekStart,7):cycleEnd;
+const days=Math.max(1,Math.round((nextB-weekStart)/86400000));
+startAmount=leftover+dailyRate*days;
+}
+}
+const spentSoFar=sumTx(tx,weekStart,addDays(today,1));
+return{weekStart:isoDate(weekStart),startAmount,cycleEnd:isoDate(cycleEnd),dailyRate,selfDebt,
+currentBudget:startAmount-spentSoFar,emanPayment};
+}
+async function ensureWeekly(){
+const now=new Date();
+if(!DATA.weekly){
+const cs=DATA.cycleStart?new Date(DATA.cycleStart+'T00:00:00'):latestPayday(now);
+const cycleEndDate=paydayAfter(now); // rate is based on days actually remaining, since we're initializing mid-cycle
+const daysRemaining=Math.max(1,Math.round((cycleEndDate-dOnly(now))/86400000));
+const envelope=computeEnvelope();
+const dailyRate=envelope/daysRemaining;
+let ws=sunday(now);if(ws<dOnly(cs))ws=dOnly(cs);
+const nextB=addDays(ws,7)<cycleEndDate?addDays(ws,7):cycleEndDate;
+const daysLeftInStretch=Math.max(1,Math.round((nextB-dOnly(now))/86400000));
+await saveData(cur=>{cur.weekly={weekStart:isoDate(ws),startAmount:dailyRate*daysLeftInStretch,
+cycleEnd:isoDate(cycleEndDate),dailyRate,selfDebt:0};});
+return;
+}
+const r=advanceWeekly(DATA.weekly,DATA.transactions||[],now);
+const changed=r.weekStart!==DATA.weekly.weekStart||r.cycleEnd!==DATA.weekly.cycleEnd;
+if(changed){
+await saveData(cur=>{
+cur.weekly={weekStart:r.weekStart,startAmount:r.startAmount,cycleEnd:r.cycleEnd,dailyRate:r.dailyRate,selfDebt:r.selfDebt};
+if(r.emanPayment>0){
+const sisE=(cur.debts||[]).find(d=>d.id==='sisE');
+if(sisE)sisE.remaining=Math.max(0,Number(sisE.remaining)-r.emanPayment);
+}
+});
+}
+}
  
 async function loadData(){
- const h={'Accept':'application/vnd.github.raw'};const t=token();if(t)h.Authorization='Bearer '+t;
- const r=await fetch(API+'/contents/data.json?ref=main&_='+Date.now(),{headers:h});
- if(!r.ok)throw new Error('load '+r.status);
- DATA=await r.json();render();
+const h={'Accept':'application/vnd.github.raw'};const t=token();if(t)h.Authorization='Bearer '+t;
+const r=await fetch(API+'/contents/data.json?ref=main&_='+Date.now(),{headers:h});
+if(!r.ok)throw new Error('load '+r.status);
+DATA=await r.json();
+await ensureWeekly();
+render();
 }
 async function saveData(mut){
- let t=token();if(!t){t=prompt('Paste your GitHub token to save changes');if(!t)return;t=t.trim();localStorage.setItem(TKEY,t);}
- const h={'Authorization':'Bearer '+t,'Accept':'application/vnd.github+json'};
- // Try up to 5 times. On a 409/422 conflict (robot wrote at the same moment),
- // silently re-fetch the freshest file, re-apply this change, and resend.
- for(let attempt=0;attempt<5;attempt++){
-  try{
-   const g=await fetch(API+'/contents/data.json?ref=main&_='+Date.now(),{headers:h});
-   if(g.status===401||g.status===403){localStorage.removeItem(TKEY);alert('Token problem — tap again to re-enter.');return;}
-   if(!g.ok){alert('Save failed (read '+g.status+')');return;}
-   const gj=await g.json();
-   const cur=JSON.parse(decodeURIComponent(escape(atob(gj.content.replace(/\s/g,'')))));
-   mut(cur);cur.asOf=riyadhStamp();
-   const enc=btoa(unescape(encodeURIComponent(JSON.stringify(cur,null,1))));
-   const p=await fetch(API+'/contents/data.json',{method:'PUT',headers:h,
-    body:JSON.stringify({message:'app edit '+cur.asOf,content:enc,sha:gj.sha,branch:'main'})});
-   if(p.ok){DATA=cur;render();return;}
-   if(p.status===409||p.status===422){await new Promise(r=>setTimeout(r,400));continue;} // conflict — retry
-   if(p.status===401||p.status===403){localStorage.removeItem(TKEY);alert('Token problem — tap again to re-enter.');return;}
-   alert('Save failed '+p.status);return;
-  }catch(e){if(attempt===4){alert('Save error: '+e.message);return;}await new Promise(r=>setTimeout(r,400));}
- }
- alert('The robot was busy saving — please tap once more.');
+let t=token();if(!t){t=prompt('Paste your GitHub token to save changes');if(!t)return;t=t.trim();localStorage.setItem(TKEY,t);}
+const h={'Authorization':'Bearer '+t,'Accept':'application/vnd.github+json'};
+// Try up to 5 times. On a 409/422 conflict (robot wrote at the same moment),
+// silently re-fetch the freshest file, re-apply this change, and resend.
+for(let attempt=0;attempt<5;attempt++){
+try{
+const g=await fetch(API+'/contents/data.json?ref=main&_='+Date.now(),{headers:h});
+if(g.status===401||g.status===403){localStorage.removeItem(TKEY);alert('Token problem — tap again to re-enter.');return;}
+if(!g.ok){alert('Save failed (read '+g.status+')');return;}
+const gj=await g.json();
+const cur=JSON.parse(decodeURIComponent(escape(atob(gj.content.replace(/\s/g,'')))));
+mut(cur);cur.asOf=riyadhStamp();
+const enc=btoa(unescape(encodeURIComponent(JSON.stringify(cur,null,1))));
+const p=await fetch(API+'/contents/data.json',{method:'PUT',headers:h,
+body:JSON.stringify({message:'app edit '+cur.asOf,content:enc,sha:gj.sha,branch:'main'})});
+if(p.ok){DATA=cur;render();return;}
+if(p.status===409||p.status===422){await new Promise(r=>setTimeout(r,400));continue;} // conflict — retry
+if(p.status===401||p.status===403){localStorage.removeItem(TKEY);alert('Token problem — tap again to re-enter.');return;}
+alert('Save failed '+p.status);return;
+}catch(e){if(attempt===4){alert('Save error: '+e.message);return;}await new Promise(r=>setTimeout(r,400));}
+}
+alert('The robot was busy saving — please tap once more.');
 }
  
 function render(){
- if(!DATA)return;
- const now=new Date();
- const stale=DATA.cycleStart && DATA.cycleStart < isoDate(latestPayday(now));
- const commits=(DATA.commitments||[]).map(c=>Object.assign({},c,{paid:stale?false:!!c.paid}));
- const cats=stale?{}:(DATA.spendCats||{});
- const bal=Number(DATA.balance)||0, salary=Number(DATA.salary)||27932, cushion=Number(DATA.cushion)||200;
+if(!DATA)return;
+const now=new Date();
+const stale=DATA.cycleStart && DATA.cycleStart < isoDate(latestPayday(now));
+const commits=(DATA.commitments||[]).map(c=>Object.assign({},c,{paid:stale?false:!!c.paid}));
+const cats=stale?{}:(DATA.spendCats||{});
+const bal=Number(DATA.balance)||0, salary=Number(DATA.salary)||27932, cushion=Number(DATA.cushion)||200;
  
- const pd=paydayAfter(now);
- const days=Math.max(1,Math.ceil((pd-now)/86400000));
- const weeksLeft=Math.max(1,days/7);
- const unpaid=commits.filter(c=>!c.paid&&c.id!=='living').reduce((a,c)=>a+Number(c.amount),0);
- const avail=Math.max(0,bal-cushion);
- const weekly=avail/weeksLeft, daily=avail/days;
+const pd=paydayAfter(now);
+const days=Math.max(1,Math.ceil((pd-now)/86400000));
+const unpaid=commits.filter(c=>!c.paid&&c.id!=='living').reduce((a,c)=>a+Number(c.amount),0);
+const wkly=DATA.weekly||{currentBudget:0,dailyRate:0};
+const weekly=advanceWeekly(wkly,DATA.transactions||[],now).currentBudget;
+const daily=wkly.dailyRate||0;
  
- document.getElementById('mo').textContent=now.toLocaleDateString('en-US',{month:'long',year:'numeric'});
- document.getElementById('bal').innerHTML=money(bal)+' <span class="sar">SAR</span>';
- document.getElementById('asof').textContent='updated '+(DATA.asOf||'');
- document.getElementById('days').textContent=days;
- document.getElementById('paylab').textContent='days to payday ('+pd.toLocaleDateString('en-US',{day:'numeric',month:'short'})+')';
- document.getElementById('safe').textContent=f(daily);
- document.getElementById('wk-amt').textContent=f(weekly)+' SAR';
- const wc=document.getElementById('weekcard'),ws=document.getElementById('wk-status');
- wc.className='week';
- if(weekly>=1300){wc.classList.add('g');ws.textContent='🟢 Green week — normal envelope. Enjoy it, guilt-free.';ws.style.color='var(--green)';}
- else if(weekly>=800){wc.classList.add('y');ws.textContent='🟡 Careful week — home food, skip delivery.';ws.style.color='var(--amber)';}
- else{wc.classList.add('r');ws.textContent='🔴 Tight week — essentials only. Payday is close.';ws.style.color='var(--red)';}
+document.getElementById('mo').textContent=now.toLocaleDateString('en-US',{month:'long',year:'numeric'});
+document.getElementById('bal').innerHTML=money(bal)+' <span class="sar">SAR</span>';
+document.getElementById('asof').textContent='updated '+(DATA.asOf||'');
+document.getElementById('days').textContent=days;
+document.getElementById('paylab').textContent='days to payday ('+pd.toLocaleDateString('en-US',{day:'numeric',month:'short'})+')';
+document.getElementById('safe').textContent=f(daily);
+document.getElementById('wk-amt').textContent=f(weekly)+' SAR';
+const wc=document.getElementById('weekcard'),ws=document.getElementById('wk-status');
+wc.className='week';
+if(weekly>=1300){wc.classList.add('g');ws.textContent='🟢 Green week — normal envelope. Enjoy it, guilt-free.';ws.style.color='var(--green)';}
+else if(weekly>=800){wc.classList.add('y');ws.textContent='🟡 Careful week — home food, skip delivery.';ws.style.color='var(--amber)';}
+else if(weekly>=0){wc.classList.add('r');ws.textContent='🔴 Tight week — essentials only. Payday is close.';ws.style.color='var(--red)';}
+else{wc.classList.add('r');ws.textContent="🔴 Over this week's budget — coming out of next week.";ws.style.color='var(--red)';}
  
- // 47/30/23 bars (grouped, dynamic)
- const grp={commit:0,future:0,living:0};
- commits.forEach(c=>{grp[c.grp||'commit']=(grp[c.grp||'commit']||0)+Number(c.amount);});
- const bars=[['🏠 Commitments',grp.commit,'var(--violet)'],['🚀 Future You (debts + buffer)',grp.future,'var(--teal)'],['😊 Living (yours)',grp.living,'var(--amber)']];
- document.getElementById('splitbars').innerHTML=bars.map(([n,v,c])=>
-  `<div class="rowline"><div class="nm">${n}</div><div class="amt">${f(v)}</div></div><div class="bar"><i style="width:${Math.min(100,v/salary*100)}%;background:${c}"></i></div>`).join('');
- const paid=commits.filter(c=>c.paid).reduce((a,c)=>a+Number(c.actual!=null?c.actual:c.amount),0);
- document.getElementById('paidnote').textContent='Paid so far this cycle: '+f(paid)+' of '+f(salary)+' SAR.';
+// 47/30/23 bars (grouped, dynamic)
+const grp={commit:0,future:0,living:0};
+commits.forEach(c=>{grp[c.grp||'commit']=(grp[c.grp||'commit']||0)+Number(c.amount);});
+const bars=[['🏠 Commitments',grp.commit,'var(--violet)'],['🚀 Future You (debts + buffer)',grp.future,'var(--teal)'],['😊 Living (yours)',grp.living,'var(--amber)']];
+document.getElementById('splitbars').innerHTML=bars.map(([n,v,c])=>
+`<div class="rowline"><div class="nm">${n}</div><div class="amt">${f(v)}</div></div><div class="bar"><i style="width:${Math.min(100,v/salary*100)}%;background:${c}"></i></div>`).join('');
+const paid=commits.filter(c=>c.paid).reduce((a,c)=>a+Number(c.actual!=null?c.actual:c.amount),0);
+document.getElementById('paidnote').textContent='Paid so far this cycle: '+f(paid)+' of '+f(salary)+' SAR.';
  
- // commitments (tap row to mark paid + enter actual, pencil to edit plan, + to add)
- document.getElementById('commits').innerHTML=commits.map(c=>{
-   const shown=c.paid?(c.actual!=null?c.actual:c.amount):c.amount;
-   const hint=(c.paid&&c.actual!=null&&Number(c.actual)!==Number(c.amount))?` <span style="color:var(--sub);font-weight:400">· plan ${f(c.amount)}</span>`:'';
-   return `<div class="crow ${c.paid?'paid':''}" style="flex-wrap:wrap;border-bottom:none;margin-bottom:2px">
-     <span class="ck ${c.paid?'on':''}" onclick="toggleCommit('${c.id}')">${c.paid?'✓':''}</span>
-     <span class="cn" onclick="toggleCommit('${c.id}')">${c.star?'⭐ ':''}${c.name}${hint}</span>
-     <span class="ca" onclick="toggleCommit('${c.id}')">${f(shown)} / ${f(c.amount)}</span>
-     <span class="pen" onclick="editCommit('${c.id}')">✏️</span>
+// commitments (tap row to mark paid + enter actual, pencil to edit plan, + to add)
+document.getElementById('commits').innerHTML=commits.map(c=>{
+const shown=c.paid?(c.actual!=null?c.actual:c.amount):c.amount;
+const hint=(c.paid&&c.actual!=null&&Number(c.actual)!==Number(c.amount))?` <span style="color:var(--sub);font-weight:400">· plan ${f(c.amount)}</span>`:'';
+return `<div class="crow ${c.paid?'paid':''}" style="flex-wrap:wrap;border-bottom:none;margin-bottom:2px">
+<span class="ck ${c.paid?'on':''}" onclick="toggleCommit('${c.id}')">${c.paid?'✓':''}</span>
+<span class="cn" onclick="toggleCommit('${c.id}')">${c.star?'⭐ ':''}${c.name}${hint}</span>
+<span class="ca" onclick="toggleCommit('${c.id}')">${f(shown)} / ${f(c.amount)}</span>
+<span class="pen" onclick="editCommit('${c.id}')">✏️</span>
 <div style="flex-basis:100%;padding-left:33px"><div class="bar" style="margin-top:2px"><i style="width:${c.paid?100:0}%;background:${c.paid?'var(--green)':'var(--line)'}"></i></div></div>
 </div>`;}).join('')
-  +`<div class="addrow" onclick="addCommit()">＋ Add commitment</div>`;
- document.getElementById('setupline').textContent='Salary '+f(salary)+' · cushion '+f(cushion)+' — tap to edit';
++`<div class="addrow" onclick="addCommit()">＋ Add commitment</div>`;
+document.getElementById('setupline').textContent='Salary '+f(salary)+' · cushion '+f(cushion)+' — tap to edit';
  
- // spend cats (this cycle)
- const meta=DATA.catMeta||[];
- const vals=meta.map(([id,label,col])=>[label,Number(cats[id]||0),col]).filter(x=>x[1]>0).sort((a,b)=>b[1]-a[1]);
- if(vals.length===0){document.getElementById('cats').innerHTML='<div class="note">No spending logged yet this cycle. It fills in as your transaction alerts arrive.</div>';}
- else{const cmax=Math.max(...vals.map(v=>v[1]));
-  document.getElementById('cats').innerHTML=vals.map(([n,v,c])=>
-   `<div class="rowline" style="flex-wrap:wrap"><div class="nm">${n}</div><div class="amt">${f(v)}</div>
-    <div style="flex-basis:100%"><div class="bar"><i style="width:${Math.max(4,v/cmax*100)}%;background:${c}"></i></div></div></div>`).join('');}
+// spend cats (this cycle)
+const meta=DATA.catMeta||[];
+const vals=meta.map(([id,label,col])=>[label,Number(cats[id]||0),col]).filter(x=>x[1]>0).sort((a,b)=>b[1]-a[1]);
+if(vals.length===0){document.getElementById('cats').innerHTML='<div class="note">No spending logged yet this cycle. It fills in as your transaction alerts arrive.</div>';}
+else{const cmax=Math.max(...vals.map(v=>v[1]));
+document.getElementById('cats').innerHTML=vals.map(([n,v,c])=>
+`<div class="rowline" style="flex-wrap:wrap"><div class="nm">${n}</div><div class="amt">${f(v)}</div>
+<div style="flex-basis:100%"><div class="bar"><i style="width:${Math.max(4,v/cmax*100)}%;background:${c}"></i></div></div></div>`).join('');}
  
- let s2=(DATA.subs||[]).map((row,i)=>`<tr onclick="editSub(${i})"><td>${row[0]}</td><td>${f(row[1])}</td></tr>`).join('');
- s2+=`<tr><td colspan="2" onclick="addSub()" style="color:var(--teal);font-weight:650;text-align:center;border-bottom:none">＋ Add subscription</td></tr>`;
- s2+=`<tr class="tot"><td>Active / month</td><td>${f((DATA.subs||[]).reduce((a,[,v])=>a+v,0))}</td></tr>`;
- document.getElementById('subs').innerHTML=s2;
+let s2=(DATA.subs||[]).map((row,i)=>`<tr onclick="editSub(${i})"><td>${row[0]}</td><td>${f(row[1])}</td></tr>`).join('');
+s2+=`<tr><td colspan="2" onclick="addSub()" style="color:var(--teal);font-weight:650;text-align:center;border-bottom:none">＋ Add subscription</td></tr>`;
+s2+=`<tr class="tot"><td>Active / month</td><td>${f((DATA.subs||[]).reduce((a,[,v])=>a+v,0))}</td></tr>`;
+document.getElementById('subs').innerHTML=s2;
  
- // debts (tap to edit)
- document.getElementById('debts').innerHTML=(DATA.debts||[]).map(db=>{
-  const total=Number(db.total)||Number(db.remaining),rem=Number(db.remaining);
-  const pct=total>0?Math.min(100,Math.max(0,(total-rem)/total*100)):0;
-  return `<div class="drow" onclick="editDebt('${db.id}')">
-    <div class="dt"><div class="dn">${db.name}</div><div class="dr">${f(rem)}</div></div>
-    <div class="bar" style="margin-top:6px"><i style="width:${pct}%;background:var(--teal)"></i></div>
-    <div class="ds">${f(total-rem)} paid of ${f(total)} · <span class="edit">tap to update</span></div></div>`;}).join('');
- const cons=(DATA.debts||[]).filter(d=>!d.longterm).reduce((a,d)=>a+Number(d.remaining),0);
- document.getElementById('debts').innerHTML+=`<div class="rowline tot" style="margin-top:10px;border-top:2px solid var(--line);padding-top:10px"><div class="nm"><b>Consumer debt left</b></div><div class="amt">${f(cons)}</div></div>`;
- document.getElementById('debts').innerHTML+=`<div class="addrow" onclick="addDebt()">＋ Add debt</div>`;
+// debts (tap to edit)
+document.getElementById('debts').innerHTML=(DATA.debts||[]).map(db=>{
+const total=Number(db.total)||Number(db.remaining),rem=Number(db.remaining);
+const pct=total>0?Math.min(100,Math.max(0,(total-rem)/total*100)):0;
+return `<div class="drow" onclick="editDebt('${db.id}')">
+<div class="dt"><div class="dn">${db.name}</div><div class="dr">${f(rem)}</div></div>
+<div class="bar" style="margin-top:6px"><i style="width:${pct}%;background:var(--teal)"></i></div>
+<div class="ds">${f(total-rem)} paid of ${f(total)} · <span class="edit">tap to update</span></div></div>`;}).join('');
+const cons=(DATA.debts||[]).filter(d=>!d.longterm).reduce((a,d)=>a+Number(d.remaining),0);
+document.getElementById('debts').innerHTML+=`<div class="rowline tot" style="margin-top:10px;border-top:2px solid var(--line);padding-top:10px"><div class="nm"><b>Consumer debt left</b></div><div class="amt">${f(cons)}</div></div>`;
+document.getElementById('debts').innerHTML+=`<div class="addrow" onclick="addDebt()">＋ Add debt</div>`;
  
- // goals (tap to edit)
- document.getElementById('goals').innerHTML=(DATA.goals||[]).map(g=>{
-  const p=g.tgt>0?Math.min(100,Math.round(g.cur/g.tgt*100)):0;
-  return `<div class="goal" onclick="editGoal('${g.id}')"><div class="g-top"><div class="g-nm">${g.name}</div>
-   <div class="g-pct" style="color:${g.col}">${p}%</div></div>
-   <div class="bar"><i style="width:${p}%;background:${g.col}"></i></div>
-   <div class="g-sub">${f(g.cur)} / ${f(g.tgt)} SAR — ${g.sub} · <span class="edit">tap to edit</span></div></div>`;}).join('')
-  +`<div class="addrow" onclick="addGoal()">＋ Add goal</div>`;
+// goals (tap to edit)
+document.getElementById('goals').innerHTML=(DATA.goals||[]).map(g=>{
+const p=g.tgt>0?Math.min(100,Math.round(g.cur/g.tgt*100)):0;
+return `<div class="goal" onclick="editGoal('${g.id}')"><div class="g-top"><div class="g-nm">${g.name}</div>
+<div class="g-pct" style="color:${g.col}">${p}%</div></div>
+<div class="bar"><i style="width:${p}%;background:${g.col}"></i></div>
+<div class="g-sub">${f(g.cur)} / ${f(g.tgt)} SAR — ${g.sub} · <span class="edit">tap to edit</span></div></div>`;}).join('')
++`<div class="addrow" onclick="addGoal()">＋ Add goal</div>`;
  
- // month
- const spent=Object.values(cats).reduce((a,v)=>a+Number(v),0);
- let leak='—';const le=vals[0];if(le)leak=le[0];
- document.getElementById('mtitle').textContent=now.toLocaleDateString('en-US',{month:'long',year:'numeric'})+' — your stand';
- document.getElementById('m-bal').textContent=money(bal);
- document.getElementById('m-days').textContent=days;
- document.getElementById('m-wk').textContent=f(weekly);
- document.getElementById('m-spent').textContent=f(spent);
- document.getElementById('m-leak').textContent=leak;
+// month
+const spent=Object.values(cats).reduce((a,v)=>a+Number(v),0);
+let leak='—';const le=vals[0];if(le)leak=le[0];
+document.getElementById('mtitle').textContent=now.toLocaleDateString('en-US',{month:'long',year:'numeric'})+' — your stand';
+document.getElementById('m-bal').textContent=money(bal);
+document.getElementById('m-days').textContent=days;
+document.getElementById('m-wk').textContent=f(weekly);
+document.getElementById('m-spent').textContent=f(spent);
+document.getElementById('m-leak').textContent=leak;
 const thisTotal=spent, lastTotal=Object.values(DATA.lastCycleCats||{}).reduce((a,v)=>a+Number(v),0);
 document.getElementById('m-this').textContent=f(thisTotal)+' SAR';
 document.getElementById('m-last').textContent=f(lastTotal)+' SAR';
@@ -399,129 +484,129 @@ function uid(p){return p+Math.random().toString(36).slice(2,7);}
 function num(x){return parseFloat(String(x).replace(/,/g,''));}
  
 function toggleCommit(id){
- const c=(DATA.commitments||[]).find(x=>x.id===id);if(!c)return;
- if(c.paid){ // already paid -> untick and clear the actual
-  saveData(cur=>{const x=cur.commitments.find(y=>y.id===id);if(x){x.paid=false;delete x.actual;}});
-  return;
- }
- const a=prompt('How much did you actually pay for "'+c.name+'"?  (plan is '+f(c.amount)+')',c.amount);
- if(a===null)return; // cancelled -> leave unpaid
- const an=num(a);if(isNaN(an)){alert('Numbers only');return;}
- saveData(cur=>{const x=cur.commitments.find(y=>y.id===id);if(x){x.paid=true;x.actual=an;}});
+const c=(DATA.commitments||[]).find(x=>x.id===id);if(!c)return;
+if(c.paid){ // already paid -> untick and clear the actual
+saveData(cur=>{const x=cur.commitments.find(y=>y.id===id);if(x){x.paid=false;delete x.actual;}});
+return;
+}
+const a=prompt('How much did you actually pay for "'+c.name+'"? (plan is '+f(c.amount)+')',c.amount);
+if(a===null)return; // cancelled -> leave unpaid
+const an=num(a);if(isNaN(an)){alert('Numbers only');return;}
+saveData(cur=>{const x=cur.commitments.find(y=>y.id===id);if(x){x.paid=true;x.actual=an;}});
 }
  
 function editCommit(id){
- const c=(DATA.commitments||[]).find(x=>x.id===id);if(!c)return;
- const nm=prompt('Name  (clear the box + OK to DELETE this item):',c.name);if(nm===null)return;
- if(nm.trim()===''){if(confirm('Delete "'+c.name+'"?'))saveData(cur=>{cur.commitments=cur.commitments.filter(y=>y.id!==id);});return;}
- const am=prompt('Monthly amount (SAR):',c.amount);if(am===null)return;
- const an=num(am);if(isNaN(an)){alert('Numbers only');return;}
- saveData(cur=>{const x=cur.commitments.find(y=>y.id===id);if(x){x.name=nm;x.amount=an;}});
+const c=(DATA.commitments||[]).find(x=>x.id===id);if(!c)return;
+const nm=prompt('Name (clear the box + OK to DELETE this item):',c.name);if(nm===null)return;
+if(nm.trim()===''){if(confirm('Delete "'+c.name+'"?'))saveData(cur=>{cur.commitments=cur.commitments.filter(y=>y.id!==id);});return;}
+const am=prompt('Monthly amount (SAR):',c.amount);if(am===null)return;
+const an=num(am);if(isNaN(an)){alert('Numbers only');return;}
+saveData(cur=>{const x=cur.commitments.find(y=>y.id===id);if(x){x.name=nm;x.amount=an;}});
 }
 function addCommit(){
- const nm=prompt('New commitment name:');if(!nm)return;
- const am=prompt('Monthly amount (SAR):');if(am===null)return;
- const an=num(am);if(isNaN(an)){alert('Numbers only');return;}
- let grp=prompt('Group?  type one:  commit  /  future  /  living','commit');if(grp===null)return;
- grp=grp.trim().toLowerCase();if(!['commit','future','living'].includes(grp))grp='commit';
- saveData(cur=>{cur.commitments=cur.commitments||[];cur.commitments.push({id:uid('c'),name:nm,amount:an,paid:false,grp:grp});});
+const nm=prompt('New commitment name:');if(!nm)return;
+const am=prompt('Monthly amount (SAR):');if(am===null)return;
+const an=num(am);if(isNaN(an)){alert('Numbers only');return;}
+let grp=prompt('Group? type one: commit / future / living','commit');if(grp===null)return;
+grp=grp.trim().toLowerCase();if(!['commit','future','living'].includes(grp))grp='commit';
+saveData(cur=>{cur.commitments=cur.commitments||[];cur.commitments.push({id:uid('c'),name:nm,amount:an,paid:false,grp:grp});});
 }
  
 function editDebt(id){
- const db=(DATA.debts||[]).find(x=>x.id===id);if(!db)return;
- const nm=prompt('Debt name  (clear + OK to DELETE):',db.name);if(nm===null)return;
- if(nm.trim()===''){if(confirm('Delete "'+db.name+'"?'))saveData(cur=>{cur.debts=cur.debts.filter(y=>y.id!==id);});return;}
- const r=prompt('Remaining (SAR):',db.remaining);if(r===null)return;
- const t=prompt('Total original (SAR):',db.total!=null?db.total:db.remaining);if(t===null)return;
- const rn=num(r),tn=num(t);if(isNaN(rn)||isNaN(tn)){alert('Numbers only');return;}
- saveData(cur=>{const x=cur.debts.find(y=>y.id===id);if(x){x.name=nm;x.remaining=rn;x.total=tn;}});
+const db=(DATA.debts||[]).find(x=>x.id===id);if(!db)return;
+const nm=prompt('Debt name (clear + OK to DELETE):',db.name);if(nm===null)return;
+if(nm.trim()===''){if(confirm('Delete "'+db.name+'"?'))saveData(cur=>{cur.debts=cur.debts.filter(y=>y.id!==id);});return;}
+const r=prompt('Remaining (SAR):',db.remaining);if(r===null)return;
+const t=prompt('Total original (SAR):',db.total!=null?db.total:db.remaining);if(t===null)return;
+const rn=num(r),tn=num(t);if(isNaN(rn)||isNaN(tn)){alert('Numbers only');return;}
+saveData(cur=>{const x=cur.debts.find(y=>y.id===id);if(x){x.name=nm;x.remaining=rn;x.total=tn;}});
 }
 function addDebt(){
- const nm=prompt('New debt name:');if(!nm)return;
- const r=prompt('Remaining (SAR):');if(r===null)return;
- const t=prompt('Total original (SAR):',r);if(t===null)return;
- const rn=num(r),tn=num(t);if(isNaN(rn)||isNaN(tn)){alert('Numbers only');return;}
- saveData(cur=>{cur.debts=cur.debts||[];cur.debts.push({id:uid('d'),name:nm,remaining:rn,total:tn});});
+const nm=prompt('New debt name:');if(!nm)return;
+const r=prompt('Remaining (SAR):');if(r===null)return;
+const t=prompt('Total original (SAR):',r);if(t===null)return;
+const rn=num(r),tn=num(t);if(isNaN(rn)||isNaN(tn)){alert('Numbers only');return;}
+saveData(cur=>{cur.debts=cur.debts||[];cur.debts.push({id:uid('d'),name:nm,remaining:rn,total:tn});});
 }
  
 function editGoal(id){
- const g=(DATA.goals||[]).find(x=>x.id===id);if(!g)return;
- const nm=prompt('Goal name  (clear + OK to DELETE):',g.name);if(nm===null)return;
- if(nm.trim()===''){if(confirm('Delete "'+g.name+'"?'))saveData(cur=>{cur.goals=cur.goals.filter(y=>y.id!==id);});return;}
- const c=prompt('Progress so far (SAR saved/paid):',g.cur);if(c===null)return;
- const t=prompt('Target (SAR):',g.tgt);if(t===null)return;
- const cn=num(c),tn=num(t);if(isNaN(cn)||isNaN(tn)){alert('Numbers only');return;}
- saveData(cur=>{const x=cur.goals.find(y=>y.id===id);if(x){x.name=nm;x.cur=cn;x.tgt=tn;}});
+const g=(DATA.goals||[]).find(x=>x.id===id);if(!g)return;
+const nm=prompt('Goal name (clear + OK to DELETE):',g.name);if(nm===null)return;
+if(nm.trim()===''){if(confirm('Delete "'+g.name+'"?'))saveData(cur=>{cur.goals=cur.goals.filter(y=>y.id!==id);});return;}
+const c=prompt('Progress so far (SAR saved/paid):',g.cur);if(c===null)return;
+const t=prompt('Target (SAR):',g.tgt);if(t===null)return;
+const cn=num(c),tn=num(t);if(isNaN(cn)||isNaN(tn)){alert('Numbers only');return;}
+saveData(cur=>{const x=cur.goals.find(y=>y.id===id);if(x){x.name=nm;x.cur=cn;x.tgt=tn;}});
 }
 function addGoal(){
- const nm=prompt('New goal name:');if(!nm)return;
- const t=prompt('Target (SAR):');if(t===null)return;
- const c=prompt('Progress so far (SAR):','0');if(c===null)return;
- const cn=num(c),tn=num(t);if(isNaN(cn)||isNaN(tn)){alert('Numbers only');return;}
- const sub=prompt('Short note (optional):','')||'';
- saveData(cur=>{cur.goals=cur.goals||[];cur.goals.push({id:uid('g'),name:nm,cur:cn,tgt:tn,col:'#2dd4bf',sub:sub});});
+const nm=prompt('New goal name:');if(!nm)return;
+const t=prompt('Target (SAR):');if(t===null)return;
+const c=prompt('Progress so far (SAR):','0');if(c===null)return;
+const cn=num(c),tn=num(t);if(isNaN(cn)||isNaN(tn)){alert('Numbers only');return;}
+const sub=prompt('Short note (optional):','')||'';
+saveData(cur=>{cur.goals=cur.goals||[];cur.goals.push({id:uid('g'),name:nm,cur:cn,tgt:tn,col:'#2dd4bf',sub:sub});});
 }
  
 function editSub(i){
- const s=(DATA.subs||[])[i];if(!s)return;
- const nm=prompt('Subscription  (clear + OK to DELETE):',s[0]);if(nm===null)return;
- if(nm.trim()===''){if(confirm('Delete "'+s[0]+'"?'))saveData(cur=>{cur.subs.splice(i,1);});return;}
- const am=prompt('Monthly amount (SAR):',s[1]);if(am===null)return;
- const an=num(am);if(isNaN(an)){alert('Numbers only');return;}
- saveData(cur=>{cur.subs[i]=[nm,an];});
+const s=(DATA.subs||[])[i];if(!s)return;
+const nm=prompt('Subscription (clear + OK to DELETE):',s[0]);if(nm===null)return;
+if(nm.trim()===''){if(confirm('Delete "'+s[0]+'"?'))saveData(cur=>{cur.subs.splice(i,1);});return;}
+const am=prompt('Monthly amount (SAR):',s[1]);if(am===null)return;
+const an=num(am);if(isNaN(an)){alert('Numbers only');return;}
+saveData(cur=>{cur.subs[i]=[nm,an];});
 }
 function addSub(){
- const nm=prompt('New subscription name:');if(!nm)return;
- const am=prompt('Monthly amount (SAR):');if(am===null)return;
- const an=num(am);if(isNaN(an)){alert('Numbers only');return;}
- saveData(cur=>{cur.subs=cur.subs||[];cur.subs.push([nm,an]);});
+const nm=prompt('New subscription name:');if(!nm)return;
+const am=prompt('Monthly amount (SAR):');if(am===null)return;
+const an=num(am);if(isNaN(an)){alert('Numbers only');return;}
+saveData(cur=>{cur.subs=cur.subs||[];cur.subs.push([nm,an]);});
 }
  
 function editSetup(){
- const s=prompt('Monthly salary (SAR):',DATA.salary);if(s===null)return;
- const c=prompt('Cushion to always keep untouched (SAR):',DATA.cushion);if(c===null)return;
- const sn=num(s),cn=num(c);if(isNaN(sn)||isNaN(cn)){alert('Numbers only');return;}
- saveData(cur=>{cur.salary=sn;cur.cushion=cn;});
+const s=prompt('Monthly salary (SAR):',DATA.salary);if(s===null)return;
+const c=prompt('Cushion to always keep untouched (SAR):',DATA.cushion);if(c===null)return;
+const sn=num(s),cn=num(c);if(isNaN(sn)||isNaN(cn)){alert('Numbers only');return;}
+saveData(cur=>{cur.salary=sn;cur.cushion=cn;});
 }
  
 function setBalance(){
- const v=num(document.getElementById('balbox').value);
- if(isNaN(v)){alert('Enter a number');return;}
- if(!confirm('Set your real balance to '+money(v)+' SAR?'))return;
- saveData(cur=>{cur.balance=v;cur.cursor=cursorNow();});
- document.getElementById('balbox').value='';
+const v=num(document.getElementById('balbox').value);
+if(isNaN(v)){alert('Enter a number');return;}
+if(!confirm('Set your real balance to '+money(v)+' SAR?'))return;
+saveData(cur=>{cur.balance=v;cur.cursor=cursorNow();});
+document.getElementById('balbox').value='';
 }
  
 async function runRobot(){
- const b=document.getElementById('robotBtn');
- let t=token();if(!t){t=prompt('Paste your GitHub token');if(!t)return;t=t.trim();localStorage.setItem(TKEY,t);}
- b.disabled=true;b.textContent='⏳ starting…';
- const H={'Authorization':'Bearer '+t,'Accept':'application/vnd.github+json'};
- const WF=API+'/actions/workflows/update.yml';
- try{
-  let prev=null;try{const p=await(await fetch(WF+'/runs?per_page=1',{headers:H})).json();prev=(p.workflow_runs&&p.workflow_runs[0])?p.workflow_runs[0].id:null;}catch(e){}
-  const d=await fetch(WF+'/dispatches',{method:'POST',headers:H,body:JSON.stringify({ref:'main'})});
-  if(d.status===401||d.status===403){localStorage.removeItem(TKEY);b.textContent='🔑 token — tap again';b.disabled=false;return;}
-  if(d.status!==204){b.textContent='✗ error '+d.status;b.disabled=false;return;}
-  const t0=Date.now();
-  const timer=setInterval(async()=>{
-   const secs=Math.round((Date.now()-t0)/1000);b.textContent='🤖 working… '+secs+'s';
-   if(secs>180){clearInterval(timer);b.textContent='⌛ slow — check Actions';b.disabled=false;return;}
-   try{const j=await(await fetch(WF+'/runs?per_page=1&_='+Date.now(),{headers:H})).json();
-    const run=j.workflow_runs&&j.workflow_runs[0];
-    if(run&&run.id!==prev&&run.status==='completed'){clearInterval(timer);
-     if(run.conclusion==='success'){await loadData();b.textContent='✅ up to date';}
-     else{b.textContent='✗ failed — check Actions';}
-     b.disabled=false;}
-   }catch(e){}
-  },5000);
- }catch(e){b.textContent='✗ no internet?';b.disabled=false;}
+const b=document.getElementById('robotBtn');
+let t=token();if(!t){t=prompt('Paste your GitHub token');if(!t)return;t=t.trim();localStorage.setItem(TKEY,t);}
+b.disabled=true;b.textContent='⏳ starting…';
+const H={'Authorization':'Bearer '+t,'Accept':'application/vnd.github+json'};
+const WF=API+'/actions/workflows/update.yml';
+try{
+let prev=null;try{const p=await(await fetch(WF+'/runs?per_page=1',{headers:H})).json();prev=(p.workflow_runs&&p.workflow_runs[0])?p.workflow_runs[0].id:null;}catch(e){}
+const d=await fetch(WF+'/dispatches',{method:'POST',headers:H,body:JSON.stringify({ref:'main'})});
+if(d.status===401||d.status===403){localStorage.removeItem(TKEY);b.textContent='🔑 token — tap again';b.disabled=false;return;}
+if(d.status!==204){b.textContent='✗ error '+d.status;b.disabled=false;return;}
+const t0=Date.now();
+const timer=setInterval(async()=>{
+const secs=Math.round((Date.now()-t0)/1000);b.textContent='🤖 working… '+secs+'s';
+if(secs>180){clearInterval(timer);b.textContent='⌛ slow — check Actions';b.disabled=false;return;}
+try{const j=await(await fetch(WF+'/runs?per_page=1&_='+Date.now(),{headers:H})).json();
+const run=j.workflow_runs&&j.workflow_runs[0];
+if(run&&run.id!==prev&&run.status==='completed'){clearInterval(timer);
+if(run.conclusion==='success'){await loadData();b.textContent='✅ up to date';}
+else{b.textContent='✗ failed — check Actions';}
+b.disabled=false;}
+}catch(e){}
+},5000);
+}catch(e){b.textContent='✗ no internet?';b.disabled=false;}
 }
  
 document.querySelectorAll('.nav button').forEach(bn=>bn.onclick=()=>{
- document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('on'));
- document.querySelectorAll('.view').forEach(x=>x.classList.remove('on'));
- bn.classList.add('on');document.getElementById('v-'+bn.dataset.v).classList.add('on');window.scrollTo(0,0);});
+document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('on'));
+document.querySelectorAll('.view').forEach(x=>x.classList.remove('on'));
+bn.classList.add('on');document.getElementById('v-'+bn.dataset.v).classList.add('on');window.scrollTo(0,0);});
  
 // PIN lock
 let store={get:k=>{try{return localStorage.getItem(k)}catch(e){return null}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}}};
@@ -530,15 +615,15 @@ const lmsg=document.getElementById('lockmsg'),dots=document.querySelectorAll('.d
 if(setting)lmsg.textContent="Create a 4-digit PIN for your app";
 function paint(){dots.forEach((d,i)=>d.classList.toggle('f',i<entered.length));}
 document.querySelectorAll('.pad button').forEach(b=>b.onclick=()=>{
- const t=b.textContent;
- if(t==='⌫'){entered=entered.slice(0,-1);paint();return;}
- if(entered.length>=4)return;entered+=t;paint();
- if(entered.length===4){setTimeout(()=>{
-   if(setting){if(!firstPin){firstPin=entered;entered="";paint();lmsg.textContent="Repeat the PIN to confirm";}
-     else if(firstPin===entered){store.set('pin',entered);unlock();}
-     else{firstPin="";entered="";paint();lmsg.textContent="Didn't match — create a 4-digit PIN";}}
-   else{if(entered===store.get('pin'))unlock();else{entered="";paint();lmsg.textContent="Wrong PIN — try again";}}
- },120);}
+const t=b.textContent;
+if(t==='⌫'){entered=entered.slice(0,-1);paint();return;}
+if(entered.length>=4)return;entered+=t;paint();
+if(entered.length===4){setTimeout(()=>{
+if(setting){if(!firstPin){firstPin=entered;entered="";paint();lmsg.textContent="Repeat the PIN to confirm";}
+else if(firstPin===entered){store.set('pin',entered);unlock();}
+else{firstPin="";entered="";paint();lmsg.textContent="Didn't match — create a 4-digit PIN";}}
+else{if(entered===store.get('pin'))unlock();else{entered="";paint();lmsg.textContent="Wrong PIN — try again";}}
+},120);}
 });
 function unlock(){document.getElementById('lock').style.display='none';loadData().catch(e=>{document.getElementById('bal').textContent='load error';});}
 </script></body></html>
