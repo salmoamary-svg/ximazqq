@@ -1,4 +1,4 @@
-!DOCTYPE html><html lang="en"><head>
+<!DOCTYPE html><html lang="en"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -156,7 +156,7 @@ padding:10px 16px;font-size:14px;font-weight:700;box-shadow:0 4px 14px rgba(0,0,
 </div></div>
  
 <div class="view" id="v-spend"><div class="wrap">
-<div class="card"><div class="sec-title">This week vs last week</div><div id="weekcmp"></div></div>
+<div class="card"><div class="sec-title">Last 7 days vs previous 7</div><div id="weekcmp"></div></div>
 <div class="card"><div class="sec-title">Daily spending — last 14 days</div><div id="daytl"></div></div>
 <div class="card"><div class="sec-title">Where money goes — this cycle</div><div id="cats"></div></div>
 <div class="card"><div class="sec-title">Active subscriptions</div><table class="tbl" id="subs"></table></div>
@@ -348,9 +348,9 @@ const bal=Number(DATA.balance)||0, salary=Number(DATA.salary)||27932, cushion=Nu
 const pd=paydayAfter(now);
 const days=Math.max(1,Math.ceil((pd-now)/86400000));
 const unpaid=commits.filter(c=>!c.paid&&c.id!=='living').reduce((a,c)=>a+Number(c.amount),0);
-const wkly=DATA.weekly||{currentBudget:0,dailyRate:0};
-const weekly=advanceWeekly(wkly,DATA.transactions||[],now).currentBudget;
-const daily=wkly.dailyRate||0;
+const wkly=DATA.weekly;
+const weekly=wkly?advanceWeekly(wkly,DATA.transactions||[],now).currentBudget:0;
+const daily=wkly&&wkly.dailyRate||0;
  
 document.getElementById('mo').textContent=now.toLocaleDateString('en-US',{month:'long',year:'numeric'});
 document.getElementById('bal').innerHTML=money(bal)+' <span class="sar">SAR</span>';
