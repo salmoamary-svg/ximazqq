@@ -136,6 +136,10 @@ padding:10px 16px;font-size:14px;font-weight:700;box-shadow:0 4px 14px rgba(0,0,
 <div class="wk-n" id="wk-amt">—</div>
 <div class="wk-s" id="wk-status"></div>
 <div class="note" id="wk-note">Resets every Sunday. Leftover carries to next week; overspend borrows from it. At payday, whatever's left goes to Sister E.</div>
+<div class="setbox">
+<input id="windbox" inputmode="decimal" placeholder="Add windfall (SAR)…">
+<button onclick="addWindfall()">Add</button>
+</div>
 </div>
  
 <div class="card">
@@ -575,6 +579,14 @@ if(isNaN(v)){alert('Enter a number');return;}
 if(!confirm('Set your real balance to '+money(v)+' SAR?'))return;
 saveData(cur=>{cur.balance=v;cur.cursor=cursorNow();});
 document.getElementById('balbox').value='';
+}
+
+function addWindfall(){
+const v=num(document.getElementById('windbox').value);
+if(isNaN(v)){alert('Enter a number');return;}
+if(!confirm('Add '+money(v)+' SAR to this week\'s budget?'))return;
+saveData(cur=>{cur.weekly=cur.weekly||{};cur.weekly.startAmount=(Number(cur.weekly.startAmount)||0)+v;});
+document.getElementById('windbox').value='';
 }
  
 async function runRobot(){
