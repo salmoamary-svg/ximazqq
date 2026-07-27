@@ -19,6 +19,53 @@ There is nothing to build. To verify a change, syntax-check the artifacts:
 **Do not commit `data.json` from a branch.** The robot rewrites it on `main` roughly daily
 and the app writes on every edit, so a branch snapshot will clobber newer state at merge.
 
+## 2026-07-27 — salmoamary-svg — the tick as a manual lever, and shipping that actually arrives
+
+### What changed
+The classification fix above was live on Pages and correct, but the phone showed the old
+numbers for hours. The app splits its delivery: `data.json` is re-fetched every load with a
+`_=Date.now()` buster, while the HTML is whatever copy the phone cached — and an iOS
+home-screen app holds the shell indefinitely (Pages only sends `max-age=600`). So the data
+reads current while the logic is stale, which looks exactly like a broken fix. Worse, the
+Update button reported "✅ up to date" after refreshing only the *data*.
+
+- **`BUILD` constant** (`index.html`, by `REPO`/`API`). `checkBuild()` reads the copy of
+  `index.html` on `main`, parses its `BUILD`, and shows a tap-to-reload banner when it
+  differs. `reloadFresh()` goes to `?v=<ts>` — a plain `location.reload()` can be served
+  back out of the cache that caused the problem. **Bump `BUILD` in the same commit as any
+  `index.html` change**, or the banner never fires. The parse is anchored `/^const BUILD=/m`
+  because an unanchored one matches its own source further down the same file.
+  `checkBuild()` is not awaited and never throws — a version check must not delay the
+  numbers or break the app when offline.
+- The Update button now distinguishes "data fresh" from "app current".
+- **Ticking a commitment** (`toggleCommit`) now also settles the debit that paid it:
+  `tickCandidate()` looks for a `review` transaction matching the entered amount (±2% or 25)
+  and writes `txClass[iso]={kind:'bill',commit:id,via:'tick'}`. Unticking removes only its
+  own `via:'tick'` entries, so hand labels from the review card survive.
+
+Candidates are drawn **only from `review`** — debits already held out of the envelope
+pending a decision. Labelling one settles it rather than moving money that was already
+counted, and if no debit matches, ticking changes nothing but the tick. That is the
+anti-inflation guarantee: no transaction, no credit. It is what makes the tick safe, and
+it is tested directly (§12 of the harness).
+
+### What's next
+- The build banner cannot help the first time: the version already on the phone predates
+  `BUILD`, so it has no `checkBuild()`. One manual cache-bust
+  (`https://salmoamary-svg.github.io/ximazqq/?v=2`, then re-add to the home screen) is still
+  needed. Every update after that self-announces.
+- `BUILD` is bumped by hand. Auto-hashing was rejected — the running DOM has been mutated by
+  render, so it cannot be compared against source — but a forgotten bump fails silently.
+- The tick matches on amount alone. Two commitments with the same plan paid in one cycle
+  will attach to whichever debit is nearest; the review card is the correction path.
+
+### What the other dev must know
+- App URL is **https://salmoamary-svg.github.io/ximazqq/** (GitHub Pages, `main`, root).
+- No env vars, no migrations. `data.json` was **not** committed.
+- The verification harness lives in the session scratchpad, not the repo, and runs against a
+  **frozen `fixture.json`** — pointing it at the live `data.json` makes it fail whenever the
+  robot writes, which is every few minutes and has nothing to do with the code.
+
 ## 2026-07-27 — salmoamary-svg — paying a bill drained the weekly envelope
 
 ### What changed

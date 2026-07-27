@@ -86,6 +86,8 @@ align-items:center;justify-content:center;gap:18px}
 .pad button{height:64px;border-radius:50%;border:1px solid var(--line);background:var(--card);
 color:var(--ink);font-size:22px;font-weight:600}
 .pad button:active{background:#22374d}
+#newbuild{display:none;margin:0 16px 10px;padding:11px 13px;border-radius:12px;background:#123027;
+border:1px solid var(--teal);color:var(--teal);font-size:13px;font-weight:650;text-align:center}
 .rv{padding:10px 2px;border-bottom:1px solid var(--line)}
 .rv .rv-t{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
 .rv .rv-n{font-size:14px}.rv .rv-a{font-variant-numeric:tabular-nums;font-weight:750;font-size:15px}
@@ -123,6 +125,7 @@ padding:10px 16px;font-size:14px;font-weight:700;box-shadow:0 4px 14px rgba(0,0,
 </div>
  
 <div class="top"><h1>💰 Saad Money</h1><div class="mo" id="mo"></div></div>
+<div id="newbuild" onclick="reloadFresh()">⬆️ A newer version of the app is ready — tap to load it</div>
  
 <div class="view on" id="v-home"><div class="wrap">
 <div class="card hero">
@@ -221,6 +224,11 @@ week's money until you say — so the number above is incomplete, not wrong.</di
 const REPO='salmoamary-svg/ximazqq';
 const API='https://api.github.com/repos/'+REPO;
 const TKEY='saad_money_gh_pat';
+// Bump BUILD in the same commit as any index.html change. data.json is re-fetched on every
+// load, but the HTML itself is whatever copy the phone cached — an iOS home-screen app can
+// hold it indefinitely, so the data looks current while the logic is months old. checkBuild()
+// compares this against the copy on main and offers a reload the cache can't satisfy.
+const BUILD='2026-07-27c';
 let DATA=null;
 const f=n=>Math.round(n).toLocaleString('en-US');
 const money=n=>Number(n).toLocaleString('en-US',{minimumFractionDigits:Number.isInteger(Number(n))?0:2,maximumFractionDigits:2});
@@ -418,7 +426,29 @@ if(!r.ok)throw new Error('load '+r.status);
 DATA=await r.json();
 await ensureWeekly();
 render();
+checkBuild(); // not awaited: a stale-app notice must never delay or break the numbers
 }
+// Reads the BUILD constant out of the copy of index.html on main. Returns it, or null if the
+// check couldn't run — offline, rate-limited, whatever. Never throws: being unable to check
+// for an update is not a reason to interrupt someone looking at their balance.
+async function remoteBuild(){
+try{
+const h={'Accept':'application/vnd.github.raw'};const t=token();if(t)h.Authorization='Bearer '+t;
+const r=await fetch(API+'/contents/index.html?ref=main&_='+Date.now(),{headers:h});
+if(!r.ok)return null;
+// Anchored to line start: this pattern would otherwise match its own source further down
+// the very file it is scanning, and read a fragment of the regex as the version.
+const m=/^const BUILD='([^']+)'/m.exec(await r.text());
+return m?m[1]:null;
+}catch(e){return null;}
+}
+async function checkBuild(){
+const rb=await remoteBuild();
+if(rb&&rb!==BUILD)document.getElementById('newbuild').style.display='block';
+}
+// Reload on a URL the cache has never seen. A plain location.reload() can be served straight
+// back out of the same cache that made the app stale in the first place.
+function reloadFresh(){location.replace(location.pathname+'?v='+Date.now());}
 async function saveData(mut){
 let t=token();if(!t){t=prompt('Paste your GitHub token to save changes');if(!t)return;t=t.trim();localStorage.setItem(TKEY,t);}
 const h={'Authorization':'Bearer '+t,'Accept':'application/vnd.github+json'};
@@ -643,16 +673,34 @@ return `<div class="tl-day"><div class="tl-date">${dlabel} · ${f(tot)} SAR</div
 function uid(p){return p+Math.random().toString(36).slice(2,7);}
 function num(x){return parseFloat(String(x).replace(/,/g,''));}
  
+// The debit that paid this commitment, if one is sitting unlabelled in the review queue.
+// Only 'review' transactions are candidates: they are already being held out of the envelope
+// pending a decision, so labelling one settles it rather than moving money that was already
+// counted. Returns the nearest by amount, or null.
+function tickCandidate(amt){
+const tol=Math.max(25,amt*0.02);let best=null,bestD=Infinity;
+cycleTx(new Date()).forEach(t=>{if(t.kind!=='review')return;
+const d=Math.abs(t.amt-amt);if(d<=tol&&d<bestD){best=t;bestD=d;}});
+return best;
+}
 function toggleCommit(id){
 const c=(DATA.commitments||[]).find(x=>x.id===id);if(!c)return;
-if(c.paid){ // already paid -> untick and clear the actual
-saveData(cur=>{const x=cur.commitments.find(y=>y.id===id);if(x){x.paid=false;delete x.actual;}});
+if(c.paid){ // already paid -> untick, clear the actual, and release anything this tick labelled
+saveData(cur=>{const x=cur.commitments.find(y=>y.id===id);if(x){x.paid=false;delete x.actual;}
+Object.keys(cur.txClass||{}).forEach(k=>{const v=cur.txClass[k];
+if(v&&v.via==='tick'&&v.commit===id)delete cur.txClass[k];});}); // hand labels (no `via`) survive
 return;
 }
 const a=prompt('How much did you actually pay for "'+c.name+'"? (plan is '+f(c.amount)+')',c.amount);
 if(a===null)return; // cancelled -> leave unpaid
 const an=num(a);if(isNaN(an)){alert('Numbers only');return;}
-saveData(cur=>{const x=cur.commitments.find(y=>y.id===id);if(x){x.paid=true;x.actual=an;}});
+// If a matching unlabelled debit exists, this tick settles it: the payment stops counting as
+// living spend. If there is none — paid in cash, from another account, not yet alerted — the
+// tick records the bill and nothing else. No transaction, no credit, so the weekly envelope
+// can never be inflated by money that never left the account.
+const hit=tickCandidate(an);
+saveData(cur=>{const x=cur.commitments.find(y=>y.id===id);if(x){x.paid=true;x.actual=an;}
+if(hit){cur.txClass=cur.txClass||{};cur.txClass[hit.iso]={kind:'bill',commit:id,via:'tick'};}});
 }
  
 function editCommit(id){
@@ -763,7 +811,11 @@ if(secs>180){clearInterval(timer);b.textContent='⌛ slow — check Actions';b.d
 try{const j=await(await fetch(WF+'/runs?per_page=1&_='+Date.now(),{headers:H})).json();
 const run=j.workflow_runs&&j.workflow_runs[0];
 if(run&&run.id!==prev&&run.status==='completed'){clearInterval(timer);
-if(run.conclusion==='success'){await loadData();b.textContent='✅ up to date';}
+// "up to date" used to mean only the data was fresh, while the app itself could be an
+// old cached build — which reads as a promise about both. Say which, and check the other.
+if(run.conclusion==='success'){await loadData();
+const rb=await remoteBuild();
+b.textContent=(rb&&rb!==BUILD)?'⬆️ app update ready':'✅ up to date';}
 else{b.textContent='✗ failed — check Actions';}
 b.disabled=false;}
 }catch(e){}
