@@ -111,8 +111,9 @@
    "id": "elec",
    "name": "Electricity",
    "amount": 527,
-   "paid": false,
-   "grp": "commit"
+   "paid": true,
+   "grp": "commit",
+   "actual": 527
   },
   {
    "id": "subs",
@@ -517,5 +518,12 @@
   "cycleEnd": "2026-08-27",
   "dailyRate": 204.74193548387098,
   "selfDebt": 0
+ },
+ "txClass": {
+  "2026-07-27T16:59:08Z": {
+   "kind": "bill",
+   "commit": "elec",
+   "via": "tick"
+  }
  }
 }
