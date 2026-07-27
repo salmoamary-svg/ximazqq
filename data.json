@@ -1,5 +1,5 @@
 {
- "asOf": "2026-07-27 04:30 PM",
+ "asOf": "2026-07-27 08:04 PM",
  "balance": 28079.84,
  "salary": 27932,
  "cushion": 200,
@@ -64,9 +64,8 @@
    "id": "loan",
    "name": "Bank loan (auto)",
    "amount": 7027,
-   "paid": true,
-   "grp": "commit",
-   "actual": 7027
+   "paid": false,
+   "grp": "commit"
   },
   {
    "id": "phone",
