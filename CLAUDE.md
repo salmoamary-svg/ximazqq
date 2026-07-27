@@ -19,6 +19,40 @@ There is nothing to build. To verify a change, syntax-check the artifacts:
 **Do not commit `data.json` from a branch.** The robot rewrites it on `main` roughly daily
 and the app writes on every edit, so a branch snapshot will clobber newer state at merge.
 
+## 2026-07-27 — salmoamary-svg — ticking a commitment now moves the balance
+
+### What changed
+Requested twice, and refused the first time on the grounds that `update_app.py` already does
+`balance -= amt` for every alerted debit, so subtracting again would double-count. That
+objection only covers bills **the bank saw**. Pay the maid in cash and no alert ever fires,
+the balance stays too high, and ticking genuinely should correct it.
+
+`manualOutflow()` subtracts only the part of a ticked commitment that the transactions don't
+already account for; `effectiveBalance()` is `DATA.balance` minus that. Derived, never stored,
+so the robot remains the only writer of `balance`. Feeds the hero card (with a note saying why
+it differs from the bank) and `computeEnvelope`'s cash cap. `BUILD` → `2026-07-27f`.
+
+Self-correcting by construction: tick a cash payment and the balance drops; when the delayed
+alert lands, the robot drops `balance` *and* the debit becomes attributable, so the adjustment
+falls to zero — one subtraction, not two. That sequence is asserted directly (§5 of `balance.js`).
+
+### tickCandidate had to widen, and that has a cost
+Electricity (500) and car insurance (310) are both **below `reviewMin()` (≈635)**, so an alerted
+payment for either is classified `living` and never attributed — which meant ticking them
+subtracted from the balance a second time. `tickCandidate` now also considers `living`
+transactions in the `everyday` bucket, not just `review` ones.
+
+The cost: ticking a bill whose amount happens to equal a genuine grocery run pulls that run out
+of the envelope, so **the week can go up**. The earlier "a tick can never raise your week"
+guarantee is now narrower: money is never invented (a real debit must exist), only the
+unidentified bucket is ever touched, and the review card lists it for one-tap undo. Pinned in
+§7 of `balance.js` so a future change can't quietly widen it further.
+
+### Harness
+Four suites in the session scratchpad, all against the frozen `fixture.json`:
+`harness.js` (58, classification + envelope), `split.js` (16), `cancel.js` (8, token-cancel),
+`balance.js` (26, balance adjustment + double-count guard).
+
 ## 2026-07-27 — salmoamary-svg — one payment, two bills
 
 ### What changed

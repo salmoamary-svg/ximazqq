@@ -228,7 +228,7 @@ const TKEY='saad_money_gh_pat';
 // load, but the HTML itself is whatever copy the phone cached — an iOS home-screen app can
 // hold it indefinitely, so the data looks current while the logic is months old. checkBuild()
 // compares this against the copy on main and offers a reload the cache can't satisfy.
-const BUILD='2026-07-27e';
+const BUILD='2026-07-27f';
 let DATA=null;
 const f=n=>Math.round(n).toLocaleString('en-US');
 const money=n=>Number(n).toLocaleString('en-US',{minimumFractionDigits:Number.isInteger(Number(n))?0:2,maximumFractionDigits:2});
@@ -321,8 +321,31 @@ function livingAllocation(){ // the "Living" slice of the 47/30/23 split — wha
 return (DATA.commitments||[]).filter(c=>(c.grp||'commit')==='living')
 .reduce((a,c)=>a+(Number(c.amount)||0),0);
 }
+// Money you've told us you paid that the bank never reported — cash, another account, an alert
+// that didn't arrive. Ticking a commitment is an assertion that it is paid, so the balance should
+// reflect it even though no debit exists to prove it.
+//
+// Only the part the transactions *don't* already cover is counted, which is what keeps this from
+// double-subtracting: update_app.py has already taken every alerted debit off `balance`. So a bill
+// the bank saw contributes nothing here, and if a delayed alert lands later the robot drops the
+// balance while paidByTx grows — the adjustment shrinks to zero on its own. Derived, never stored,
+// so the robot stays the only writer of `balance`.
+function manualOutflow(now){
+const t=now||new Date();
+const seen=paidByTx(t);
+return (DATA.commitments||[]).reduce((a,c)=>{
+if(!c.paid||c.id==='living')return a;
+const claimed=Number(c.actual!=null?c.actual:c.amount)||0;
+let covered=seen[c.id]||0;
+// Nothing attributed yet, but an unattributed debit of about this size exists — the alert has
+// landed since the tick, so the balance has already absorbed it. Counting it here is what makes
+// a tick-then-alert sequence subtract once rather than twice.
+if(covered<claimed){const hit=tickCandidate(claimed,t);if(hit)covered+=hit.amt;}
+return a+Math.max(0,claimed-covered);},0);
+}
+function effectiveBalance(now){return (Number(DATA.balance)||0)-manualOutflow(now);}
 function computeEnvelope(){ // a cycle's spending pot: the Living slice, but never more cash than actually exists
-const bal=Number(DATA.balance)||0, cushion=Number(DATA.cushion)||200;
+const bal=effectiveBalance(),cushion=Number(DATA.cushion)||200;
 const avail=Math.max(0,bal-cushion);
 const living=livingAllocation();
 return living>0?Math.min(living,avail):avail;
@@ -499,7 +522,8 @@ const seen=byTx[c.id]||0,manual=stale?false:!!c.paid;
 const auto=!manual&&seen>=Number(c.amount)*0.9;
 return Object.assign({},c,{paid:manual||auto,actual:manual?c.actual:(auto?seen:undefined),viaTx:auto});});
 const cats=stale?{}:(DATA.spendCats||{});
-const bal=Number(DATA.balance)||0, salary=Number(DATA.salary)||27932, cushion=Number(DATA.cushion)||200;
+const offBank=stale?0:manualOutflow(now); // bills you ticked that the bank never reported
+const bal=(Number(DATA.balance)||0)-offBank, salary=Number(DATA.salary)||27932, cushion=Number(DATA.cushion)||200;
  
 const pd=paydayAfter(now);
 const days=Math.max(1,Math.ceil((pd-now)/86400000));
@@ -510,7 +534,8 @@ const daily=wkly&&wkly.dailyRate||0;
  
 document.getElementById('mo').textContent=now.toLocaleDateString('en-US',{month:'long',year:'numeric'});
 document.getElementById('bal').innerHTML=money(bal)+' <span class="sar">SAR</span>';
-document.getElementById('asof').textContent='updated '+(DATA.asOf||'');
+document.getElementById('asof').textContent='updated '+(DATA.asOf||'')
++(offBank>0?' · less '+f(offBank)+' you ticked as paid but the bank hasn\'t shown yet':'');
 document.getElementById('days').textContent=days;
 document.getElementById('paylab').textContent='days to payday ('+pd.toLocaleDateString('en-US',{day:'numeric',month:'short'})+')';
 document.getElementById('safe').textContent=f(daily);
@@ -711,9 +736,19 @@ function num(x){return parseFloat(String(x).replace(/,/g,''));}
 // Only 'review' transactions are candidates: they are already being held out of the envelope
 // pending a decision, so labelling one settles it rather than moving money that was already
 // counted. Returns the nearest by amount, or null.
-function tickCandidate(amt){
+// The debit that paid this commitment. Two kinds of transaction qualify, both unidentified:
+//   - 'review': large and already held out of the envelope pending a decision;
+//   - 'living' in the 'everyday' bucket: below reviewMin(), so it was never questioned and is
+//     currently being charged to your weekly money. Electricity (500) and car insurance (310)
+//     are both under that threshold, so without this they could never be attributed at all —
+//     which would also make ticking them subtract from the balance a second time.
+// Restricted to the unidentified bucket: a 'shopping' or 'travel' debit matched a positive
+// keyword rule and must not be reinterpreted as a bill just because the amount lines up.
+function tickCandidate(amt,now){
 const tol=Math.max(25,amt*0.02);let best=null,bestD=Infinity;
-cycleTx(new Date()).forEach(t=>{if(t.kind!=='review')return;
+cycleTx(now||new Date()).forEach(t=>{
+const eligible=t.kind==='review'||(t.kind==='living'&&!t.manual&&UNIDENTIFIED[t.cat]);
+if(!eligible)return;
 const d=Math.abs(t.amt-amt);if(d<=tol&&d<bestD){best=t;bestD=d;}});
 return best;
 }
