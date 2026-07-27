@@ -53,6 +53,77 @@ Four suites in the session scratchpad, all against the frozen `fixture.json`:
 `harness.js` (58, classification + envelope), `split.js` (16), `cancel.js` (8, token-cancel),
 `balance.js` (26, balance adjustment + double-count guard).
 
+## 2026-07-27 — salmoamary-svg — overnight pass: the tick/balance feature had a real bug, and needed an override
+
+### What triggered this
+Minutes after the balance-on-tick feature shipped, the user ticked five commitments and the
+balance read 9,117.35 against a real bank balance of ~14,400 — and the week card showed a false
+green 1,310. Two separate things were going on:
+
+1. **A real bug.** `tickCandidate` had been widened to match 'living'-classified debits under
+   `reviewMin()` (electricity, car insurance), so that ticking them wouldn't double-subtract the
+   balance. It worked exactly as built — and that was the problem: ticking "Electricity" for 527
+   matched a genuine 527.36 coffee/grocery debit purely because the amount lined up, relabelled it
+   `{kind:'bill',commit:'elec',via:'tick'}`, and pulled real living spend out of the week. This was
+   flagged as a known residual risk when it shipped and pinned with a test — the test just asserted
+   the wrong thing (that this WAS acceptable) instead of catching it.
+
+2. **Pre-existing drift, made visible.** The bank-tracked `balance` (19,074.35) was already ~4,674
+   off from reality before any of tonight's ticking — normal drift in an email-parsed running
+   total, not something this session caused. The new subtract-on-tick feature stacked its own
+   (correct) 9,957 adjustment on top of an already-wrong number, so the gap became large enough to
+   look broken instead of quietly being a little off.
+
+### The fix
+- **`tickCandidate` reverted to 'review'-only.** It no longer touches anything classified 'living',
+  so a tick can never again reclassify real spend as a bill by amount coincidence.
+- **`bankCoverage()`** (new, read-only) replaces that widened matching for the balance side only:
+  it looks for a same-amount debit of *any* kind this cycle to avoid double-subtracting, but never
+  writes `txClass` and never touches the living envelope. Splits the concern that was tangled
+  before: "has this money left the account" is no longer the same question as "should this money
+  count against my week."
+- **The override this needed:** `DATA.balanceAnchoredAt`, stamped by `setBalance()` (and by the
+  `SAADMONEY-DATA` email override in `update_app.py`) every time the balance is corrected to a real
+  figure. `manualOutflow()` now ignores any tick whose `tickedAt` predates the last anchor — a
+  correction is a checkpoint saying "this already accounts for everything I've ticked so far,"
+  and only a *later* tick keeps adjusting the display from there. Without this, correcting drift
+  and the tick feature would fight each other forever. `tickedAt` clears at cycle rollover
+  alongside `paid`/`actual` (`update_app.py`).
+- Eager `checkBuild()`: also runs on `visibilitychange` and every 2 minutes, not just on load, so
+  a future fix reaches an app left open without needing a full background/reopen.
+- A drift nudge: the balance note suggests checking the real balance when unconfirmed ticks exceed
+  ~10% of salary — the exact situation that caused tonight's confusion.
+
+Tested against the real scenario directly (34-check `balance.js`, extended): ticking loan/
+groceries/Sister A/credit-card with no matching debit owes 9,957; anchoring a fresh 14,400 zeroes
+it; a tick made *after* the anchor still adjusts the display; a legacy tick with no `tickedAt`
+(predates this feature) is settled by any anchor. `BUILD` → `2026-07-27g`.
+
+### Corrected directly on `main`, not from a branch
+The bad tick from tonight had already written `txClass["2026-07-27T16:59:08Z"]=
+{kind:'bill',commit:'elec',via:'tick'}` into the live `data.json`, wrongly holding the 527.36
+debit out of Living. New code stops this from happening again, but a manual label always wins
+(by design), so the stale one would keep overriding forever without a data fix. Removed that one
+key via a direct, SHA-checked API write to `main` — the same conflict-safe read-modify-write
+`saveData()` itself uses, not a branch merge, so it cannot clobber the robot's concurrent writes.
+No other field was touched.
+
+### Still open, deliberately not done tonight
+- **Balance drift itself** is not fixed, only made survivable. The email-parsing pipeline will
+  keep drifting from the real bank balance over time; periodic use of "Set real balance" (now
+  override-safe) is the intended remedy, not a code fix.
+- **No new `categorize()` keyword rules.** Musaned/housemaid and the grocery transfer still fall
+  into `everyday`. Declined again for the same reason as before: alert text is never stored, so
+  there is nothing to test a guessed regex against — needs real sample phrasing from the user.
+- **No service worker.** Considered, for auto-refreshing the app shell instead of the tap-to-reload
+  banner. Rejected: a misconfigured service worker can get permanently stuck serving a stale
+  cache — strictly worse than tonight's problem, and not something to risk unattended without a
+  real device to verify on. The eager `checkBuild()` polling above is the safer version of the
+  same idea.
+- **No LLM-based transaction classification.** Would need sending bank alert text to a third party
+  (a privacy stance this project has explicitly rejected) and a paid API key. Not a call to make
+  unilaterally overnight.
+
 ## 2026-07-27 — salmoamary-svg — one payment, two bills
 
 ### What changed

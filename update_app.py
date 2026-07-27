@@ -131,7 +131,7 @@ def main():
     pay=latest_payday(today).isoformat()
     if d.get("cycleStart") != pay:
         d["lastCycleCats"]=dict(d.get("spendCats",{}))
-        for c in d["commitments"]: c["paid"]=False; c.pop("actual",None)
+        for c in d["commitments"]: c["paid"]=False; c.pop("actual",None); c.pop("tickedAt",None)
         d["spendCats"]={}
         g=find(d["goals"],"id","under")
         if g: g["cur"]=0
@@ -220,6 +220,10 @@ def main():
                 if "balance" in obj:
                     balance=float(obj["balance"]); changed=True
                     d["last_data_msgid"]=latest[2]
+                    # A ground-truth correction, same as tapping "Set real balance" in the app:
+                    # settles every commitment ticked before this instant so the app doesn't
+                    # keep subtracting them from a balance that already accounts for them.
+                    d["balanceAnchoredAt"]=datetime.now(timezone.utc).isoformat().replace("+00:00","Z")
                     log("balance override ->", balance)
             except json.JSONDecodeError as e:
                 log("override JSON invalid:", e)
