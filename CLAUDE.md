@@ -19,6 +19,29 @@ There is nothing to build. To verify a change, syntax-check the artifacts:
 **Do not commit `data.json` from a branch.** The robot rewrites it on `main` roughly daily
 and the app writes on every edit, so a branch snapshot will clobber newer state at merge.
 
+## 2026-07-27 — salmoamary-svg — a dismissed token prompt silently ate the edit
+
+### What changed
+Both token gates (`saveData`, `runRobot`) did `if(!t)return` on a cancelled prompt, so a tick
+or a review-card label just appeared not to work — no message, no saved state. They now say
+so: `saveData` alerts that nothing was written, and the Update button reads `🔑 token needed`
+and stays tappable. `BUILD` bumped to `2026-07-27d`.
+
+This surfaces because **iOS gives a home-screen web app its own storage container, separate
+from Safari's**. A token entered in one is simply absent in the other, so the prompt reappears
+long after it was first answered, on an app that has been working for weeks. Same for the PIN.
+
+### Repo is public, deliberately
+`data.json` — salary, balance, debts, transactions — is readable by anyone, unauthenticated.
+This was reviewed and **kept**: it is what lets the app display numbers without a token. The
+two alternatives both cost more than they are worth here:
+- Flipping the repo private **breaks Pages on a Free plan** (private-repo Pages needs Pro), so
+  it would take the app offline, not just secure it.
+- Moving `data.json` to a private repo works on Free but needs a second repo, a cross-repo PAT
+  in Actions for the robot, and the token becomes mandatory just to *read*.
+A "secret" gist is not private — anyone with the link can read it — so it buys nothing.
+Revisit only if the account moves to Pro.
+
 ## 2026-07-27 — salmoamary-svg — the tick as a manual lever, and shipping that actually arrives
 
 ### What changed

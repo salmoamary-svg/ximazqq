@@ -228,7 +228,7 @@ const TKEY='saad_money_gh_pat';
 // load, but the HTML itself is whatever copy the phone cached — an iOS home-screen app can
 // hold it indefinitely, so the data looks current while the logic is months old. checkBuild()
 // compares this against the copy on main and offers a reload the cache can't satisfy.
-const BUILD='2026-07-27c';
+const BUILD='2026-07-27d';
 let DATA=null;
 const f=n=>Math.round(n).toLocaleString('en-US');
 const money=n=>Number(n).toLocaleString('en-US',{minimumFractionDigits:Number.isInteger(Number(n))?0:2,maximumFractionDigits:2});
@@ -450,7 +450,14 @@ if(rb&&rb!==BUILD)document.getElementById('newbuild').style.display='block';
 // back out of the same cache that made the app stale in the first place.
 function reloadFresh(){location.replace(location.pathname+'?v='+Date.now());}
 async function saveData(mut){
-let t=token();if(!t){t=prompt('Paste your GitHub token to save changes');if(!t)return;t=t.trim();localStorage.setItem(TKEY,t);}
+// Dismissing the prompt used to drop the edit on the floor with no message, so a tick or a
+// label just appeared not to work. iOS keeps a home-screen app's storage apart from Safari's,
+// so a token saved in one context is simply absent in the other — which makes this prompt show
+// up unexpectedly, long after it was first answered.
+let t=token();
+if(!t){t=prompt('Paste your GitHub token to save changes');
+if(!t){alert("Not saved — Saad Money needs your GitHub token to write changes. Nothing was lost, just tap again when you have it.");return;}
+t=t.trim();localStorage.setItem(TKEY,t);}
 const h={'Authorization':'Bearer '+t,'Accept':'application/vnd.github+json'};
 // Try up to 5 times. On a 409/422 conflict (robot wrote at the same moment),
 // silently re-fetch the freshest file, re-apply this change, and resend.
@@ -795,7 +802,10 @@ document.getElementById('windbox').value='';
  
 async function runRobot(){
 const b=document.getElementById('robotBtn');
-let t=token();if(!t){t=prompt('Paste your GitHub token');if(!t)return;t=t.trim();localStorage.setItem(TKEY,t);}
+let t=token();
+if(!t){t=prompt('Paste your GitHub token');
+if(!t){b.textContent='🔑 token needed';return;} // say why nothing happened; button stays tappable
+t=t.trim();localStorage.setItem(TKEY,t);}
 b.disabled=true;b.textContent='⏳ starting…';
 const H={'Authorization':'Bearer '+t,'Accept':'application/vnd.github+json'};
 const WF=API+'/actions/workflows/update.yml';
