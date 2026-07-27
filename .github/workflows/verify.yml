@@ -1,0 +1,29 @@
+name: Verify BUILD bump
+# index.html is served straight from main with no build step, and an iOS home-screen app can
+# hold a cached copy indefinitely. The BUILD constant is what lets the app notice its own code
+# is stale and offer a reload — but only if it actually changes whenever index.html does. This
+# catches the one way that silently fails: shipping an index.html edit without bumping it.
+on:
+  push:
+    branches: [main]
+    paths: [index.html]
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: BUILD must change whenever index.html does
+        run: |
+          if git diff --quiet HEAD^ HEAD -- index.html; then
+            echo "index.html unchanged in this push — nothing to check."
+            exit 0
+          fi
+          old=$(git show HEAD^:index.html | grep -m1 "^const BUILD=" || echo "")
+          new=$(grep -m1 "^const BUILD=" index.html || echo "")
+          if [ "$old" = "$new" ]; then
+            echo "::error file=index.html::index.html changed but BUILD did not ($new). Bump it, or the update banner on the live app will never fire and a phone can be left running stale code indefinitely."
+            exit 1
+          fi
+          echo "BUILD bumped: $old -> $new"

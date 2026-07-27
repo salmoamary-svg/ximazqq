@@ -53,6 +53,19 @@ Four suites in the session scratchpad, all against the frozen `fixture.json`:
 `harness.js` (58, classification + envelope), `split.js` (16), `cancel.js` (8, token-cancel),
 `balance.js` (26, balance adjustment + double-count guard).
 
+## 2026-07-27 — salmoamary-svg — CI catches a forgotten BUILD bump
+
+### What changed
+New `.github/workflows/verify.yml`, triggered only on a push to `main` that touches `index.html`
+(so the robot's data-only `auto-update` commits never run it). Diffs `index.html` against the
+previous commit; if it changed but the `^const BUILD=` line didn't, the run fails with an
+explicit error instead of silently shipping a build the app can never detect on its own.
+
+Purely advisory — no branch protection exists, so a failing run doesn't block anything, it just
+turns the commit red on GitHub. Verified directly against this session's real history (three
+commits that each correctly bumped `BUILD`, all pass) and a synthetic commit that edits
+`index.html` without bumping it (correctly fails).
+
 ## 2026-07-27 — salmoamary-svg — goals stop reading 0%
 
 ### What changed
