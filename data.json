@@ -1,5 +1,5 @@
 {
- "asOf": "2026-07-27 10:58 PM",
+ "asOf": "2026-07-27 10:59 PM",
  "balance": 19074.35,
  "salary": 27932,
  "cushion": 200,
@@ -141,8 +141,9 @@
    "id": "sisA",
    "name": "Sister A.",
    "amount": 1000,
-   "paid": false,
-   "grp": "future"
+   "paid": true,
+   "grp": "future",
+   "actual": 1000
   },
   {
    "id": "cc",
