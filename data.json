@@ -89,8 +89,10 @@
    "id": "phone",
    "name": "Phone / telecom",
    "amount": 1720,
-   "paid": false,
-   "grp": "commit"
+   "paid": true,
+   "grp": "commit",
+   "actual": 1170,
+   "tickedAt": "2026-07-27T20:33:13Z"
   },
   {
    "id": "maid",
