@@ -228,7 +228,7 @@ const TKEY='saad_money_gh_pat';
 // load, but the HTML itself is whatever copy the phone cached — an iOS home-screen app can
 // hold it indefinitely, so the data looks current while the logic is months old. checkBuild()
 // compares this against the copy on main and offers a reload the cache can't satisfy.
-const BUILD='2026-07-27g';
+const BUILD='2026-07-27h';
 let DATA=null;
 const f=n=>Math.round(n).toLocaleString('en-US');
 const money=n=>Number(n).toLocaleString('en-US',{minimumFractionDigits:Number.isInteger(Number(n))?0:2,maximumFractionDigits:2});
@@ -316,6 +316,23 @@ function sumTx(tx,start,end){ // sums *living* spend in [start,end); bills come 
 return (tx||[]).reduce((a,row)=>{const t=new Date(row[0]);
 if(t<start||t>=end)return a;
 return classifyTx(row).kind==='living'?a+Number(row[2]):a;},0);
+}
+// Progress toward a goal, derived from ground truth that's already tracked elsewhere wherever
+// possible, rather than a number that has to be hand-updated and drifts the moment it's forgotten:
+//   - sisE/cc: debts[].remaining is already the running truth (the payday sweep credits sisE,
+//     update_app.py credits cc on every settlement), so progress is just tgt minus what's left.
+//   - buffer: no debt backs it, so update_app.py accumulates DATA.bufferSaved at each cycle
+//     rollover whenever the buffer commitment was paid — the one goal that has to be persisted
+//     because the money it tracks doesn't live anywhere else once the cycle resets.
+//   - anything else (the 'under' spend-this-cycle goal, or a custom goal added in the app):
+//     stored g.cur is already the source of truth, left untouched.
+function goalCur(g){
+if(g.id==='sisE'||g.id==='cc'){
+const db=(DATA.debts||[]).find(x=>x.id===g.id);
+return db?Math.max(0,Number(g.tgt)-Number(db.remaining)):Number(g.cur)||0;
+}
+if(g.id==='buffer')return Number(DATA.bufferSaved)||0;
+return Number(g.cur)||0;
 }
 function livingAllocation(){ // the "Living" slice of the 47/30/23 split — what a month of spending is meant to cost
 return (DATA.commitments||[]).filter(c=>(c.grp||'commit')==='living')
@@ -627,11 +644,12 @@ document.getElementById('debts').innerHTML+=`<div class="addrow" onclick="addDeb
  
 // goals (tap to edit)
 document.getElementById('goals').innerHTML=(DATA.goals||[]).map(g=>{
-const p=g.tgt>0?Math.min(100,Math.round(g.cur/g.tgt*100)):0;
+const cur=goalCur(g);
+const p=g.tgt>0?Math.min(100,Math.round(cur/g.tgt*100)):0;
 return `<div class="goal" onclick="editGoal('${g.id}')"><div class="g-top"><div class="g-nm">${g.name}</div>
 <div class="g-pct" style="color:${g.col}">${p}%</div></div>
 <div class="bar"><i style="width:${p}%;background:${g.col}"></i></div>
-<div class="g-sub">${f(g.cur)} / ${f(g.tgt)} SAR — ${g.sub} · <span class="edit">tap to edit</span></div></div>`;}).join('')
+<div class="g-sub">${f(cur)} / ${f(g.tgt)} SAR — ${g.sub} · <span class="edit">tap to edit</span></div></div>`;}).join('')
 +`<div class="addrow" onclick="addGoal()">＋ Add goal</div>`;
  
 // month

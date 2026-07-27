@@ -53,6 +53,27 @@ Four suites in the session scratchpad, all against the frozen `fixture.json`:
 `harness.js` (58, classification + envelope), `split.js` (16), `cancel.js` (8, token-cancel),
 `balance.js` (26, balance adjustment + double-count guard).
 
+## 2026-07-27 — salmoamary-svg — goals stop reading 0%
+
+### What changed
+All four goal bars always read 0% — `goals[].cur` was never updated by anything. `goalCur(g)`
+(`index.html`) now derives progress at render time from ground truth that mostly already exists,
+rather than a number someone has to remember to update:
+- **Sister E. / Credit card** — `tgt - debts[id].remaining`. `debts[].remaining` is already
+  continuously maintained (the payday sweep credits Sister E., `update_app.py` credits the card
+  on every settlement), so this is a pure read of data that was already correct; it just wasn't
+  connected to the goal bar.
+- **Emergency buffer** — no debt backs it, so there was nothing existing to read. New
+  `DATA.bufferSaved`, accumulated by `update_app.py` at each cycle rollover if the buffer
+  commitment was paid, *before* `paid`/`actual` are cleared for the new cycle. This is the one
+  goal whose progress had to become newly persisted state, since the money it tracks doesn't live
+  anywhere else once a cycle turns over.
+- Everything else (the robot-maintained "under" goal, any custom goal added in the app) is
+  untouched — `goalCur` returns the stored `cur` unchanged.
+
+9 checks (`goals.js`) plus the rollover accumulation logic tested directly against
+`update_app.py`'s own code (paid/unpaid/no-actual-entered cases). `BUILD` → `2026-07-27h`.
+
 ## 2026-07-27 — salmoamary-svg — overnight pass: the tick/balance feature had a real bug, and needed an override
 
 ### What triggered this

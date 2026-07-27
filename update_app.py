@@ -131,6 +131,12 @@ def main():
     pay=latest_payday(today).isoformat()
     if d.get("cycleStart") != pay:
         d["lastCycleCats"]=dict(d.get("spendCats",{}))
+        # The buffer goal has no debts entry to read progress from, so this is the one figure
+        # that has to be persisted here: paid/actual reset below and the money it represents
+        # doesn't live anywhere else once the cycle turns over.
+        buf=find(d["commitments"],"id","buffer")
+        if buf and buf.get("paid"):
+            d["bufferSaved"]=round(d.get("bufferSaved",0)+float(buf.get("actual") or buf["amount"]),2)
         for c in d["commitments"]: c["paid"]=False; c.pop("actual",None); c.pop("tickedAt",None)
         d["spendCats"]={}
         g=find(d["goals"],"id","under")
