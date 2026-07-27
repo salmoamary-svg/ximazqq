@@ -229,9 +229,15 @@ function sunday(d){const nd=dOnly(d);nd.setDate(nd.getDate()-nd.getDay());return
 function sumTx(tx,start,end){ // sums transactions in [start,end)
 return (tx||[]).reduce((a,row)=>{const t=new Date(row[0]);return (t>=start&&t<end)?a+Number(row[2]):a;},0);
 }
-function computeEnvelope(){ // current spendable pot: balance minus the untouchable cushion
+function livingAllocation(){ // the "Living" slice of the 47/30/23 split — what a month of spending is meant to cost
+return (DATA.commitments||[]).filter(c=>(c.grp||'commit')==='living')
+.reduce((a,c)=>a+(Number(c.amount)||0),0);
+}
+function computeEnvelope(){ // a cycle's spending pot: the Living slice, but never more cash than actually exists
 const bal=Number(DATA.balance)||0, cushion=Number(DATA.cushion)||200;
-return Math.max(0,bal-cushion);
+const avail=Math.max(0,bal-cushion);
+const living=livingAllocation();
+return living>0?Math.min(living,avail):avail;
 }
 // Advances a persisted weekly-ledger state forward to "now", crossing as many Sunday
 // and payday boundaries as needed. Pure function of (state, transactions, now) so it's easy to reason about.
@@ -276,23 +282,50 @@ const spentSoFar=sumTx(tx,weekStart,addDays(today,1));
 return{weekStart:isoDate(weekStart),startAmount,cycleEnd:isoDate(cycleEnd),dailyRate,selfDebt,
 currentBudget:startAmount-spentSoFar,emanPayment};
 }
+// The payday sweep sets the cycle's rate from whatever balance is on file at that moment — which is
+// zero-ish when the salary lands after the rollover. This re-rates the cycle once the money shows up.
+// Upward only: spending during the cycle must never shrink the envelope, that's what rollover is for.
+function healWeekly(w,now){
+const today=dOnly(now),cycleEnd=new Date(w.cycleEnd+'T00:00:00'),weekStart=new Date(w.weekStart+'T00:00:00');
+if(today>=cycleEnd)return null;
+if(isoDate(cycleEnd)!==isoDate(paydayAfter(now)))return null; // ledger out of step with the calendar — leave it alone
+const cycleStart=latestPayday(now);
+const cycleDays=Math.max(1,Math.round((cycleEnd-cycleStart)/86400000));
+const rate=computeEnvelope()/cycleDays;
+if(rate<=(Number(w.dailyRate)||0)+0.01)return null;
+const nextB=addDays(weekStart,7)<cycleEnd?addDays(weekStart,7):cycleEnd;
+const days=Math.max(1,Math.round((nextB-weekStart)/86400000));
+const carry=(Number(w.startAmount)||0)-(Number(w.dailyRate)||0)*days; // last week's rollover, kept as-is
+return{weekStart:w.weekStart,startAmount:carry+rate*days,cycleEnd:w.cycleEnd,dailyRate:rate,selfDebt:w.selfDebt||0};
+}
+// The ledger as of "now": rolled forward across any boundaries, then re-rated if it was set from a stale balance.
+function weeklyView(now){
+if(!DATA.weekly)return null;
+const r=advanceWeekly(DATA.weekly,DATA.transactions||[],now);
+const h=healWeekly(r,now);
+if(!h)return r;
+const spentSoFar=sumTx(DATA.transactions||[],new Date(h.weekStart+'T00:00:00'),addDays(dOnly(now),1));
+return Object.assign({},h,{currentBudget:h.startAmount-spentSoFar,emanPayment:r.emanPayment});
+}
 async function ensureWeekly(){
 const now=new Date();
 if(!DATA.weekly){
 const cs=DATA.cycleStart?new Date(DATA.cycleStart+'T00:00:00'):latestPayday(now);
-const cycleEndDate=paydayAfter(now); // rate is based on days actually remaining, since we're initializing mid-cycle
-const daysRemaining=Math.max(1,Math.round((cycleEndDate-dOnly(now))/86400000));
+const cycleEndDate=paydayAfter(now);
+const cycleDays=Math.max(1,Math.round((cycleEndDate-dOnly(cs))/86400000));
 const envelope=computeEnvelope();
-const dailyRate=envelope/daysRemaining;
+const dailyRate=envelope/cycleDays; // the rate spreads the pot over the whole cycle...
 let ws=sunday(now);if(ws<dOnly(cs))ws=dOnly(cs);
 const nextB=addDays(ws,7)<cycleEndDate?addDays(ws,7):cycleEndDate;
-const daysLeftInStretch=Math.max(1,Math.round((nextB-dOnly(now))/86400000));
+const daysLeftInStretch=Math.max(1,Math.round((nextB-dOnly(now))/86400000)); // ...but we're starting mid-week, so only credit the days still ahead
 await saveData(cur=>{cur.weekly={weekStart:isoDate(ws),startAmount:dailyRate*daysLeftInStretch,
 cycleEnd:isoDate(cycleEndDate),dailyRate,selfDebt:0};});
 return;
 }
-const r=advanceWeekly(DATA.weekly,DATA.transactions||[],now);
-const changed=r.weekStart!==DATA.weekly.weekStart||r.cycleEnd!==DATA.weekly.cycleEnd;
+const r=weeklyView(now),w=DATA.weekly;
+const changed=r.weekStart!==w.weekStart||r.cycleEnd!==w.cycleEnd
+||Math.abs(r.dailyRate-(Number(w.dailyRate)||0))>0.005
+||Math.abs(r.startAmount-(Number(w.startAmount)||0))>0.005;
 if(changed){
 await saveData(cur=>{
 cur.weekly={weekStart:r.weekStart,startAmount:r.startAmount,cycleEnd:r.cycleEnd,dailyRate:r.dailyRate,selfDebt:r.selfDebt};
@@ -348,8 +381,8 @@ const bal=Number(DATA.balance)||0, salary=Number(DATA.salary)||27932, cushion=Nu
 const pd=paydayAfter(now);
 const days=Math.max(1,Math.ceil((pd-now)/86400000));
 const unpaid=commits.filter(c=>!c.paid&&c.id!=='living').reduce((a,c)=>a+Number(c.amount),0);
-const wkly=DATA.weekly;
-const weekly=wkly?advanceWeekly(wkly,DATA.transactions||[],now).currentBudget:0;
+const wkly=weeklyView(now);
+const weekly=wkly?wkly.currentBudget:0;
 const daily=wkly&&wkly.dailyRate||0;
  
 document.getElementById('mo').textContent=now.toLocaleDateString('en-US',{month:'long',year:'numeric'});
