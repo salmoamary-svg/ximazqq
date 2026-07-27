@@ -1,5 +1,5 @@
 {
- "asOf": "2026-07-27 10:57 PM",
+ "asOf": "2026-07-27 10:58 PM",
  "balance": 19074.35,
  "salary": 27932,
  "cushion": 200,
@@ -110,7 +110,7 @@
   {
    "id": "elec",
    "name": "Electricity",
-   "amount": 500,
+   "amount": 527,
    "paid": false,
    "grp": "commit"
   },
