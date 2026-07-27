@@ -1,5 +1,5 @@
 {
- "asOf": "2026-07-27 06:50 AM",
+ "asOf": "2026-07-27 08:03 AM",
  "balance": 28081.34,
  "salary": 27932,
  "cushion": 200,
@@ -437,9 +437,9 @@
  ],
  "weekly": {
   "weekStart": "2026-07-27",
-  "startAmount": 0,
+  "startAmount": 1433.1935483870968,
   "cycleEnd": "2026-08-27",
-  "dailyRate": 0,
+  "dailyRate": 204.74193548387098,
   "selfDebt": 0
  }
 }
