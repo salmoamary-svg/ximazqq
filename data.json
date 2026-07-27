@@ -104,8 +104,9 @@
    "id": "groc",
    "name": "Groceries → wife",
    "amount": 1000,
-   "paid": false,
-   "grp": "commit"
+   "paid": true,
+   "grp": "commit",
+   "actual": 1000
   },
   {
    "id": "elec",
