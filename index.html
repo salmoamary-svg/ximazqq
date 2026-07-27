@@ -86,6 +86,14 @@ align-items:center;justify-content:center;gap:18px}
 .pad button{height:64px;border-radius:50%;border:1px solid var(--line);background:var(--card);
 color:var(--ink);font-size:22px;font-weight:600}
 .pad button:active{background:#22374d}
+.rv{padding:10px 2px;border-bottom:1px solid var(--line)}
+.rv .rv-t{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.rv .rv-n{font-size:14px}.rv .rv-a{font-variant-numeric:tabular-nums;font-weight:750;font-size:15px}
+.rv .rv-b{display:flex;gap:8px;margin-top:8px}
+.rv .rv-b button{flex:1;background:#0f1c2a;border:1px solid var(--line);color:var(--ink);
+border-radius:10px;padding:8px;font-size:12.5px;font-weight:650}
+.rv .rv-b button.pri{border-color:var(--teal);color:var(--teal)}
+.rv.done .rv-n{color:var(--sub)}
 .wk-cmp{margin:8px 0}
 .wk-cmp .wk-cat{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;margin-bottom:2px;gap:8px}
 .wk-cmp .wk-cat .d-up{color:var(--red);font-weight:650}
@@ -141,7 +149,14 @@ padding:10px 16px;font-size:14px;font-weight:700;box-shadow:0 4px 14px rgba(0,0,
 <button onclick="addWindfall()">Add</button>
 </div>
 </div>
- 
+
+<div class="card" id="reviewcard" style="display:none">
+<div class="sec-title" id="review-title">Needs a label</div>
+<div id="reviewlist"></div>
+<div class="note">Big payments the app couldn't place on its own. They're held out of this
+week's money until you say — so the number above is incomplete, not wrong.</div>
+</div>
+
 <div class="card">
 <div class="sec-title">The 47 / 30 / 23 split (payday)</div>
 <div id="splitbars"></div>
@@ -225,9 +240,68 @@ function dOnly(d){return new Date(d.getFullYear(),d.getMonth(),d.getDate());}
 function addDays(d,n){const nd=new Date(d);nd.setDate(nd.getDate()+n);return nd;}
 function sunday(d){const nd=dOnly(d);nd.setDate(nd.getDate()-nd.getDay());return nd;} // most recent Sunday (getDay()===0)
  
+// ---- Transaction classification: which debits are living spend, which are bills ----
+// The 47/30/23 split already funds commitments and debts out of their own slices, so letting
+// a bill hit the weekly envelope charges the same riyal twice. Everything below is derived
+// from the raw transaction list at render time — nothing is written into data.json — so a
+// rule change (or a correction) re-rates history on the next load.
+const CATCLASS={loan:'bill',stc:'bill',phone:'bill',cc:'bill',carins:'bill',bnpl:'bill',family:'bill',
+everyday:'living',shopping:'living',bills:'living',travel:'living'}; // 'bills' is medical/pharmacy, not household bills
+// Categories that map to exactly one commitment, so a debit there can tick it off. stc and
+// family each span several commitments — kept out of the envelope, but never auto-attributed.
+const CAT2COMMIT={phone:'phone',loan:'loan',cc:'cc',carins:'carins'};
+// 'everyday' is update_app.py's fallback bucket — a debit lands there precisely because nothing
+// identified it, which is also where mislabelled bank transfers end up. It is the only category
+// we ever second-guess. Every other living category matched a positive keyword rule, so it really
+// is that thing and always counts, however large.
+const UNIDENTIFIED={everyday:1};
+// A debit worth 3+ days of living money is not groceries. Anchored to the Living *plan*
+// rather than the ledger's dailyRate, so classification stays a pure function of the budget
+// and can't feed back into the rate it helps compute.
+function reviewMin(){const living=livingAllocation();return Math.max(500,(living>0?living:6000)/30*3);}
+// Nearest commitment whose plan matches this amount. Deliberately ignores each commitment's
+// `paid` flag: paid state is *derived* from classification (see paidByTx), so reading it here
+// would be circular. Only ever called for debits above reviewMin(), which is what stops a real
+// 1,000 SAR shopping trip from being swallowed by the 1,000 SAR groceries commitment.
+function matchCommit(amt){
+const tol=Math.max(25,amt*0.02);let best=null,bestD=Infinity;
+(DATA.commitments||[]).forEach(c=>{if(c.id==='living')return;
+const d=Math.abs((Number(c.amount)||0)-amt);if(d<=tol&&d<bestD){best=c.id;bestD=d;}});
+return best;
+}
+// 'living' draws the weekly envelope, 'bill' never does, 'review' is a large unlabelled debit —
+// held out of the envelope and surfaced on the review card rather than guessed at.
+function classifyTx(row){
+const cat=row[1],amt=Number(row[2])||0;
+const ov=(DATA.txClass||{})[row[0]];
+if(ov&&ov.kind)return{kind:ov.kind==='bill'?'bill':'living',commit:ov.commit||null,manual:true};
+if(CATCLASS[cat]==='bill')return{kind:'bill',commit:CAT2COMMIT[cat]||null,auto:true};
+if(!UNIDENTIFIED[cat])return{kind:'living',commit:null}; // positively identified as living spend
+if(amt<reviewMin())return{kind:'living',commit:null}; // ordinary day-to-day spend always counts
+const m=matchCommit(amt); // large and unidentified — most likely a bill that lost its label
+if(m)return{kind:'bill',commit:m,auto:true,guess:true};
+return{kind:'review',commit:null};
+}
+// Every transaction in the current cycle, classified. Feeds the review card and the paid meter.
+function cycleTx(now){
+const cs=DATA.cycleStart?new Date(DATA.cycleStart+'T00:00:00'):latestPayday(now);
+const end=addDays(dOnly(now),1);
+return (DATA.transactions||[]).filter(r=>{const t=new Date(r[0]);return t>=cs&&t<end;})
+.map(r=>Object.assign({iso:r[0],cat:r[1],amt:Number(r[2])||0},classifyTx(r)));
+}
+// What each commitment has actually been paid, according to the transactions attributed to it.
+// Display-only — never persisted, so the robot stays the sole writer of the stored `paid` flag.
+function paidByTx(now){
+const out={};
+cycleTx(now).forEach(t=>{if(t.kind==='bill'&&t.commit)out[t.commit]=(out[t.commit]||0)+t.amt;});
+return out;
+}
+
 // ---- Weekly envelope ledger: fixed Sun–Sat weeks, rollover both ways, cycle-end sweep to Eman ----
-function sumTx(tx,start,end){ // sums transactions in [start,end)
-return (tx||[]).reduce((a,row)=>{const t=new Date(row[0]);return (t>=start&&t<end)?a+Number(row[2]):a;},0);
+function sumTx(tx,start,end){ // sums *living* spend in [start,end); bills come out of their own slices
+return (tx||[]).reduce((a,row)=>{const t=new Date(row[0]);
+if(t<start||t>=end)return a;
+return classifyTx(row).kind==='living'?a+Number(row[2]):a;},0);
 }
 function livingAllocation(){ // the "Living" slice of the 47/30/23 split — what a month of spending is meant to cost
 return (DATA.commitments||[]).filter(c=>(c.grp||'commit')==='living')
@@ -374,7 +448,13 @@ function render(){
 if(!DATA)return;
 const now=new Date();
 const stale=DATA.cycleStart && DATA.cycleStart < isoDate(latestPayday(now));
-const commits=(DATA.commitments||[]).map(c=>Object.assign({},c,{paid:stale?false:!!c.paid}));
+// A commitment counts as paid if it was ticked by hand, or if the transactions attributed to
+// it cover most of its plan. Derived only — the stored flag is left for the robot to manage.
+const byTx=stale?{}:paidByTx(now);
+const commits=(DATA.commitments||[]).map(c=>{
+const seen=byTx[c.id]||0,manual=stale?false:!!c.paid;
+const auto=!manual&&seen>=Number(c.amount)*0.9;
+return Object.assign({},c,{paid:manual||auto,actual:manual?c.actual:(auto?seen:undefined),viaTx:auto});});
 const cats=stale?{}:(DATA.spendCats||{});
 const bal=Number(DATA.balance)||0, salary=Number(DATA.salary)||27932, cushion=Number(DATA.cushion)||200;
  
@@ -412,9 +492,10 @@ document.getElementById('paidnote').textContent='Paid so far this cycle: '+f(pai
 document.getElementById('commits').innerHTML=commits.map(c=>{
 const shown=c.paid?(c.actual!=null?c.actual:c.amount):c.amount;
 const hint=(c.paid&&c.actual!=null&&Number(c.actual)!==Number(c.amount))?` <span style="color:var(--sub);font-weight:400">· plan ${f(c.amount)}</span>`:'';
+const src=c.viaTx?` <span style="color:var(--sub);font-weight:400">· from your payments</span>`:'';
 return `<div class="crow ${c.paid?'paid':''}" style="flex-wrap:wrap;border-bottom:none;margin-bottom:2px">
 <span class="ck ${c.paid?'on':''}" onclick="toggleCommit('${c.id}')">${c.paid?'✓':''}</span>
-<span class="cn" onclick="toggleCommit('${c.id}')">${c.star?'⭐ ':''}${c.name}${hint}</span>
+<span class="cn" onclick="toggleCommit('${c.id}')">${c.star?'⭐ ':''}${c.name}${hint}${src}</span>
 <span class="ca" onclick="toggleCommit('${c.id}')">${f(shown)} / ${f(c.amount)}</span>
 <span class="pen" onclick="editCommit('${c.id}')">✏️</span>
 <div style="flex-basis:100%;padding-left:33px"><div class="bar" style="margin-top:2px"><i style="width:${c.paid?100:0}%;background:${c.paid?'var(--green)':'var(--line)'}"></i></div></div>
@@ -475,9 +556,51 @@ if(diff<0){mt.textContent='↓ '+pct+'% less than last cycle so far';mt.style.co
 else if(diff>0){mt.textContent='↑ '+pct+'% more than last cycle so far';mt.style.color='var(--red)';}
 else{mt.textContent='Same as last cycle so far';mt.style.color='var(--sub)';}}
 else{mt.textContent='';}
-renderWeekly();renderDaily();
+renderWeekly();renderDaily();renderReview(now);
 }
- 
+
+// Large debits the rules couldn't place, plus the ones they placed by guessing at the amount —
+// both need to be visible and one tap from correct, since either can be wrong in a way that
+// silently moves the week's number.
+function renderReview(now){
+const card=document.getElementById('reviewcard');if(!card)return;
+const items=cycleTx(now).filter(t=>t.kind==='review'||t.guess).reverse();
+if(items.length===0){card.style.display='none';return;}
+card.style.display='';
+const pend=items.filter(t=>t.kind==='review').length;
+document.getElementById('review-title').textContent=pend
+?(pend===1?'1 payment needs a label':pend+' payments need a label')
+:'Payments matched to bills';
+document.getElementById('reviewlist').innerHTML=items.map(t=>{
+const when=new Date(t.iso).toLocaleDateString('en-US',{day:'numeric',month:'short'});
+if(t.kind==='review')return `<div class="rv">
+<div class="rv-t"><div class="rv-n">${when} · ${catLabel(t.cat)}</div><div class="rv-a">${f(t.amt)}</div></div>
+<div class="rv-b"><button class="pri" onclick="labelTx('${t.iso}','bill')">It's a bill</button>
+<button onclick="labelTx('${t.iso}','living')">Living spend</button></div></div>`;
+const cm=(DATA.commitments||[]).find(c=>c.id===t.commit);
+return `<div class="rv done">
+<div class="rv-t"><div class="rv-n">${when} · matched to <b>${cm?cm.name:t.commit}</b></div><div class="rv-a">${f(t.amt)}</div></div>
+<div class="rv-b"><button onclick="labelTx('${t.iso}','living')">No — living spend</button></div></div>`;
+}).join('');
+}
+// Records the user's call on one transaction. Keyed by timestamp so it survives the robot's
+// appends and the 200-transaction trim, and so we never ask about the same debit twice.
+function labelTx(iso,kind){
+let commit=null;
+if(kind==='bill'){
+const seen=paidByTx(new Date()); // don't offer bills your own transactions already cover
+const open=(DATA.commitments||[]).filter(c=>c.id!=='living'&&!c.paid&&!((seen[c.id]||0)>=Number(c.amount)*0.9));
+if(open.length){
+const list=open.map((c,i)=>(i+1)+'. '+c.name+' ('+f(c.amount)+')').join('\n');
+const a=prompt('Which bill was this? Number, or blank to just keep it out of your weekly money.\n\n'+list);
+if(a===null)return; // cancelled — leave it pending
+const n=parseInt(a,10);
+if(n>=1&&n<=open.length)commit=open[n-1].id;
+}
+}
+saveData(cur=>{cur.txClass=cur.txClass||{};cur.txClass[iso]={kind:kind,commit:commit};});
+}
+
 function catLabel(id){const m=(DATA.catMeta||[]).find(x=>x[0]===id);return m?m[1]:id;}
 function renderWeekly(){
 const el=document.getElementById('weekcmp');if(!el)return;
