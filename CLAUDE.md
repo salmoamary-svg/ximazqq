@@ -19,6 +19,30 @@ There is nothing to build. To verify a change, syntax-check the artifacts:
 **Do not commit `data.json` from a branch.** The robot rewrites it on `main` roughly daily
 and the app writes on every edit, so a branch snapshot will clobber newer state at merge.
 
+## 2026-07-27 — salmoamary-svg — one payment, two bills
+
+### What changed
+A single 2,500 transfer turned out to be the maid (1,500) and the wife's groceries (1,000)
+together, and `txClass` held exactly one `commit` per transaction — so attributing it
+overstated whichever bill was picked and left the other showing unpaid.
+
+`txClass[iso]` now takes an optional `split: [{commit,amt},…]` alongside the existing
+`commit`. `splitByPlan()` divides the payment in proportion to the commitments' plans, with
+the rounding remainder on the last part so the pieces always add back to the whole. The
+review card's bill prompt accepts several numbers ("3,4"), and renders a split as
+`Housemaid 1,500 + Groceries → wife 1,000`. Old single-`commit` entries still work; there is
+no migration. `BUILD` → `2026-07-27e`.
+
+The review card also now keeps listing labels set by hand, not just pending and guessed ones.
+Before this a hand label vanished the moment it saved, so a wrong pick had no undo path.
+
+### The amount-guess misfired, as predicted
+`matchCommit` attached the *standalone* 1,500 debit to Housemaid because the amount matched
+the plan exactly — but the maid was actually paid inside the 2,500. Two payments, one bill.
+The guess is visible and one tap from undone, which is the whole reason guesses are surfaced
+rather than applied silently, but it is a live example of the failure mode: **amount alone
+cannot distinguish two debits that both look like the same bill.**
+
 ## 2026-07-27 — salmoamary-svg — a dismissed token prompt silently ate the edit
 
 ### What changed

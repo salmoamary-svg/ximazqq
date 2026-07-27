@@ -228,7 +228,7 @@ const TKEY='saad_money_gh_pat';
 // load, but the HTML itself is whatever copy the phone cached — an iOS home-screen app can
 // hold it indefinitely, so the data looks current while the logic is months old. checkBuild()
 // compares this against the copy on main and offers a reload the cache can't satisfy.
-const BUILD='2026-07-27d';
+const BUILD='2026-07-27e';
 let DATA=null;
 const f=n=>Math.round(n).toLocaleString('en-US');
 const money=n=>Number(n).toLocaleString('en-US',{minimumFractionDigits:Number.isInteger(Number(n))?0:2,maximumFractionDigits:2});
@@ -282,7 +282,11 @@ return best;
 function classifyTx(row){
 const cat=row[1],amt=Number(row[2])||0;
 const ov=(DATA.txClass||{})[row[0]];
-if(ov&&ov.kind)return{kind:ov.kind==='bill'?'bill':'living',commit:ov.commit||null,manual:true};
+// A hand label wins outright. `split` carries one payment across several commitments — one
+// transfer routinely covers the maid and the groceries together, and attributing the whole
+// amount to whichever one you picked first overstates that bill and leaves the other unpaid.
+if(ov&&ov.kind)return{kind:ov.kind==='bill'?'bill':'living',commit:ov.commit||null,
+split:(ov.split&&ov.split.length)?ov.split:null,manual:true};
 if(CATCLASS[cat]==='bill')return{kind:'bill',commit:CAT2COMMIT[cat]||null,auto:true};
 if(!UNIDENTIFIED[cat])return{kind:'living',commit:null}; // positively identified as living spend
 if(amt<reviewMin())return{kind:'living',commit:null}; // ordinary day-to-day spend always counts
@@ -301,7 +305,9 @@ return (DATA.transactions||[]).filter(r=>{const t=new Date(r[0]);return t>=cs&&t
 // Display-only — never persisted, so the robot stays the sole writer of the stored `paid` flag.
 function paidByTx(now){
 const out={};
-cycleTx(now).forEach(t=>{if(t.kind==='bill'&&t.commit)out[t.commit]=(out[t.commit]||0)+t.amt;});
+cycleTx(now).forEach(t=>{if(t.kind!=='bill')return;
+if(t.split){t.split.forEach(s=>{if(s&&s.commit)out[s.commit]=(out[s.commit]||0)+(Number(s.amt)||0);});return;}
+if(t.commit)out[t.commit]=(out[t.commit]||0)+t.amt;});
 return out;
 }
 
@@ -601,7 +607,9 @@ renderWeekly();renderDaily();renderReview(now);
 // silently moves the week's number.
 function renderReview(now){
 const card=document.getElementById('reviewcard');if(!card)return;
-const items=cycleTx(now).filter(t=>t.kind==='review'||t.guess).reverse();
+// Pending decisions, amount-guesses, and labels you set by hand. Hand labels stay listed so a
+// split or a wrong pick is still one tap from being undone — before this they vanished on save.
+const items=cycleTx(now).filter(t=>t.kind==='review'||t.guess||(t.manual&&t.kind==='bill')).reverse();
 if(items.length===0){card.style.display='none';return;}
 card.style.display='';
 const pend=items.filter(t=>t.kind==='review').length;
@@ -614,28 +622,47 @@ if(t.kind==='review')return `<div class="rv">
 <div class="rv-t"><div class="rv-n">${when} · ${catLabel(t.cat)}</div><div class="rv-a">${f(t.amt)}</div></div>
 <div class="rv-b"><button class="pri" onclick="labelTx('${t.iso}','bill')">It's a bill</button>
 <button onclick="labelTx('${t.iso}','living')">Living spend</button></div></div>`;
-const cm=(DATA.commitments||[]).find(c=>c.id===t.commit);
+const nameOf=id=>{const c=(DATA.commitments||[]).find(x=>x.id===id);return c?c.name:id;};
+const to=t.split?t.split.map(s=>nameOf(s.commit)+' '+f(s.amt)).join(' + '):nameOf(t.commit);
 return `<div class="rv done">
-<div class="rv-t"><div class="rv-n">${when} · matched to <b>${cm?cm.name:t.commit}</b></div><div class="rv-a">${f(t.amt)}</div></div>
+<div class="rv-t"><div class="rv-n">${when} · matched to <b>${to}</b></div><div class="rv-a">${f(t.amt)}</div></div>
 <div class="rv-b"><button onclick="labelTx('${t.iso}','living')">No — living spend</button></div></div>`;
 }).join('');
 }
 // Records the user's call on one transaction. Keyed by timestamp so it survives the robot's
 // appends and the 200-transaction trim, and so we never ask about the same debit twice.
+// Divide one payment across the commitments it covered, in proportion to their plans. Picking
+// maid (1,500) and groceries (1,000) for a 2,500 transfer lands on exactly those two figures;
+// when the plans don't sum to the amount paid, each keeps its share and the rounding remainder
+// goes on the last so the parts always add back to the whole.
+function splitByPlan(picks,amt){
+const tot=picks.reduce((a,c)=>a+(Number(c.amount)||0),0);
+if(!(tot>0))return picks.map(c=>({commit:c.id,amt:Math.round(amt/picks.length*100)/100}));
+let left=amt;
+return picks.map((c,i)=>{
+const share=(i===picks.length-1)?left:Math.round(amt*(Number(c.amount)/tot)*100)/100;
+left=Math.round((left-share)*100)/100;
+return{commit:c.id,amt:share};});
+}
 function labelTx(iso,kind){
-let commit=null;
+let commit=null,split=null;
 if(kind==='bill'){
+const row=(DATA.transactions||[]).find(r=>r[0]===iso);
+const amt=row?Number(row[2])||0:0;
 const seen=paidByTx(new Date()); // don't offer bills your own transactions already cover
 const open=(DATA.commitments||[]).filter(c=>c.id!=='living'&&!c.paid&&!((seen[c.id]||0)>=Number(c.amount)*0.9));
 if(open.length){
 const list=open.map((c,i)=>(i+1)+'. '+c.name+' ('+f(c.amount)+')').join('\n');
-const a=prompt('Which bill was this? Number, or blank to just keep it out of your weekly money.\n\n'+list);
+const a=prompt('Which bill(s) did this '+f(amt)+' pay?\nOne number, or several separated by commas if it covered more than one.\nBlank just keeps it out of your weekly money.\n\n'+list);
 if(a===null)return; // cancelled — leave it pending
-const n=parseInt(a,10);
-if(n>=1&&n<=open.length)commit=open[n-1].id;
+const picks=String(a).split(/[^0-9]+/).filter(Boolean).map(x=>parseInt(x,10))
+.filter((n,i,arr)=>n>=1&&n<=open.length&&arr.indexOf(n)===i).map(n=>open[n-1]);
+if(picks.length===1)commit=picks[0].id;
+else if(picks.length>1)split=splitByPlan(picks,amt);
 }
 }
-saveData(cur=>{cur.txClass=cur.txClass||{};cur.txClass[iso]={kind:kind,commit:commit};});
+saveData(cur=>{cur.txClass=cur.txClass||{};
+cur.txClass[iso]=split?{kind:kind,commit:null,split:split}:{kind:kind,commit:commit};});
 }
 
 function catLabel(id){const m=(DATA.catMeta||[]).find(x=>x[0]===id);return m?m[1]:id;}
