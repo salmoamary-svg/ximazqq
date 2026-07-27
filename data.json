@@ -148,7 +148,7 @@
   {
    "id": "cc",
    "name": "Credit-card paydown",
-   "amount": 1500,
+   "amount": 930,
    "paid": false,
    "grp": "future"
   },
