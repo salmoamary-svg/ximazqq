@@ -53,6 +53,19 @@ Four suites in the session scratchpad, all against the frozen `fixture.json`:
 `harness.js` (58, classification + envelope), `split.js` (16), `cancel.js` (8, token-cancel),
 `balance.js` (26, balance adjustment + double-count guard).
 
+## 2026-07-27 — salmoamary-svg — researched, and declined, a service worker
+
+Checked whether there's a better-known fix for the iOS home-screen caching problem than the
+`BUILD`-compare-and-banner approach already in place, since it was the direct cause of an
+hours-long confusion earlier tonight. A recent (2026) write-up on exactly this problem
+(single-file no-build PWA vs. iOS home-screen caching) confirms there isn't one: their working
+fix needs Vite build hashing plus a Workbox-orchestrated service worker together — meta tags
+alone are "a total failure," and HTTP headers "the bookmarked Home Screen app often ignores."
+That's a full build pipeline, which is exactly what this project has deliberately never had.
+Given that, `checkBuild()` polling (load + `visibilitychange` + 2-minute interval) plus a
+cache-busting reload URL is the right-sized mitigation for this codebase, not a shortcut around
+a better answer — there isn't one available without adopting a build step this project rejects.
+
 ## 2026-07-27 — salmoamary-svg — CI catches a forgotten BUILD bump
 
 ### What changed
