@@ -1,5 +1,5 @@
 {
- "asOf": "2026-07-27 10:59 PM",
+ "asOf": "2026-07-27 11:01 PM",
  "balance": 19074.35,
  "salary": 27932,
  "cushion": 200,
@@ -149,8 +149,9 @@
    "id": "cc",
    "name": "Credit-card paydown",
    "amount": 930,
-   "paid": false,
-   "grp": "future"
+   "paid": true,
+   "grp": "future",
+   "actual": 930
   },
   {
    "id": "buffer",
