@@ -19,6 +19,63 @@ There is nothing to build. To verify a change, syntax-check the artifacts:
 **Do not commit `data.json` from a branch.** The robot rewrites it on `main` roughly daily
 and the app writes on every edit, so a branch snapshot will clobber newer state at merge.
 
+## 2026-07-27 — salmoamary-svg — paying a bill drained the weekly envelope
+
+### What changed
+The week card read `-7,452 SAR` on a day with ~529 SAR of actual living spend. `sumTx()`
+summed **every** transaction in the window with no filter, so paying a commitment charged
+the Living envelope — money the 47/30/23 split has already set aside under Commitments
+(13,085) and Future You (8,500). Every bill was counted twice. The week's 8,885 was
+1,771 phone + 2,500 STC + 1,500 housemaid + 2,500 transfer + 85 BNPL, and only 529 living.
+
+New classification layer in `index.html`, all derived from the raw transaction list at
+render time — nothing written into `data.json`, so history re-rates on the next load and
+the current week repaired itself with no migration:
+
+- `CATCLASS` marks `loan/stc/phone/cc/carins/bnpl/family` as bills that never touch the
+  envelope. Unknown categories fall through to living — the safe direction here.
+- `UNIDENTIFIED = {everyday}` is the **only** category ever second-guessed. It is
+  `update_app.py`'s fallback bucket, so a debit lands there precisely because nothing
+  identified it, which is also where mislabelled bank transfers end up. Everything else
+  matched a positive keyword rule and always counts, however large.
+- Above `reviewMin()` (3 days of the Living plan ≈ 635), an `everyday` debit is
+  amount-matched to a commitment (`matchCommit`, ±2% or 25). No match → `review`: held out
+  of the envelope and surfaced on a new card, never guessed at.
+- `paidByTx()` derives "Paid so far this cycle" from the transactions that paid each
+  commitment — display-only, so the robot stays the sole writer of the stored `paid` flag.
+  Only 1:1 categories attribute (`CAT2COMMIT`); `stc` and `family` span several
+  commitments, so they leave the envelope but never auto-tick anything.
+
+`matchCommit` deliberately ignores `c.paid`: paid state is derived *from* classification,
+so reading it there would be circular.
+
+Also fixed `update_app.py:186` — auto-attribution did `cm["actual"]=amt`, so the three
+phone debits left `actual` at 460 instead of 1,771.40. It accumulates within a cycle now.
+
+Verified against the real `data.json` with a 41-check harness: living spend 528.86,
+week 904.33 (amber), one review item, phone 1,771.40 and maid 1,500 attributed. Rollover
+in both directions and `healWeekly` idempotency still hold.
+
+### What's next
+- A 1,000 SAR unrecognised transfer still matches the 1,000 `groc` commitment. Genuinely
+  ambiguous without merchant text, so it is matched as a `guess` and listed on the review
+  card with a one-tap undo rather than resolved silently. Watch whether that misfires.
+- An unreviewed large debit is **excluded** from the envelope, so the week reads
+  optimistically until labelled. Deliberate — the review card makes it visibly incomplete
+  rather than silently wrong — but it does mean an ignored card overstates the week.
+- `categorize()` in `update_app.py` was left alone on purpose: alert text is never stored
+  (by design, for privacy), so there is nothing to test a new keyword rule against.
+- Auto-ticked commitments can't be un-ticked from the commitments list, since the tick is
+  derived. The fix path is the review card — correct the transaction, not the symptom.
+
+### What the other dev must know
+- No env vars, no schema, no migrations. `data.json` was **not** committed.
+- `txClass` is a new optional top-level object in `data.json`, keyed by transaction ISO
+  timestamp: `{"2026-07-27T17:00:48Z": {"kind":"bill","commit":"maid"}}`. Written only by
+  the app, append-only, so it is safe against the robot's concurrent writes. Orphan keys
+  left by the 200-transaction trim are harmless. A manual label always wins over the rules.
+- Editing a commitment's `amount` now also moves `reviewMin()` and the match tolerance.
+
 ## 2026-07-27 — salmoamary-svg — weekly envelope froze at zero after payday
 
 ### What changed

@@ -182,15 +182,16 @@ def main():
             d["transactions"]=d.get("transactions",[])
             d["transactions"].append([dt.astimezone(timezone.utc).isoformat().replace("+00:00","Z"),cat,amt])
             d["transactions"]=d["transactions"][-200:]
-            # auto-attribution (conservative)
+            # auto-attribution (conservative). A bill can arrive as several debits — the phone
+            # bill lands as three — so accumulate across the cycle instead of overwriting with
+            # whichever one happened to be last. Cleared at rollover with the paid flags.
+            cm=find(d["commitments"],"id",cat) if cat in ("cc","phone") else None
+            if cm:
+                sofar=(cm.get("actual") or 0) if cm.get("paid") else 0
+                cm["actual"]=round(sofar+amt,2); cm["paid"]=True
             if cat=="cc":
-                cm=find(d["commitments"],"id","cc")
-                if cm: cm["paid"]=True; cm["actual"]=amt
                 db=find(d["debts"],"id","cc")
                 if db: db["remaining"]=max(0,round(db["remaining"]-amt,2))
-            if cat=="phone":
-                cm=find(d["commitments"],"id","phone")
-                if cm: cm["paid"]=True; cm["actual"]=amt
             log("-%.2f [%s] -> %.2f" % (amt,cat,balance))
  
         d["processed"].append(mid)
