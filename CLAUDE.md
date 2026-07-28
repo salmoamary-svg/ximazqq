@@ -19,6 +19,45 @@ There is nothing to build. To verify a change, syntax-check the artifacts:
 **Do not commit `data.json` from a branch.** The robot rewrites it on `main` roughly daily
 and the app writes on every edit, so a branch snapshot will clobber newer state at merge.
 
+## 2026-07-28 — salmoamary-svg — reverted: ticking no longer touches the balance
+
+### What changed
+Explicitly asked for, less than a day after the balance-on-tick feature shipped: "I think the old
+way is better... I want it to be as a checklist that I can just tick." The reasoning given —
+"it can duplicate" and "very confusing" — is fair. That feature was the direct cause of nearly
+every bug fixed today: the electricity/coffee-run misfire, the need for a separate `bankCoverage`
+concept once the fix for that broke the balance math, and a `balanceAnchoredAt`/`tickedAt`
+override just to stop a real "Set real balance" correction from fighting the tick feature. Four
+interacting pieces of derived state, for one number, on a page meant to be glanced at.
+
+Removed entirely: `manualOutflow`, `bankCoverage`, `effectiveBalance`, the `tickedAt` stamp in
+`toggleCommit`, the `balanceAnchoredAt` stamp in both `setBalance()` and the `SAADMONEY-DATA`
+email override in `update_app.py`, and the "less X you ticked as paid" note plus its drift nudge.
+`computeEnvelope()` reads `DATA.balance` directly again, exactly as it did before any of this
+existed. The stray `tickedAt`/`balanceAnchoredAt` keys already sitting in live `data.json` are
+inert — nothing reads them anymore, and the existing rollover cleanup (`c.pop("tickedAt")`)
+quietly clears the commitment-side ones at the next cycle turn. Not worth a special-purpose write
+to scrub early.
+
+**Kept, deliberately:** `tickCandidate` and its role in `toggleCommit` — ticking a commitment
+still looks for a matching `review` transaction and labels it, which keeps a real bill out of the
+Living envelope. That is a classification fix, not a balance one; it never touches money, only
+which bucket a transaction counts toward, and the user's complaint was specifically about the
+balance side. The anti-inflation guarantee (`review` transactions only, never `living` ones)
+stayed untouched throughout today's changes and still holds.
+
+The new intended workflow, in the user's own words: the checkbox is a to-do list ("did I pay
+this, and how much"); reconciling that against real bank activity — matching debits, catching
+duplicates, correcting the balance — happens by hand, in conversation, the same way tonight's
+phone-bill and STC-transfer corrections were done directly. Automating that fully turned out to
+be harder to get right than doing it once, carefully, together.
+
+`balance.js` rewritten from 33 checks (testing machinery that no longer exists) to 17: confirms
+the removed functions are gone, ticking never moves `DATA.balance` under any circumstance, a
+correction made via "Set real balance" is permanent regardless of later ticks, and the
+review-settling classification behavior plus its safety guard both survived untouched. `BUILD` →
+`2026-07-28a`.
+
 ## 2026-07-27 — salmoamary-svg — ticking a commitment now moves the balance
 
 ### What changed

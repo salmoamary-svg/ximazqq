@@ -228,7 +228,7 @@ const TKEY='saad_money_gh_pat';
 // load, but the HTML itself is whatever copy the phone cached — an iOS home-screen app can
 // hold it indefinitely, so the data looks current while the logic is months old. checkBuild()
 // compares this against the copy on main and offers a reload the cache can't satisfy.
-const BUILD='2026-07-27h';
+const BUILD='2026-07-28a';
 let DATA=null;
 const f=n=>Math.round(n).toLocaleString('en-US');
 const money=n=>Number(n).toLocaleString('en-US',{minimumFractionDigits:Number.isInteger(Number(n))?0:2,maximumFractionDigits:2});
@@ -338,49 +338,16 @@ function livingAllocation(){ // the "Living" slice of the 47/30/23 split — wha
 return (DATA.commitments||[]).filter(c=>(c.grp||'commit')==='living')
 .reduce((a,c)=>a+(Number(c.amount)||0),0);
 }
-// Whether a ticked commitment's money has already left the account, regardless of what the bank
-// alert was classified as. Read-only: unlike tickCandidate, this never writes txClass or moves
-// anything out of the living envelope. A commitment below reviewMin (electricity, car insurance)
-// gets its matching debit classified 'living', not 'bill' — correctly, since a coffee run and a
-// utility bill of the same size are indistinguishable without merchant text — so paidByTx alone
-// would never see it. This is what stops that gap from being double-subtracted from the balance
-// without also wrongly pulling that spend out of Living the way an earlier version of this did.
-function bankCoverage(claimed,now){
-const tol=Math.max(25,claimed*0.02);let best=0,bestD=Infinity;
-cycleTx(now||new Date()).forEach(t=>{
-if(t.kind==='bill')return; // already precisely counted via paidByTx below
-const d=Math.abs(t.amt-claimed);if(d<=tol&&d<bestD){best=t.amt;bestD=d;}});
-return best;
-}
-// Money you've told us you paid that the bank never reported — cash, another account, an alert
-// that didn't arrive. Ticking a commitment is an assertion that it is paid, so the balance should
-// reflect it even though no debit exists to prove it.
-//
-// Only the part the transactions *don't* already cover is counted, which is what keeps this from
-// double-subtracting: update_app.py has already taken every alerted debit off `balance`. So a bill
-// the bank saw contributes nothing here, and if a delayed alert lands later the robot drops the
-// balance while paidByTx/bankCoverage grows — the adjustment shrinks to zero on its own. Derived,
-// never stored, so the robot stays the only writer of `balance`.
-//
-// A tick from before the last "Set real balance" (or SAADMONEY-DATA email) correction is already
-// folded into that ground-truth number — subtracting it again would count the same money twice.
-// That is the override the balance card needs: correcting the balance settles every outstanding
-// tick as of that moment, and only ticks made *after* it keep adjusting the display from there.
-function manualOutflow(now){
-const t=now||new Date();
-const seen=paidByTx(t);
-const anchor=DATA.balanceAnchoredAt;
-return (DATA.commitments||[]).reduce((a,c)=>{
-if(!c.paid||c.id==='living')return a;
-if(anchor&&(!c.tickedAt||c.tickedAt<=anchor))return a; // already reflected in the anchored balance
-const claimed=Number(c.actual!=null?c.actual:c.amount)||0;
-let covered=seen[c.id]||0;
-if(covered<claimed)covered=Math.max(covered,bankCoverage(claimed,t));
-return a+Math.max(0,claimed-covered);},0);
-}
-function effectiveBalance(now){return (Number(DATA.balance)||0)-manualOutflow(now);}
+// Ticking a commitment is a checklist mark only — it does not touch the balance. An earlier
+// version derived a "money you told us you paid but the bank hasn't shown yet" adjustment from
+// ticks (manualOutflow/bankCoverage, plus a balanceAnchoredAt override to stop it double-counting
+// after a correction). Removed at the user's request: reconciling ticks against real bank
+// activity is done by hand together, in conversation, rather than guessed at automatically —
+// exactly the "old way" that predates that feature, and the direct cause of most of this
+// session's confusion (a tick could still misfire and, worse, silently move real spending
+// between buckets to make its own math balance). `DATA.balance` is the robot's number, full stop.
 function computeEnvelope(){ // a cycle's spending pot: the Living slice, but never more cash than actually exists
-const bal=effectiveBalance(),cushion=Number(DATA.cushion)||200;
+const bal=Number(DATA.balance)||0,cushion=Number(DATA.cushion)||200;
 const avail=Math.max(0,bal-cushion);
 const living=livingAllocation();
 return living>0?Math.min(living,avail):avail;
@@ -562,8 +529,7 @@ const seen=byTx[c.id]||0,manual=stale?false:!!c.paid;
 const auto=!manual&&seen>=Number(c.amount)*0.9;
 return Object.assign({},c,{paid:manual||auto,actual:manual?c.actual:(auto?seen:undefined),viaTx:auto});});
 const cats=stale?{}:(DATA.spendCats||{});
-const offBank=stale?0:manualOutflow(now); // bills you ticked that the bank never reported
-const bal=(Number(DATA.balance)||0)-offBank, salary=Number(DATA.salary)||27932, cushion=Number(DATA.cushion)||200;
+const bal=Number(DATA.balance)||0, salary=Number(DATA.salary)||27932, cushion=Number(DATA.cushion)||200;
  
 const pd=paydayAfter(now);
 const days=Math.max(1,Math.ceil((pd-now)/86400000));
@@ -574,13 +540,7 @@ const daily=wkly&&wkly.dailyRate||0;
  
 document.getElementById('mo').textContent=now.toLocaleDateString('en-US',{month:'long',year:'numeric'});
 document.getElementById('bal').innerHTML=money(bal)+' <span class="sar">SAR</span>';
-// A big, growing gap between the bank-tracked balance and what you've ticked is exactly what
-// makes this number confusing to trust — a nudge toward the existing correction tool (below)
-// beats letting the two silently drift further apart.
-const driftNote=offBank>Math.max(2000,salary*0.1)
-?' — worth checking your real balance below, that\'s a lot riding on unconfirmed ticks':'';
-document.getElementById('asof').textContent='updated '+(DATA.asOf||'')
-+(offBank>0?' · less '+f(offBank)+' you ticked as paid but the bank hasn\'t shown yet'+driftNote:'');
+document.getElementById('asof').textContent='updated '+(DATA.asOf||'');
 document.getElementById('days').textContent=days;
 document.getElementById('paylab').textContent='days to payday ('+pd.toLocaleDateString('en-US',{day:'numeric',month:'short'})+')';
 document.getElementById('safe').textContent=f(daily);
@@ -782,11 +742,9 @@ function num(x){return parseFloat(String(x).replace(/,/g,''));}
 // Only 'review' transactions are candidates: they are already being held out of the envelope
 // pending a decision, so labelling one settles it rather than moving money that was already
 // counted. Deliberately does NOT reach into 'living' debits below reviewMin — a first version
-// of this did, to stop electricity/car-insurance from double-subtracting the balance, and it
+// of this did, to also patch up the balance-on-tick feature that has since been removed, and it
 // once matched a genuine coffee-run debit to "electricity paid" purely because the amount lined
-// up, silently pulling real spending out of the week. bankCoverage() (above) now handles the
-// balance side of that case without touching classification. Returns the nearest by amount, null
-// if none.
+// up, silently pulling real spending out of the week. Returns the nearest by amount, null if none.
 function tickCandidate(amt,now){
 const tol=Math.max(25,amt*0.02);let best=null,bestD=Infinity;
 cycleTx(now||new Date()).forEach(t=>{if(t.kind!=='review')return;
@@ -796,7 +754,7 @@ return best;
 function toggleCommit(id){
 const c=(DATA.commitments||[]).find(x=>x.id===id);if(!c)return;
 if(c.paid){ // already paid -> untick, clear the actual, and release anything this tick labelled
-saveData(cur=>{const x=cur.commitments.find(y=>y.id===id);if(x){x.paid=false;delete x.actual;delete x.tickedAt;}
+saveData(cur=>{const x=cur.commitments.find(y=>y.id===id);if(x){x.paid=false;delete x.actual;}
 Object.keys(cur.txClass||{}).forEach(k=>{const v=cur.txClass[k];
 if(v&&v.via==='tick'&&v.commit===id)delete cur.txClass[k];});}); // hand labels (no `via`) survive
 return;
@@ -809,8 +767,7 @@ const an=num(a);if(isNaN(an)){alert('Numbers only');return;}
 // tick records the bill and nothing else. No transaction, no credit, so the weekly envelope
 // can never be inflated by money that never left the account.
 const hit=tickCandidate(an);
-const stamp=cursorNow(); // compared lexically against balanceAnchoredAt in manualOutflow()
-saveData(cur=>{const x=cur.commitments.find(y=>y.id===id);if(x){x.paid=true;x.actual=an;x.tickedAt=stamp;}
+saveData(cur=>{const x=cur.commitments.find(y=>y.id===id);if(x){x.paid=true;x.actual=an;}
 if(hit){cur.txClass=cur.txClass||{};cur.txClass[hit.iso]={kind:'bill',commit:id,via:'tick'};}});
 }
  
@@ -892,11 +849,7 @@ function setBalance(){
 const v=num(document.getElementById('balbox').value);
 if(isNaN(v)){alert('Enter a number');return;}
 if(!confirm('Set your real balance to '+money(v)+' SAR?'))return;
-// Correcting the balance is a ground-truth checkpoint: whatever you've ticked as paid up to
-// this instant is presumed already reflected in the number you just typed, so it stops being
-// subtracted a second time. Only a tick made after this stamp adjusts the display from here.
-const now=cursorNow();
-saveData(cur=>{cur.balance=v;cur.cursor=now;cur.balanceAnchoredAt=now;});
+saveData(cur=>{cur.balance=v;cur.cursor=cursorNow();});
 document.getElementById('balbox').value='';
 }
 
