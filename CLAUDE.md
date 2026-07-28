@@ -19,6 +19,13 @@ There is nothing to build. To verify a change, syntax-check the artifacts:
 **Do not commit `data.json` from a branch.** The robot rewrites it on `main` roughly daily
 and the app writes on every edit, so a branch snapshot will clobber newer state at merge.
 
+**Correcting a value in `data.json` directly is fine — from the assistant, not from a branch.**
+Reconciling a specific transaction or figure by hand (see "the first real reconciliation," below)
+means writing straight to `main` via a fresh fetch → targeted edit → diff against the original →
+SHA-checked write, the same conflict-safe shape `saveData()` itself uses. Diff the *entire* file
+before sending, not just the field being changed — a same-content mistake here once wiped several
+top-level keys (see the "near-miss" note under "overnight pass").
+
 ## 2026-07-28 — salmoamary-svg — speed and feel pass
 
 ### What was actually slow, and what wasn't
@@ -173,6 +180,36 @@ rather than a number someone has to remember to update:
 9 checks (`goals.js`) plus the rollover accumulation logic tested directly against
 `update_app.py`'s own code (paid/unpaid/no-actual-entered cases). `BUILD` → `2026-07-27h`.
 
+## 2026-07-27/28 — salmoamary-svg — the first real reconciliation, done by hand
+
+The morning after the overnight pass, two corrections — done in conversation, not by any rule in
+the code, which is exactly the workflow the user asked to formalize a few hours later (see
+"reverted," above). Both applied as direct, SHA-checked `data.json` writes, diff-verified against
+a fresh fetch before sending.
+
+**Phone bill.** The bank's three `phone` debits summed to 1,771.40, but the user's real total was
+1,570, reimbursed 400 by a friend for a shared line — net cost 1,170. Set `phone.actual=1170` by
+hand; `paidByTx`'s bank-derived 1,771.40 no longer drives the display for a manually-corrected
+commitment. The 201.40 gap between the bank total and the stated bill was never resolved — noted
+to the user, not chased.
+
+**The STC transfer.** A 2,500 transfer to STC Pay, then redistributed 1,000 to groceries and
+1,500 to the housemaid, had produced **three** debit alerts in `data.json` for what was one real
+movement of money: an `everyday` 2,500 (a duplicate alert of the same transfer), the `stc` 2,500
+itself, and an `everyday` 1,500 (STC Pay's own sub-transfer notification). Separately, a `527.36`
+`everyday` debit — the one the electricity mismatch had touched overnight — turned out to
+genuinely be the electricity bill, confirmed directly by the user. Applied via `txClass`: `527.36`
+→ hand-labelled `elec`; the `stc` 2,500 → `split` across `groc` (1,000) and `maid` (1,500), using
+the split feature built for exactly this shape of transaction; the other two entries → `bill` with
+no `commit`, so they stop counting as spend without crediting anything a second or third time.
+Week went from 782 to 1,310 (green) — the electricity correction was real money, not a bug this
+time.
+
+This is the one instance so far of the "review it with you" workflow reasoned about directly:
+matching debits, catching duplicates, and reconciling a manual figure against what the bank
+reported are all things this session concluded are worth doing by hand, carefully, rather than
+automating with rules that keep needing another rule to fix the last one's edge case.
+
 ## 2026-07-27 — salmoamary-svg — overnight pass: the tick/balance feature had a real bug, and needed an override
 
 ### What triggered this
@@ -227,6 +264,14 @@ debit out of Living. New code stops this from happening again, but a manual labe
 key via a direct, SHA-checked API write to `main` — the same conflict-safe read-modify-write
 `saveData()` itself uses, not a branch merge, so it cannot clobber the robot's concurrent writes.
 No other field was touched.
+
+**A near-miss on the first attempt, worth being honest about:** that write went out with placeholder
+content instead of the real patched file (`7435986`, commit message literally "placeholder"),
+wiping `commitments`/`debts`/`goals`/`transactions` to empty arrays for about two minutes.
+Caught on the very next read-back and restored exactly (`5442363`), verified field-by-field
+against what was there before. No data was actually lost, but it happened, it's visible in this
+history, and the lesson stuck: every write after this one was diff-verified against a fresh fetch
+*before* sending, not just sha-checked.
 
 ### Still open, deliberately not done tonight
 - **Balance drift itself** is not fixed, only made survivable. The email-parsing pipeline will
