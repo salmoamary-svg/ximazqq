@@ -19,6 +19,40 @@ There is nothing to build. To verify a change, syntax-check the artifacts:
 **Do not commit `data.json` from a branch.** The robot rewrites it on `main` roughly daily
 and the app writes on every edit, so a branch snapshot will clobber newer state at merge.
 
+## 2026-07-28 — salmoamary-svg — speed and feel pass
+
+### What was actually slow, and what wasn't
+Measured before touching anything, since "make it faster" is easy to spend effort on the wrong
+thing: `render()` takes **4ms** even stress-tested at the historical 200-transaction cap (Node,
+so a real phone is slower, but nowhere near perceptible either way). `classifyTx()` does get
+recomputed more than once per render — `cycleTx`, `paidByTx`, and `sumTx` each walk the
+transaction list independently — but at real data volumes that's tens of extra calls, not
+thousands, and the measurement above already includes it. **Not worth memoizing** — it would add
+a cache-invalidation surface (tied to every place `DATA` is reassigned) to save time nobody would
+ever feel. Left alone.
+
+The one real, perceptible latency was the network round-trip: `loadData()` only used to fire
+*after* PIN entry, every single time the app opens, even though `data.json` is fetched
+unauthenticated — the repo is deliberately public, so there is no security reason to gate the
+fetch behind the PIN. It now fires the instant the script runs, in parallel with typing the PIN;
+`unlock()` just hides the lock screen over a dashboard that's usually already rendered behind it.
+Relies on `loadData` being a hoisted function declaration, called before its own text runs —
+verified directly (a mocked `fetch` confirms exactly one call, made before the simulated PIN
+entry completes, with `unlock()` triggering no second one).
+
+### Design: tap feedback and a few animations
+`-webkit-tap-highlight-color` is disabled globally, which means every tap gave zero visual
+acknowledgement on iOS — on a page about money, that reads as "did this register?" more than it
+should. Commitment/debt/goal rows get a soft `:active` highlight; buttons (`.setbox button`, the
+review card's actions, `+ Add…` rows, the Update FAB) get a gentle press-in. Progress bars
+(`.bar>i`) now animate their width instead of snapping, so ticking a commitment visibly fills its
+bar rather than jumping. A new `flashSaved()` briefly highlights the balance card on every
+successful `saveData()` — the one universal "yes, that was written" signal across every kind of
+edit the app supports.
+
+Checked and left alone: contrast ratios across the whole palette are 6.6:1–16:1 (computed
+directly, WCAG AA needs 4.5:1 for small text) — nothing to fix there. `BUILD` → `2026-07-28b`.
+
 ## 2026-07-28 — salmoamary-svg — reverted: ticking no longer touches the balance
 
 ### What changed

@@ -38,7 +38,7 @@ padding:0 16px;font-size:13px;font-weight:700}
 .rowline .nm{flex:1;font-size:14px}
 .rowline .amt{font-variant-numeric:tabular-nums;font-weight:650;font-size:14px}
 .bar{height:8px;border-radius:6px;background:#0f1c2a;overflow:hidden;margin-top:5px}
-.bar>i{display:block;height:100%;border-radius:6px}
+.bar>i{display:block;height:100%;border-radius:6px;transition:width .4s cubic-bezier(.4,0,.2,1)}
 .note{font-size:11.5px;color:var(--sub);line-height:1.5;margin-top:8px}
 .tbl{width:100%;border-collapse:collapse;font-size:13.5px}
 .tbl td{padding:9px 2px;border-bottom:1px solid var(--line)}
@@ -86,6 +86,17 @@ align-items:center;justify-content:center;gap:18px}
 .pad button{height:64px;border-radius:50%;border:1px solid var(--line);background:var(--card);
 color:var(--ink);font-size:22px;font-weight:600}
 .pad button:active{background:#22374d}
+/* Tap feedback. -webkit-tap-highlight-color is disabled globally (top of file), so without this
+   every tap gives zero visual acknowledgement on iOS — worth having on a page people trust with
+   their money. Rows get a soft highlight; button-like things get a gentle press-in. */
+.crow,.drow,.goal{transition:background-color .15s ease}
+.crow:active,.drow:active,.goal:active{background:rgba(255,255,255,.035)}
+.setbox button,.rv .rv-b button,.addrow,#robotBtn{transition:transform .1s ease,opacity .1s ease}
+.setbox button:active,.rv .rv-b button:active,.addrow:active,#robotBtn:active{transform:scale(.96);opacity:.85}
+.nav button{transition:opacity .1s ease}
+.nav button:active{opacity:.5}
+@keyframes savedFlash{0%{box-shadow:0 0 0 0 rgba(45,212,191,.55)}100%{box-shadow:0 0 0 0 rgba(45,212,191,0)}}
+.hero.saved{animation:savedFlash .6s ease-out}
 #newbuild{display:none;margin:0 16px 10px;padding:11px 13px;border-radius:12px;background:#123027;
 border:1px solid var(--teal);color:var(--teal);font-size:13px;font-weight:650;text-align:center}
 .rv{padding:10px 2px;border-bottom:1px solid var(--line)}
@@ -128,7 +139,7 @@ padding:10px 16px;font-size:14px;font-weight:700;box-shadow:0 4px 14px rgba(0,0,
 <div id="newbuild" onclick="reloadFresh()">⬆️ A newer version of the app is ready — tap to load it</div>
  
 <div class="view on" id="v-home"><div class="wrap">
-<div class="card hero">
+<div class="card hero" id="herocard">
 <div class="lab">Balance now</div>
 <div class="bal" id="bal">—</div>
 <div class="mut" id="asof"></div>
@@ -228,8 +239,15 @@ const TKEY='saad_money_gh_pat';
 // load, but the HTML itself is whatever copy the phone cached — an iOS home-screen app can
 // hold it indefinitely, so the data looks current while the logic is months old. checkBuild()
 // compares this against the copy on main and offers a reload the cache can't satisfy.
-const BUILD='2026-07-28a';
+const BUILD='2026-07-28b';
 let DATA=null;
+// data.json is fetched unauthenticated (the repo is deliberately public — see CLAUDE.md), so
+// there is no security reason to wait for the PIN before starting the network round-trip, which
+// is the one part of loading this app that isn't instant. Kicking it off now, in parallel with
+// PIN entry, means the dashboard is usually already rendered — behind the lock screen, invisible
+// until unlock() hides it — by the time someone finishes typing. `loadData` is hoisted (it's a
+// function declaration further down), so calling it here before its own text runs is safe.
+loadData().catch(e=>{document.getElementById('bal').textContent='load error';});
 const f=n=>Math.round(n).toLocaleString('en-US');
 const money=n=>Number(n).toLocaleString('en-US',{minimumFractionDigits:Number.isInteger(Number(n))?0:2,maximumFractionDigits:2});
 function token(){try{return localStorage.getItem(TKEY)}catch(e){return null}}
@@ -485,6 +503,11 @@ setInterval(checkBuild,120000);
 // Reload on a URL the cache has never seen. A plain location.reload() can be served straight
 // back out of the same cache that made the app stale in the first place.
 function reloadFresh(){location.replace(location.pathname+'?v='+Date.now());}
+// A brief highlight on the balance card confirms a save actually landed — there is otherwise no
+// feedback that a tap did anything until the numbers visibly change, which they often won't.
+// The reflow forces the CSS animation to restart even if a previous flash hasn't finished.
+function flashSaved(){const h=document.getElementById('herocard');if(!h)return;
+h.classList.remove('saved');void h.offsetWidth;h.classList.add('saved');}
 async function saveData(mut){
 // Dismissing the prompt used to drop the edit on the floor with no message, so a tick or a
 // label just appeared not to work. iOS keeps a home-screen app's storage apart from Safari's,
@@ -508,7 +531,7 @@ mut(cur);cur.asOf=riyadhStamp();
 const enc=btoa(unescape(encodeURIComponent(JSON.stringify(cur,null,1))));
 const p=await fetch(API+'/contents/data.json',{method:'PUT',headers:h,
 body:JSON.stringify({message:'app edit '+cur.asOf,content:enc,sha:gj.sha,branch:'main'})});
-if(p.ok){DATA=cur;render();return;}
+if(p.ok){DATA=cur;render();flashSaved();return;}
 if(p.status===409||p.status===422){await new Promise(r=>setTimeout(r,400));continue;} // conflict — retry
 if(p.status===401||p.status===403){localStorage.removeItem(TKEY);alert('Token problem — tap again to re-enter.');return;}
 alert('Save failed '+p.status);return;
@@ -916,5 +939,5 @@ else{firstPin="";entered="";paint();lmsg.textContent="Didn't match — create a 
 else{if(entered===store.get('pin'))unlock();else{entered="";paint();lmsg.textContent="Wrong PIN — try again";}}
 },120);}
 });
-function unlock(){document.getElementById('lock').style.display='none';loadData().catch(e=>{document.getElementById('bal').textContent='load error';});}
+function unlock(){document.getElementById('lock').style.display='none';} // data has been loading since the script started
 </script></body></html>
