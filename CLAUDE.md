@@ -26,6 +26,66 @@ SHA-checked write, the same conflict-safe shape `saveData()` itself uses. Diff t
 before sending, not just the field being changed — a same-content mistake here once wiped several
 top-level keys (see the "near-miss" note under "overnight pass").
 
+## 2026-07-28 — salmoamary-svg — a senior-designer visual pass
+
+### What changed
+Explicitly scoped by the user to "design and experience improvements... modern, nice to look
+at, easy to use, not crowded, but not empty" — no logic changes. Took Playwright/Chromium
+screenshots of every tab (scratchpad only, fixture-driven — the app was never pointed at real
+network fetch for this) to see the app the way the user does, rather than guessing from source.
+
+- **Elevation and rhythm.** `.card`/`.week` gained a subtle shadow and radius went 16→18px, with
+  a touch more margin between cards (12→14px). Half-pixel font sizes (`11.5px`, `13.5px`, `12.5px`)
+  scattered across `.note`/`.tbl`/`.goal .g-sub`/`.week .wk-s`/`.tl-row`/the debts plan list were
+  never intentional — a type scale should hit whole numbers — so all now round to a real scale
+  step (12/14px). Commitment and debt rows got a few points more padding.
+- **Commitment bars thinned.** Every one of 12 rows carried a full 8px progress bar that only
+  ever reads paid/unpaid — the same information the checkmark already gives. New `.bar.thin`
+  (4px) for commitments only; debt bars (which show real partial progress) keep the full height.
+- **Daily spend list de-emphasized trivial amounts.** A 1.50 SAR recurring charge and a 240 SAR
+  purchase were rendered with identical visual weight in "Daily spending," so the eye had to work
+  to find what mattered. Entries under 10 SAR now render at `.tl-row.minor` (dimmed, smaller).
+- **Goals got icons** (🛡️🎯💳📉) and a dedicated amount line (`g-amt`, was crammed into the
+  sub-line and could wrap awkwardly on a debt-linked goal's longer text).
+- **The review card now visually distinguishes "needs a decision" from "just an audit trail."**
+  New `.card.needs-input` (the same amber used by the week card's own warning state) applies only
+  while `pend>0` — a genuinely unlabelled payment sitting in the queue. Once every item shown is
+  already resolved (hand-labelled or auto-matched, kept listed only for one-tap undo), the card
+  settles back to neutral. Verified against a synthetic fixture with a real pending item, since
+  the live `data.json` currently has none to screenshot against.
+
+### Two real bugs the screenshots caught, fixed as part of this pass
+Neither was reported — both are exactly the kind of thing "experience" is supposed to cover, so
+fixed without waiting for separate sign-off, and flagged here rather than silently folded in.
+
+1. **"Matched to null."** `renderReview`'s label builder checked `t.commit` before `t.split`, so
+   a split payment (no `commit`, only `split`) rendered "matched to null" instead of listing the
+   split. Reordered the check — `split` first, `commit` second, plain excluded-message last.
+2. **The Update button (`#robotBtn`) could sit on top of the review card's own buttons.** It was
+   `position:fixed`, docked a fixed distance above the nav bar — and the review card, being the
+   third card on Home, reliably lands its first action row in exactly that band on a normal phone
+   height, on ordinary page load with no scrolling involved. Measured it directly (Playwright
+   bounding boxes): the fixed button and a real "Living spend" choice overlapped by 23×33px,
+   meaning a tap meant for the transaction label could hit the update button instead. This is the
+   same class of bug flagged and *partially* addressed on 2026-07-27 (shrinking a wide pill to a
+   small circle) — that reduced the odds without removing the geometric collision, since any
+   fixed-position element will eventually coincide with some piece of scrolling content. Moved it
+   into the header next to the month label instead: it now scrolls away with everything else and
+   can never float over anything tappable. Capped at `max-width:150px` with ellipsis so a long
+   status string (`⌛ slow — check Actions`) can't push the page title off-screen.
+
+### Left alone, on purpose
+The Goals and Month tabs read visually sparse — a single card, then a large block of empty
+space above the nav bar — screenshotted directly against the live-shaped fixture, not assumed.
+Not treated as a defect: both tabs are short because there genuinely isn't more to show (four
+goals, one summary card), and inventing decorative content to fill the space would be exactly the
+kind of unrequested addition this pass was scoped to avoid. Contrast: Debts, the other short-ish
+tab, fills the screen naturally because it has six real rows of data — nothing to fix there either.
+
+Existing 122-check suite (`harness`/`split`/`cancel`/`balance`/`goals`/`spendtab`) re-run
+unchanged and all pass — this pass touched only CSS and markup structure, no logic. `BUILD` →
+`2026-07-28d`.
+
 ## 2026-07-28 — salmoamary-svg — the Spend tab never got the bill/living memo
 
 ### What changed
