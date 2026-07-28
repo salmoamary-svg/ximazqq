@@ -1,5 +1,5 @@
 {
- "asOf": "2026-07-28 09:37 AM",
+ "asOf": "2026-07-28 10:02 AM",
  "balance": 14398.5,
  "salary": 27932,
  "cushion": 200,
@@ -248,7 +248,7 @@
   }
  ],
  "spendCats": {
-  "shopping": 3.0,
+  "shopping": 3,
   "phone": 1771.4,
   "everyday": 4649.36,
   "stc": 2500,
@@ -541,18 +541,8 @@
    "commit": null
   },
   "2026-07-27T17:01:15Z": {
-   "kind": "bill",
-   "commit": null,
-   "split": [
-    {
-     "commit": "groc",
-     "amt": 1000
-    },
-    {
-     "commit": "maid",
-     "amt": 1500
-    }
-   ]
+   "kind": "living",
+   "commit": null
   },
   "2026-07-27T17:02:26Z": {
    "kind": "bill",
