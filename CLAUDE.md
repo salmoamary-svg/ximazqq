@@ -26,6 +26,40 @@ SHA-checked write, the same conflict-safe shape `saveData()` itself uses. Diff t
 before sending, not just the field being changed — a same-content mistake here once wiped several
 top-level keys (see the "near-miss" note under "overnight pass").
 
+## 2026-07-28 — salmoamary-svg — the Spend tab never got the bill/living memo
+
+### What changed
+"Last 7 days vs previous 7" read 9,640 SAR of "Everyday: food, coffee, groceries" against
+maybe 200 SAR of real spending. `renderWeekly()` and `renderDaily()` predate the whole
+bill-vs-living classification layer built earlier — they summed `DATA.transactions` straight
+by raw category, so the phone bill, the STC transfer, and the hand-labelled electricity debit
+all displayed as grocery money, the exact double-count `sumTx` was built to stop, just in a
+view nobody had gone back to touch. "Where money goes — this cycle" and the Month tab's
+"Spent this cycle"/"Biggest leak" had the identical problem, one level removed: they read
+`DATA.spendCats`, a robot-maintained raw per-category running total with no way to reflect a
+`txClass` hand-correction made to one transaction after the fact — the total updates through
+`update_app.py`'s own parsing, but a label applied later in the app can never reach it.
+
+Both render functions now filter to `classifyTx(row).kind==='living'` before bucketing —
+identical logic to `sumTx`, just applied here for the first time. New `livingCatsThisCycle()`
+replaces the `DATA.spendCats` read with the same per-category derivation `paidByTx` already
+uses for bills, scoped to the current cycle via `cycleTx`. Against the live data: "Last 7 days"
+drops from 9,640 to 756; "Where money goes" drops from including phone/stc entirely to just
+`everyday: 122, shopping: 1.5`. `BUILD` → `2026-07-28c`.
+
+### Left alone, on purpose
+The Month tab's "was X last cycle" trend still reads `DATA.lastCycleCats`, a frozen snapshot
+`update_app.py` takes at rollover — checked directly whether re-deriving it from `DATA.transactions`
+would work, and it's off by 10 SAR from a clean re-classification, because the 200-transaction
+trim can silently drop the older half of last cycle's data by the time this runs. Rebuilding a
+historical total from data that might already be gone would be fragile in a way that fails
+silently later, worse than a known, static limitation. The next full cycle tracked entirely under
+this classification layer will make the comparison accurate on its own; not worth chasing before
+then.
+
+14 checks (`spendtab.js`), including the exact screenshot numbers reproduced against the frozen
+fixture and reproduced again against the live `data.json`.
+
 ## 2026-07-28 — salmoamary-svg — speed and feel pass
 
 ### What was actually slow, and what wasn't

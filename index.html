@@ -239,7 +239,7 @@ const TKEY='saad_money_gh_pat';
 // load, but the HTML itself is whatever copy the phone cached — an iOS home-screen app can
 // hold it indefinitely, so the data looks current while the logic is months old. checkBuild()
 // compares this against the copy on main and offers a reload the cache can't satisfy.
-const BUILD='2026-07-28b';
+const BUILD='2026-07-28c';
 let DATA=null;
 // data.json is fetched unauthenticated (the repo is deliberately public — see CLAUDE.md), so
 // there is no security reason to wait for the PIN before starting the network round-trip, which
@@ -326,6 +326,16 @@ const out={};
 cycleTx(now).forEach(t=>{if(t.kind!=='bill')return;
 if(t.split){t.split.forEach(s=>{if(s&&s.commit)out[s.commit]=(out[s.commit]||0)+(Number(s.amt)||0);});return;}
 if(t.commit)out[t.commit]=(out[t.commit]||0)+t.amt;});
+return out;
+}
+// Category totals for genuine living spend this cycle — "Where money goes" and the Month tab's
+// spent/leak figures. Derived at render time from the same classification as everywhere else,
+// rather than DATA.spendCats: that's a robot-maintained running total per category with no way
+// to reflect a later hand correction to one transaction inside it (a bill hand-labelled after
+// the fact still sat in spendCats['everyday'] forever, no matter what txClass said).
+function livingCatsThisCycle(now){
+const out={};
+cycleTx(now).forEach(t=>{if(t.kind==='living')out[t.cat]=(out[t.cat]||0)+t.amt;});
 return out;
 }
 
@@ -551,7 +561,7 @@ const commits=(DATA.commitments||[]).map(c=>{
 const seen=byTx[c.id]||0,manual=stale?false:!!c.paid;
 const auto=!manual&&seen>=Number(c.amount)*0.9;
 return Object.assign({},c,{paid:manual||auto,actual:manual?c.actual:(auto?seen:undefined),viaTx:auto});});
-const cats=stale?{}:(DATA.spendCats||{});
+const cats=stale?{}:livingCatsThisCycle(now);
 const bal=Number(DATA.balance)||0, salary=Number(DATA.salary)||27932, cushion=Number(DATA.cushion)||200;
  
 const pd=paydayAfter(now);
@@ -722,7 +732,10 @@ cur.txClass[iso]=split?{kind:kind,commit:null,split:split}:{kind:kind,commit:com
 function catLabel(id){const m=(DATA.catMeta||[]).find(x=>x[0]===id);return m?m[1]:id;}
 function renderWeekly(){
 const el=document.getElementById('weekcmp');if(!el)return;
-const tx=DATA.transactions||[];
+// Living spend only — a bill (phone, STC, a hand-corrected electricity debit) is money already
+// budgeted for under Commitments, not part of "what did I spend on day-to-day stuff this week."
+// Filtering here, not just on Home, is what stops a paid bill from reading as a grocery binge.
+const tx=(DATA.transactions||[]).filter(row=>classifyTx(row).kind==='living');
 if(tx.length===0){el.innerHTML='<div class="note">No day-by-day data yet — this fills in as new transactions are logged from today onward.</div>';return;}
 const now=new Date(),day=86400000;
 const startThis=now.getTime()-7*day,startLast=now.getTime()-14*day;
@@ -743,7 +756,7 @@ el.innerHTML+=`<div class="rowline tot" style="margin-top:8px;border-top:2px sol
 }
 function renderDaily(){
 const el=document.getElementById('daytl');if(!el)return;
-const tx=DATA.transactions||[];
+const tx=(DATA.transactions||[]).filter(row=>classifyTx(row).kind==='living'); // see renderWeekly
 if(tx.length===0){el.innerHTML='<div class="note">No transaction-level data yet — this list starts filling in as new transactions are logged from today onward.</div>';return;}
 const now=new Date(),cutoff=now.getTime()-14*86400000;
 const byDay={};
