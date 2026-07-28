@@ -19,39 +19,46 @@ color:var(--ink);line-height:1.45;padding-bottom:84px;max-width:520px;margin:0 a
 padding:calc(12px + env(safe-area-inset-top)) 16px 6px}
 .top h1{font-size:19px;font-weight:750}
 .top .mo{font-size:12px;color:var(--sub)}
-.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:12px}
-.hero{background:linear-gradient(150deg,#1a2c40,#152232);text-align:center;padding:22px 16px}
+.top-r{display:flex;align-items:center;gap:10px;flex:0 0 auto}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:14px;
+box-shadow:0 2px 10px rgba(0,0,0,.22)}
+.card.needs-input{background:#2a2412;border-color:#5a4d1a}
+.hero{background:linear-gradient(150deg,#1a2c40,#152232);text-align:center;padding:24px 16px}
 .hero .lab{font-size:12px;color:var(--sub);text-transform:uppercase;letter-spacing:.6px}
 .hero .bal{font-size:40px;font-weight:800;letter-spacing:-1px;margin:2px 0}
 .hero .sar{font-size:16px;color:var(--sub);font-weight:600}
 .hero .mut{font-size:12px;color:var(--sub)}
 .hero .row{display:flex;gap:10px;margin-top:14px}
-.chip{flex:1;background:#0f1c2a;border:1px solid var(--line);border-radius:12px;padding:10px}
+.chip{flex:1;background:#0f1c2a;border:1px solid var(--line);border-radius:14px;padding:11px 10px}
 .chip .n{font-size:19px;font-weight:750}.chip .t{font-size:11px;color:var(--sub);margin-top:1px}
 .setbox{display:flex;gap:8px;margin-top:14px}
-.setbox input{flex:1;background:#0f1c2a;border:1px solid var(--line);border-radius:10px;color:var(--ink);
+.setbox input{flex:1;background:#0f1c2a;border:1px solid var(--line);border-radius:12px;color:var(--ink);
 padding:10px 12px;font-size:15px;text-align:center;font-variant-numeric:tabular-nums}
-.setbox button{background:#0f1c2a;border:1px solid var(--teal);color:var(--teal);border-radius:10px;
+.setbox button{background:#0f1c2a;border:1px solid var(--teal);color:var(--teal);border-radius:12px;
 padding:0 16px;font-size:13px;font-weight:700}
 .sec-title{font-size:13px;color:var(--sub);font-weight:650;text-transform:uppercase;letter-spacing:.5px;margin:6px 2px 8px}
 .rowline{display:flex;align-items:center;gap:10px;margin:9px 0}
 .rowline .nm{flex:1;font-size:14px}
 .rowline .amt{font-variant-numeric:tabular-nums;font-weight:650;font-size:14px}
 .bar{height:8px;border-radius:6px;background:#0f1c2a;overflow:hidden;margin-top:5px}
+/* Commitments are paid or not — a full-height bar under all 12 rows just repeats what the
+   checkmark already says. A hairline keeps the "filled" animation on tick without the visual
+   weight of a dozen identical full-width bars stacked down the list. */
+.bar.thin{height:4px}
 .bar>i{display:block;height:100%;border-radius:6px;transition:width .4s cubic-bezier(.4,0,.2,1)}
-.note{font-size:11.5px;color:var(--sub);line-height:1.5;margin-top:8px}
-.tbl{width:100%;border-collapse:collapse;font-size:13.5px}
+.note{font-size:12px;color:var(--sub);line-height:1.5;margin-top:8px}
+.tbl{width:100%;border-collapse:collapse;font-size:14px}
 .tbl td{padding:9px 2px;border-bottom:1px solid var(--line)}
 .tbl td:last-child{text-align:right;font-variant-numeric:tabular-nums;font-weight:650}
 .tot td{font-weight:800;border-top:2px solid var(--line);border-bottom:none;padding-top:10px}
 .ck{width:22px;height:22px;border-radius:7px;border:1.5px solid var(--line);display:inline-flex;
 align-items:center;justify-content:center;font-size:13px;color:#062a26;flex:0 0 auto}
 .ck.on{background:var(--teal);border-color:var(--teal)}
-.crow{display:flex;align-items:center;gap:11px;padding:10px 2px;border-bottom:1px solid var(--line)}
+.crow{display:flex;align-items:center;gap:11px;padding:12px 2px;border-bottom:1px solid var(--line)}
 .crow .cn{flex:1;font-size:14px}
 .crow.paid .cn{color:var(--sub);text-decoration:line-through}
 .crow .ca{font-variant-numeric:tabular-nums;font-weight:650;font-size:14px}
-.drow{padding:11px 2px;border-bottom:1px solid var(--line)}
+.drow{padding:13px 2px;border-bottom:1px solid var(--line)}
 .drow .dt{display:flex;justify-content:space-between;align-items:baseline}
 .drow .dn{font-size:14px}.drow .dr{font-variant-numeric:tabular-nums;font-weight:750;font-size:15px}
 .drow .ds{font-size:11px;color:var(--sub);margin-top:2px}
@@ -67,16 +74,18 @@ align-items:center;gap:3px;padding:4px 10px;font-weight:600}
 .nav .ic{font-size:19px}
 .view{display:none}.view.on{display:block;animation:f .25s ease}
 @keyframes f{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-.goal{margin:14px 0}
+.goal{margin:16px 0}
 .goal .g-top{display:flex;justify-content:space-between;align-items:baseline}
 .goal .g-nm{font-size:14px;font-weight:600}.goal .g-pct{font-size:13px;font-weight:700}
-.goal .g-sub{font-size:11.5px;color:var(--sub);margin-top:2px}
-.week{border-radius:14px;padding:14px;margin-bottom:12px;border:1px solid var(--line)}
+.goal .g-amt{font-size:13px;font-weight:650;margin-top:7px;font-variant-numeric:tabular-nums}
+.goal .g-sub{font-size:12px;color:var(--sub);margin-top:2px}
+.week{border-radius:18px;padding:16px;margin-bottom:14px;border:1px solid var(--line);
+box-shadow:0 2px 10px rgba(0,0,0,.22)}
 .week.g{background:#10281f;border-color:#1f5c46}.week.y{background:#2a2412;border-color:#5a4d1a}
 .week.r{background:#2a1414;border-color:#5c2323}
 .week .wk-n{font-size:30px;font-weight:800}
 .week .wk-t{font-size:12px;color:var(--sub)}
-.week .wk-s{font-size:12.5px;margin-top:6px;font-weight:600}
+.week .wk-s{font-size:13px;margin-top:6px;font-weight:600}
 #lock{position:fixed;inset:0;background:var(--bg);z-index:99;display:flex;flex-direction:column;
 align-items:center;justify-content:center;gap:18px}
 #lock h2{font-size:20px}#lock .sub2{color:var(--sub);font-size:13px;text-align:center;padding:0 30px}
@@ -104,7 +113,7 @@ border:1px solid var(--teal);color:var(--teal);font-size:13px;font-weight:650;te
 .rv .rv-n{font-size:14px}.rv .rv-a{font-variant-numeric:tabular-nums;font-weight:750;font-size:15px}
 .rv .rv-b{display:flex;gap:8px;margin-top:8px}
 .rv .rv-b button{flex:1;background:#0f1c2a;border:1px solid var(--line);color:var(--ink);
-border-radius:10px;padding:8px;font-size:12.5px;font-weight:650}
+border-radius:12px;padding:9px 8px;font-size:13px;font-weight:650}
 .rv .rv-b button.pri{border-color:var(--teal);color:var(--teal)}
 .rv.done .rv-n{color:var(--sub)}
 .wk-cmp{margin:8px 0}
@@ -113,15 +122,23 @@ border-radius:10px;padding:8px;font-size:12.5px;font-weight:650}
 .wk-cmp .wk-cat .d-down{color:var(--green);font-weight:650}
 .tl-day{margin:10px 0}
 .tl-day .tl-date{font-size:12px;color:var(--sub);font-weight:650;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px}
-.tl-row{display:flex;justify-content:space-between;font-size:13.5px;padding:5px 2px;border-bottom:1px solid var(--line)}
+.tl-row{display:flex;justify-content:space-between;font-size:14px;padding:5px 2px;border-bottom:1px solid var(--line)}
+.tl-row.minor{opacity:.5;font-size:13px}
 .tl-row .tl-cat{color:var(--sub)}
 .mcmp{display:flex;gap:10px;margin-top:10px}
-.mcmp .mc{flex:1;background:#0f1c2a;border:1px solid var(--line);border-radius:12px;padding:10px;text-align:center}
+.mcmp .mc{flex:1;background:#0f1c2a;border:1px solid var(--line);border-radius:14px;padding:12px 10px;text-align:center}
 .mcmp .mc .n{font-size:17px;font-weight:750}.mcmp .mc .t{font-size:11px;color:var(--sub);margin-top:1px}
 .trend{font-size:13px;font-weight:700;margin-top:8px;text-align:center}
-#robotBtn{position:fixed;right:14px;bottom:calc(96px + env(safe-area-inset-bottom));z-index:9999;
-background:linear-gradient(135deg,#2dd4bf,#1f9e8f);color:#062a26;border:none;border-radius:22px;
-padding:10px 16px;font-size:14px;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.4)}
+/* Used to float at a fixed screen position — it landed square on the review card's undo button
+   at some scroll positions, making it untappable, because a fixed element and scrolling content
+   will always collide somewhere. Living in the header instead means it scrolls away with
+   everything else and can never sit on top of anything the user is trying to tap. Idle state is
+   a small icon-only circle; it grows into a pill for status text once tapped (a brief, attention-
+   having moment), capped so a long status can't push the title off-screen. */
+#robotBtn{background:linear-gradient(135deg,#2dd4bf,#1f9e8f);color:#062a26;border:none;border-radius:999px;
+height:32px;min-width:32px;padding:0 12px;font-size:13px;font-weight:700;max-width:150px;
+overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+box-shadow:0 2px 8px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center}
 </style></head><body>
  
 <div id="lock">
@@ -135,7 +152,8 @@ padding:10px 16px;font-size:14px;font-weight:700;box-shadow:0 4px 14px rgba(0,0,
 </div>
 </div>
  
-<div class="top"><h1>💰 Saad Money</h1><div class="mo" id="mo"></div></div>
+<div class="top"><h1>💰 Saad Money</h1><div class="top-r"><div class="mo" id="mo"></div>
+<button id="robotBtn" onclick="runRobot()" aria-label="Update from bank" title="Update from bank">⟳</button></div></div>
 <div id="newbuild" onclick="reloadFresh()">⬆️ A newer version of the app is ready — tap to load it</div>
  
 <div class="view on" id="v-home"><div class="wrap">
@@ -194,7 +212,7 @@ week's money until you say — so the number above is incomplete, not wrong.</di
 <div class="view" id="v-debt"><div class="wrap">
 <div class="card"><div class="sec-title">Debts — tap to update</div><div id="debts"></div></div>
 <div class="card"><div class="sec-title">Plan — E. first, then smallest</div>
-<ol style="padding-left:18px;font-size:13.5px;line-height:1.7">
+<ol style="padding-left:18px;font-size:14px;line-height:1.7">
 <li>No BNPL (Tamara/Tabby). Deleted, stays deleted.</li>
 <li>Buffer to 28,000 (2,000/mo).</li>
 <li><b>Sister E. — 4,000/mo → clear in ~7–8 months.</b></li>
@@ -229,8 +247,6 @@ week's money until you say — so the number above is incomplete, not wrong.</di
 <button data-v="month"><span class="ic">📊</span>Month</button>
 </div>
  
-<button id="robotBtn" onclick="runRobot()">⟳ Update</button>
- 
 <script>
 const REPO='salmoamary-svg/ximazqq';
 const API='https://api.github.com/repos/'+REPO;
@@ -239,7 +255,7 @@ const TKEY='saad_money_gh_pat';
 // load, but the HTML itself is whatever copy the phone cached — an iOS home-screen app can
 // hold it indefinitely, so the data looks current while the logic is months old. checkBuild()
 // compares this against the copy on main and offers a reload the cache can't satisfy.
-const BUILD='2026-07-28c';
+const BUILD='2026-07-28d';
 let DATA=null;
 // data.json is fetched unauthenticated (the repo is deliberately public — see CLAUDE.md), so
 // there is no security reason to wait for the PIN before starting the network round-trip, which
@@ -604,7 +620,7 @@ return `<div class="crow ${c.paid?'paid':''}" style="flex-wrap:wrap;border-botto
 <span class="cn" onclick="toggleCommit('${c.id}')">${c.star?'⭐ ':''}${c.name}${hint}${src}</span>
 <span class="ca" onclick="toggleCommit('${c.id}')">${f(shown)} / ${f(c.amount)}</span>
 <span class="pen" onclick="editCommit('${c.id}')">✏️</span>
-<div style="flex-basis:100%;padding-left:33px"><div class="bar" style="margin-top:2px"><i style="width:${c.paid?100:0}%;background:${c.paid?'var(--green)':'var(--line)'}"></i></div></div>
+<div style="flex-basis:100%;padding-left:33px"><div class="bar thin" style="margin-top:4px"><i style="width:${c.paid?100:0}%;background:${c.paid?'var(--green)':'var(--line)'}"></i></div></div>
 </div>`;}).join('')
 +`<div class="addrow" onclick="addCommit()">＋ Add commitment</div>`;
 document.getElementById('setupline').textContent='Salary '+f(salary)+' · cushion '+f(cushion)+' — tap to edit';
@@ -635,14 +651,21 @@ const cons=(DATA.debts||[]).filter(d=>!d.longterm).reduce((a,d)=>a+Number(d.rema
 document.getElementById('debts').innerHTML+=`<div class="rowline tot" style="margin-top:10px;border-top:2px solid var(--line);padding-top:10px"><div class="nm"><b>Consumer debt left</b></div><div class="amt">${f(cons)}</div></div>`;
 document.getElementById('debts').innerHTML+=`<div class="addrow" onclick="addDebt()">＋ Add debt</div>`;
  
-// goals (tap to edit)
+// goals (tap to edit). A small icon per goal gives the sparsest tab in the app a bit more
+// visual anchor — this list is rarely more than 4 rows, and four bare text lines in a single
+// card read as unfinished rather than deliberately short.
+const GOAL_ICON={buffer:'🛡️',sisE:'🎯',cc:'💳',under:'📉'};
 document.getElementById('goals').innerHTML=(DATA.goals||[]).map(g=>{
 const cur=goalCur(g);
 const p=g.tgt>0?Math.min(100,Math.round(cur/g.tgt*100)):0;
-return `<div class="goal" onclick="editGoal('${g.id}')"><div class="g-top"><div class="g-nm">${g.name}</div>
+const icon=GOAL_ICON[g.id]||'⭐';
+// Split into two lines rather than one long "amount — description · tap to edit" string: the
+// combination wrapped badly for longer descriptions, stranding "tap to edit" alone on its own line.
+return `<div class="goal" onclick="editGoal('${g.id}')"><div class="g-top"><div class="g-nm">${icon} ${g.name}</div>
 <div class="g-pct" style="color:${g.col}">${p}%</div></div>
 <div class="bar"><i style="width:${p}%;background:${g.col}"></i></div>
-<div class="g-sub">${f(cur)} / ${f(g.tgt)} SAR — ${g.sub} · <span class="edit">tap to edit</span></div></div>`;}).join('')
+<div class="g-amt">${f(cur)} / ${f(g.tgt)} SAR</div>
+<div class="g-sub">${g.sub} · <span class="edit">tap to edit</span></div></div>`;}).join('')
 +`<div class="addrow" onclick="addGoal()">＋ Add goal</div>`;
  
 // month
@@ -680,6 +703,10 @@ const pend=items.filter(t=>t.kind==='review').length;
 document.getElementById('review-title').textContent=pend
 ?(pend===1?'1 payment needs a label':pend+' payments need a label')
 :'Payments matched to bills';
+// An actual decision pending gets the same "needs your attention" amber treatment as the week
+// card's own warning states; once everything is resolved, it settles back to a plain card —
+// these rows are then just an audit trail with an undo, not something asking for action.
+card.classList.toggle('needs-input',pend>0);
 document.getElementById('reviewlist').innerHTML=items.map(t=>{
 const when=new Date(t.iso).toLocaleDateString('en-US',{day:'numeric',month:'short'});
 if(t.kind==='review')return `<div class="rv">
@@ -687,9 +714,13 @@ if(t.kind==='review')return `<div class="rv">
 <div class="rv-b"><button class="pri" onclick="labelTx('${t.iso}','bill')">It's a bill</button>
 <button onclick="labelTx('${t.iso}','living')">Living spend</button></div></div>`;
 const nameOf=id=>{const c=(DATA.commitments||[]).find(x=>x.id===id);return c?c.name:id;};
-const to=t.split?t.split.map(s=>nameOf(s.commit)+' '+f(s.amt)).join(' + '):nameOf(t.commit);
+// A null commit with no split means the bill was excluded but never attributed to anything
+// specific — a duplicate alert, an internal transfer — so "matched to" would be describing a
+// match that never happened. nameOf(null) would otherwise print the literal word "null".
+const label=t.split?'matched to <b>'+t.split.map(s=>nameOf(s.commit)+' '+f(s.amt)).join(' + ')+'</b>'
+:t.commit?'matched to <b>'+nameOf(t.commit)+'</b>':'excluded — not everyday spending';
 return `<div class="rv done">
-<div class="rv-t"><div class="rv-n">${when} · matched to <b>${to}</b></div><div class="rv-a">${f(t.amt)}</div></div>
+<div class="rv-t"><div class="rv-n">${when} · ${label}</div><div class="rv-a">${f(t.amt)}</div></div>
 <div class="rv-b"><button onclick="labelTx('${t.iso}','living')">No — living spend</button></div></div>`;
 }).join('');
 }
@@ -767,7 +798,10 @@ if(days.length===0){el.innerHTML='<div class="note">No spending logged in the la
 el.innerHTML=days.map(dstr=>{
 const items=byDay[dstr],tot=items.reduce((a,[,v])=>a+v,0);
 const dlabel=new Date(dstr+'T12:00:00').toLocaleDateString('en-US',{weekday:'short',day:'numeric',month:'short'});
-const rows=items.map(([c,v])=>`<div class="tl-row"><div class="tl-cat">${catLabel(c)}</div><div>${f(v)}</div></div>`).join('');
+// A recurring 1.50 charge next to a real 240 purchase, styled identically, makes the eye work
+// to find what actually matters in the day. Fading small entries lets amount do the sorting
+// visually instead of every line shouting at the same volume.
+const rows=items.map(([c,v])=>`<div class="tl-row${v<10?' minor':''}"><div class="tl-cat">${catLabel(c)}</div><div>${f(v)}</div></div>`).join('');
 return `<div class="tl-day"><div class="tl-date">${dlabel} · ${f(tot)} SAR</div>${rows}</div>`;
 }).join('');
 }
