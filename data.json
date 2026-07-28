@@ -1,6 +1,6 @@
 {
- "asOf": "2026-07-28 07:00 AM",
- "balance": 14400,
+ "asOf": "2026-07-28 08:07 AM",
+ "balance": 14400.0,
  "salary": 27932,
  "cushion": 200,
  "cycleStart": "2026-07-27",
@@ -73,7 +73,8 @@
   "<19B5DE26-7604-440E-B283-C16C9AF42E30@gmail.com>",
   "<830861BF-F4DD-4D0F-A079-C80CDE6E7C60@gmail.com>",
   "<32EB801E-0ADD-4AC4-AE30-2AD595A33613@gmail.com>",
-  "<08D60F5C-501C-490A-B728-A6EB76D0A86C@gmail.com>"
+  "<08D60F5C-501C-490A-B728-A6EB76D0A86C@gmail.com>",
+  "<93A0A875-4AC1-4DD2-AA7E-8ED29E4A5C50@gmail.com>"
  ],
  "last_data_msgid": null,
  "commitments": [
