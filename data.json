@@ -541,8 +541,18 @@
    "commit": null
   },
   "2026-07-27T17:01:15Z": {
-   "kind": "living",
-   "commit": null
+   "kind": "bill",
+   "commit": null,
+   "split": [
+    {
+     "commit": "groc",
+     "amt": 1000
+    },
+    {
+     "commit": "maid",
+     "amt": 1500
+    }
+   ]
   },
   "2026-07-27T17:02:26Z": {
    "kind": "bill",
