@@ -175,6 +175,7 @@ box-shadow:0 2px 8px rgba(0,0,0,.3);display:flex;align-items:center;justify-cont
 <div class="wk-t">THIS WEEK'S MONEY</div>
 <div class="wk-n" id="wk-amt">—</div>
 <div class="wk-s" id="wk-status"></div>
+<div class="wk-b" id="wk-detail" style="font-size:13px;color:var(--sub);margin-top:2px"></div>
 <div class="note" id="wk-note">Resets every Sunday. Leftover carries to next week; overspend borrows from it. At payday, whatever's left goes to Sister E.</div>
 <div class="setbox">
 <input id="windbox" inputmode="decimal" placeholder="Add windfall (SAR)…">
@@ -255,7 +256,7 @@ const TKEY='saad_money_gh_pat';
 // load, but the HTML itself is whatever copy the phone cached — an iOS home-screen app can
 // hold it indefinitely, so the data looks current while the logic is months old. checkBuild()
 // compares this against the copy on main and offers a reload the cache can't satisfy.
-const BUILD='2026-07-28d';
+const BUILD='2026-07-31a';
 let DATA=null;
 // data.json is fetched unauthenticated (the repo is deliberately public — see CLAUDE.md), so
 // there is no security reason to wait for the PIN before starting the network round-trip, which
@@ -287,7 +288,7 @@ function sunday(d){const nd=dOnly(d);nd.setDate(nd.getDate()-nd.getDay());return
 // a bill hit the weekly envelope charges the same riyal twice. Everything below is derived
 // from the raw transaction list at render time — nothing is written into data.json — so a
 // rule change (or a correction) re-rates history on the next load.
-const CATCLASS={loan:'bill',stc:'bill',phone:'bill',cc:'bill',carins:'bill',bnpl:'bill',family:'bill',
+const CATCLASS={loan:'bill',stc:'bill',phone:'bill',cc:'bill',carins:'bill',bnpl:'bill',family:'bill',maintenance:'bill',
 everyday:'living',shopping:'living',bills:'living',travel:'living'}; // 'bills' is medical/pharmacy, not household bills
 // Categories that map to exactly one commitment, so a debit there can tick it off. stc and
 // family each span several commitments — kept out of the envelope, but never auto-attributed.
@@ -600,6 +601,7 @@ if(weekly>=1300){wc.classList.add('g');ws.textContent='🟢 Green week — norma
 else if(weekly>=800){wc.classList.add('y');ws.textContent='🟡 Careful week — home food, skip delivery.';ws.style.color='var(--amber)';}
 else if(weekly>=0){wc.classList.add('r');ws.textContent='🔴 Tight week — essentials only. Payday is close.';ws.style.color='var(--red)';}
 else{wc.classList.add('r');ws.textContent="🔴 Over this week's budget — coming out of next week.";ws.style.color='var(--red)';}
+document.getElementById('wk-detail').textContent='(spend ≈ '+f(daily)+'/day · '+f(weekly)+' left of '+f(wkly?wkly.startAmount:0)+')';
  
 // 47/30/23 bars (grouped, dynamic)
 const grp={commit:0,future:0,living:0};
@@ -611,7 +613,7 @@ const paid=commits.filter(c=>c.paid).reduce((a,c)=>a+Number(c.actual!=null?c.act
 document.getElementById('paidnote').textContent='Paid so far this cycle: '+f(paid)+' of '+f(salary)+' SAR.';
  
 // commitments (tap row to mark paid + enter actual, pencil to edit plan, + to add)
-document.getElementById('commits').innerHTML=commits.map(c=>{
+document.getElementById('commits').innerHTML=commits.filter(c=>c.id!=='living').map(c=>{
 const shown=c.paid?(c.actual!=null?c.actual:c.amount):c.amount;
 const hint=(c.paid&&c.actual!=null&&Number(c.actual)!==Number(c.amount))?` <span style="color:var(--sub);font-weight:400">· plan ${f(c.amount)}</span>`:'';
 const src=c.viaTx?` <span style="color:var(--sub);font-weight:400">· from your payments</span>`:'';
@@ -654,7 +656,7 @@ document.getElementById('debts').innerHTML+=`<div class="addrow" onclick="addDeb
 // goals (tap to edit). A small icon per goal gives the sparsest tab in the app a bit more
 // visual anchor — this list is rarely more than 4 rows, and four bare text lines in a single
 // card read as unfinished rather than deliberately short.
-const GOAL_ICON={buffer:'🛡️',sisE:'🎯',cc:'💳',under:'📉'};
+const GOAL_ICON={buffer:'🛡️',sisE:'🎯',cc:'💳',under:'📉',carins:'🚗'};
 document.getElementById('goals').innerHTML=(DATA.goals||[]).map(g=>{
 const cur=goalCur(g);
 const p=g.tgt>0?Math.min(100,Math.round(cur/g.tgt*100)):0;

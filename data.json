@@ -142,13 +142,6 @@
    "grp": "commit"
   },
   {
-   "id": "carins",
-   "name": "Car-insurance fund",
-   "amount": 310,
-   "paid": false,
-   "grp": "commit"
-  },
-  {
    "id": "sisE",
    "name": "Sister E. payoff",
    "amount": 4000,
@@ -171,14 +164,6 @@
    "paid": true,
    "grp": "future",
    "actual": 930
-  },
-  {
-   "id": "buffer",
-   "name": "Emergency buffer",
-   "amount": 2000,
-   "paid": false,
-   "star": true,
-   "grp": "future"
   },
   {
    "id": "living",
@@ -260,14 +245,23 @@
    "tgt": 27932,
    "col": "#2dd4bf",
    "sub": "Stay below 27,932"
+  },
+  {
+   "id": "carins",
+   "name": "Car insurance",
+   "cur": 0,
+   "tgt": 4000,
+   "col": "#a3a380",
+   "sub": "Tawuniya annual premium"
   }
  ],
  "spendCats": {
-  "shopping": 288.5,
+  "shopping": 119.5,
   "phone": 1771.4,
-  "everyday": 5671.35,
+  "everyday": 5171.35,
   "stc": 3000.0,
-  "bnpl": 84.73
+  "bnpl": 84.73,
+  "maintenance": 669.0
  },
  "lastCycleCats": {
   "everyday": 1155.42,
@@ -323,6 +317,11 @@
    "carins",
    "Car insurance",
    "#a3a380"
+  ],
+  [
+   "maintenance",
+   "Home maintenance",
+   "#c17b52"
   ],
   [
    "bills",
@@ -579,12 +578,12 @@
   ],
   [
    "2026-07-31T13:38:28Z",
-   "shopping",
+   "maintenance",
    169.0
   ],
   [
    "2026-07-31T15:43:55Z",
-   "everyday",
+   "maintenance",
    500.0
   ],
   [
