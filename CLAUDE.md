@@ -26,6 +26,59 @@ SHA-checked write, the same conflict-safe shape `saveData()` itself uses. Diff t
 before sending, not just the field being changed — a same-content mistake here once wiped several
 top-level keys (see the "near-miss" note under "overnight pass").
 
+## 2026-07-31 — salmoamary-svg — maintenance category, and car insurance moves from a tick to an automatic goal
+
+### What changed
+Two July 31 debits (169 SAR, categorized `shopping`; 500 SAR, categorized `everyday`) were
+actually home maintenance, not everyday/shopping spend. Relabelled by hand in `data.json`,
+`spendCats` rebalanced (shopping 288.5→119.5, everyday 5671.35→5171.35, new `maintenance: 669.0`),
+and a `maintenance` `catMeta` entry added. `index.html`'s `CATCLASS` now maps `maintenance` to
+`'bill'`, so it no longer inflates the weekly living envelope the way an unclassified category
+would.
+
+Car insurance moved from a 310/mo commitment (`carins`) to a 4,000 SAR annual goal — it's paid
+once a year to Tawuniya, so a monthly tick was never the right shape for it. The `carins` and
+`buffer` commitment rows were both removed (`buffer`'s progress was already tracked separately
+via `bufferSaved`, so keeping it as a commitment row too was a duplicate line); the commitments
+list render also now filters out `id==='living'`, since that row is the weekly envelope's own
+source figure, never something meant to be ticked in that list.
+
+The new `carins` goal, as first wired up, needed a manual top-up to move at all — asked, and the
+answer was it should be automatic instead, matching how `buffer` already works. Added
+`DATA.carinsSaved`, accrued unconditionally by `update_app.py` at every payday rollover (310/mo,
+the same figure the old commitment used), read by `goalCur()` exactly like `bufferSaved`.
+
+### A real bug this caught
+`bufferSaved`'s accrual was written back when `buffer` was still a commitment: `update_app.py`
+only added to it when `find(d["commitments"],"id","buffer")` came back paid. Deleting the
+`buffer` commitment (above) silently broke that condition — `find` now returns `None` forever, so
+`bufferSaved` would never have grown again. Caught while wiring up the equivalent `carinsSaved`
+accrual, before it ever ran (this cycle hadn't rolled over since the commitment was removed, so
+`bufferSaved` was still unset — no real progress was actually lost). Both `bufferSaved` and
+`carinsSaved` now accrue unconditionally at rollover instead of being gated on a tick that no
+longer exists.
+
+### Left alone, on purpose
+No new monthly "maintenance" commitment row, even though it might recur — it isn't a fixed,
+plan-able bill like `elec`/`subs`, so giving it a tick-box each cycle would mean guessing at a
+number nobody has confirmed yet. No new `categorize()` keyword rule either, same reason as every
+prior time this has come up: alert text is never stored, so there is nothing to test a guessed
+regex against.
+
+### What's next
+- The accrual amounts (2,000/mo buffer, 310/mo car insurance) are the old commitment amounts,
+  carried over as the obvious default — not re-derived from anything else. If either should
+  change, it's a one-line edit in `update_app.py`'s rollover block.
+- No payment-detection exists for the annual premium itself: when the Tawuniya bill is actually
+  paid, `carinsSaved` will keep accruing past the 4,000 target rather than resetting for next
+  year. `CAT2COMMIT` still maps category `carins`→commitment `carins`, which no longer exists —
+  harmless today (produces an unused key in `paidByTx`'s output), but worth a real fix once an
+  actual `carins`-categorized debit shows up.
+
+Syntax-checked (`node --check`, `py_compile`, `json.load`) per the verification commands above;
+no test-harness changes needed — this pass didn't touch `classifyTx`/`sumTx`/the weekly-envelope
+math, just categorization and goal accrual. `BUILD` → `2026-07-31b`.
+
 ## 2026-07-28 — salmoamary-svg — a senior-designer visual pass
 
 ### What changed

@@ -131,12 +131,12 @@ def main():
     pay=latest_payday(today).isoformat()
     if d.get("cycleStart") != pay:
         d["lastCycleCats"]=dict(d.get("spendCats",{}))
-        # The buffer goal has no debts entry to read progress from, so this is the one figure
-        # that has to be persisted here: paid/actual reset below and the money it represents
-        # doesn't live anywhere else once the cycle turns over.
-        buf=find(d["commitments"],"id","buffer")
-        if buf and buf.get("paid"):
-            d["bufferSaved"]=round(d.get("bufferSaved",0)+float(buf.get("actual") or buf["amount"]),2)
+        # Buffer and car-insurance are annual/rainy-day goals with no commitment row to tick
+        # anymore (both were removed once the goal itself took over tracking), so their progress
+        # accrues a fixed amount automatically every rollover instead of being gated on a tick
+        # that no longer exists. Amounts match what each used to be as a monthly commitment.
+        d["bufferSaved"]=round(d.get("bufferSaved",0)+2000,2)
+        d["carinsSaved"]=round(d.get("carinsSaved",0)+310,2)
         for c in d["commitments"]: c["paid"]=False; c.pop("actual",None); c.pop("tickedAt",None)
         d["spendCats"]={}
         g=find(d["goals"],"id","under")

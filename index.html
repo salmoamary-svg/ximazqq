@@ -256,7 +256,7 @@ const TKEY='saad_money_gh_pat';
 // load, but the HTML itself is whatever copy the phone cached — an iOS home-screen app can
 // hold it indefinitely, so the data looks current while the logic is months old. checkBuild()
 // compares this against the copy on main and offers a reload the cache can't satisfy.
-const BUILD='2026-07-31a';
+const BUILD='2026-07-31b';
 let DATA=null;
 // data.json is fetched unauthenticated (the repo is deliberately public — see CLAUDE.md), so
 // there is no security reason to wait for the PIN before starting the network round-trip, which
@@ -377,6 +377,7 @@ const db=(DATA.debts||[]).find(x=>x.id===g.id);
 return db?Math.max(0,Number(g.tgt)-Number(db.remaining)):Number(g.cur)||0;
 }
 if(g.id==='buffer')return Number(DATA.bufferSaved)||0;
+if(g.id==='carins')return Number(DATA.carinsSaved)||0;
 return Number(g.cur)||0;
 }
 function livingAllocation(){ // the "Living" slice of the 47/30/23 split — what a month of spending is meant to cost
