@@ -1,10 +1,10 @@
 {
- "asOf": "2026-08-02 01:12 PM",
- "balance": 13056.51,
+ "asOf": "2026-08-02 10:24 PM",
+ "balance": 12156.51,
  "salary": 27932,
  "cushion": 200,
  "cycleStart": "2026-07-27",
- "cursor": "2026-08-02T09:59:34Z",
+ "cursor": "2026-08-02T10:38:51Z",
  "processed": [
   "<5EAFF906-932B-4BD3-A7FA-FA5AFAC19A06@gmail.com>",
   "<C03A81B9-3FDC-4975-9E4E-91BD029CB1B8@gmail.com>",
@@ -96,7 +96,8 @@
   "<C9267F10-0342-40A1-8FC4-276435C3C696@gmail.com>",
   "<0726151D-6646-4ADC-865E-AC161BA3A3E4@gmail.com>",
   "<B24D365E-3938-4AB4-8E58-10548E018898@gmail.com>",
-  "<66198422-8BE7-4CFC-8439-7B69AB32378D@gmail.com>"
+  "<66198422-8BE7-4CFC-8439-7B69AB32378D@gmail.com>",
+  "<7BCB4FF4-A6FD-4C5C-AFC0-6211E3CC29D4@gmail.com>"
  ],
  "last_data_msgid": null,
  "commitments": [
@@ -247,7 +248,7 @@
   {
    "id": "under",
    "name": "Spend under salary this cycle",
-   "cur": 11000.48,
+   "cur": 11900.48,
    "tgt": 27932,
    "col": "#2dd4bf",
    "sub": "Stay below 27,932"
@@ -265,7 +266,7 @@
   "shopping": 165.0,
   "phone": 1771.4,
   "everyday": 5310.35,
-  "stc": 3000.0,
+  "stc": 3900.0,
   "bnpl": 84.73,
   "maintenance": 669.0
  },
@@ -611,6 +612,11 @@
    "2026-08-01T13:57:41Z",
    "shopping",
    12.0
+  ],
+  [
+   "2026-08-02T10:38:51Z",
+   "stc",
+   900.0
   ]
  ],
  "weekly": {
