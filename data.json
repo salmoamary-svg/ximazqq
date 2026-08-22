@@ -1,10 +1,10 @@
 {
- "asOf": "2026-08-21 08:24 PM",
- "balance": 3037.99,
+ "asOf": "2026-08-22 07:01 AM",
+ "balance": -15693.45,
  "salary": 27932,
  "cushion": 200,
  "cycleStart": "2026-07-27",
- "cursor": "2026-08-21T01:01:26Z",
+ "cursor": "2026-08-21T22:56:39Z",
  "processed": [
   "<5EAFF906-932B-4BD3-A7FA-FA5AFAC19A06@gmail.com>",
   "<C03A81B9-3FDC-4975-9E4E-91BD029CB1B8@gmail.com>",
@@ -187,7 +187,15 @@
   "<2CB53FDF-F8C2-4536-9C45-C1FE381A877D@gmail.com>",
   "<BAD42C68-B027-4E30-AB7A-7DC6A848E07C@gmail.com>",
   "<22B9C79C-B7B2-47FC-A459-A28264712720@gmail.com>",
-  "<DCAEFD32-0E4A-48B8-B7D1-CDED2E51ED9C@gmail.com>"
+  "<DCAEFD32-0E4A-48B8-B7D1-CDED2E51ED9C@gmail.com>",
+  "<115EB190-441C-4A0F-AEA4-2178B70F2520@gmail.com>",
+  "<4C052401-15D8-4EDD-A736-98228C55DF90@gmail.com>",
+  "<DBC874F5-C5C2-40EF-93F3-EF6D7D4F1506@gmail.com>",
+  "<0171845B-BF12-4C87-A011-F65F147AB248@gmail.com>",
+  "<E0ED7407-0CF7-4E67-B73F-55794FD11DB0@gmail.com>",
+  "<987AEB7D-08C4-4D0C-B1B0-5C7DA21702C4@gmail.com>",
+  "<C1FD4408-C806-4F8D-944B-F3E4C45AA445@gmail.com>",
+  "<5C31FDBC-D735-4DBF-880D-348393DB573B@gmail.com>"
  ],
  "last_data_msgid": null,
  "commitments": [
@@ -338,7 +346,7 @@
   {
    "id": "under",
    "name": "Spend under salary this cycle",
-   "cur": 22559.23,
+   "cur": 41290.67,
    "tgt": 27932,
    "col": "#2dd4bf",
    "sub": "Stay below 27,932"
@@ -353,11 +361,11 @@
   }
  ],
  "spendCats": {
-  "shopping": 2004.7,
+  "shopping": 3480.7,
   "phone": 1771.4,
-  "everyday": 11740.69,
+  "everyday": 27279.69,
   "stc": 5500,
-  "bnpl": 873.44,
+  "bnpl": 2589.88,
   "maintenance": 669
  },
  "lastCycleCats": {
@@ -982,6 +990,41 @@
    "2026-08-21T01:01:26Z",
    "everyday",
    57
+  ],
+  [
+   "2026-08-21T15:55:48Z",
+   "everyday",
+   15448.0
+  ],
+  [
+   "2026-08-21T15:56:12Z",
+   "bnpl",
+   1716.44
+  ],
+  [
+   "2026-08-21T17:34:14Z",
+   "shopping",
+   499.0
+  ],
+  [
+   "2026-08-21T18:29:37Z",
+   "shopping",
+   267.0
+  ],
+  [
+   "2026-08-21T19:50:27Z",
+   "shopping",
+   460.0
+  ],
+  [
+   "2026-08-21T19:50:42Z",
+   "shopping",
+   250.0
+  ],
+  [
+   "2026-08-21T22:56:39Z",
+   "everyday",
+   91.0
   ]
  ],
  "weekly": {
