@@ -1,10 +1,10 @@
 {
- "asOf": "2026-08-27 05:22 PM",
- "balance": 11962.08,
+ "asOf": "2026-08-28 06:30 PM",
+ "balance": 8660.32,
  "salary": 27932,
  "cushion": 200,
  "cycleStart": "2026-08-27",
- "cursor": "2026-08-27T08:44:11Z",
+ "cursor": "2026-08-28T08:01:51Z",
  "processed": [
   "<5EAFF906-932B-4BD3-A7FA-FA5AFAC19A06@gmail.com>",
   "<C03A81B9-3FDC-4975-9E4E-91BD029CB1B8@gmail.com>",
@@ -209,7 +209,20 @@
   "<803E9AFE-C6BA-4A4F-9269-969853A5EDCD@gmail.com>",
   "<DB68032B-6E94-4EA5-80F4-B0BA978D6BF0@gmail.com>",
   "<E9C900A0-17C3-49BE-B80F-D427FB464945@gmail.com>",
-  "<BD0035D8-F836-4D83-93D5-6D5F0AF07A5E@gmail.com>"
+  "<BD0035D8-F836-4D83-93D5-6D5F0AF07A5E@gmail.com>",
+  "<DDC6E9A0-8D7E-4265-953F-7D7687B72945@gmail.com>",
+  "<1325E033-6372-45E4-A103-A13B82FAC779@gmail.com>",
+  "<F2FAF711-C31C-4DF2-A672-45E6C07AEFCA@gmail.com>",
+  "<E8DF7051-1478-4AED-B321-D042044C6880@gmail.com>",
+  "<7F0657B6-DAF3-49D9-8F05-B2241BB01389@gmail.com>",
+  "<B06324F0-57AC-4C82-893F-8C79C4631941@gmail.com>",
+  "<57F6A301-A12F-42A7-8ED8-A2BE30BEB7DE@gmail.com>",
+  "<322BAE72-CC79-45C2-9E32-32098FD1C0E5@gmail.com>",
+  "<1F16DCF7-7D6B-4D85-8E10-4D333B72A1F6@gmail.com>",
+  "<2FBD3890-6D76-4BE3-BE42-33F54907FE38@gmail.com>",
+  "<F2B520F7-BA29-4BDA-BA53-2F663973D022@gmail.com>",
+  "<FD6251B6-F461-4F5C-8B1C-E4B2E21DAB34@gmail.com>",
+  "<2E9C407C-3A9D-450C-A367-E16F811202ED@gmail.com>"
  ],
  "last_data_msgid": null,
  "commitments": [
@@ -224,8 +237,9 @@
    "id": "phone",
    "name": "Phone / telecom",
    "amount": 1720,
-   "paid": false,
-   "grp": "commit"
+   "paid": true,
+   "grp": "commit",
+   "actual": 1837.97
   },
   {
    "id": "maid",
@@ -353,7 +367,7 @@
   {
    "id": "under",
    "name": "Spend under salary this cycle",
-   "cur": 61.53,
+   "cur": 3364.99,
    "tgt": 27932,
    "col": "#2dd4bf",
    "sub": "Stay below 27,932"
@@ -369,7 +383,10 @@
  ],
  "spendCats": {
   "shopping": 1.5,
-  "everyday": 60.03
+  "everyday": 947.61,
+  "bnpl": 277.91,
+  "phone": 1837.97,
+  "stc": 300.0
  },
  "lastCycleCats": {
   "shopping": 3572.64,
@@ -1062,6 +1079,46 @@
    "2026-08-27T08:44:11Z",
    "everyday",
    60.03
+  ],
+  [
+   "2026-08-27T12:02:16Z",
+   "bnpl",
+   277.91
+  ],
+  [
+   "2026-08-28T03:19:36Z",
+   "phone",
+   975.47
+  ],
+  [
+   "2026-08-28T03:20:21Z",
+   "phone",
+   402.5
+  ],
+  [
+   "2026-08-28T03:20:50Z",
+   "phone",
+   460.0
+  ],
+  [
+   "2026-08-28T07:07:22Z",
+   "everyday",
+   300.0
+  ],
+  [
+   "2026-08-28T07:07:39Z",
+   "stc",
+   300.0
+  ],
+  [
+   "2026-08-28T07:17:44Z",
+   "everyday",
+   483.58
+  ],
+  [
+   "2026-08-28T08:01:51Z",
+   "everyday",
+   104.0
   ]
  ],
  "weekly": {
