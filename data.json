@@ -1,10 +1,10 @@
 {
- "asOf": "2026-08-29 01:15 PM",
- "balance": 6297.68,
+ "asOf": "2026-08-30 12:21 PM",
+ "balance": 3078.18,
  "salary": 27932,
  "cushion": 200,
  "cycleStart": "2026-08-27",
- "cursor": "2026-08-29T07:11:58Z",
+ "cursor": "2026-08-30T08:20:25Z",
  "processed": [
   "<5EAFF906-932B-4BD3-A7FA-FA5AFAC19A06@gmail.com>",
   "<C03A81B9-3FDC-4975-9E4E-91BD029CB1B8@gmail.com>",
@@ -228,7 +228,15 @@
   "<972874F3-EF03-4143-A445-178EFE41425F@gmail.com>",
   "<1A6316C3-16F8-4863-A4C6-1E40F2AEC22A@gmail.com>",
   "<B17F858A-0359-411B-8A82-76FE54A070E8@gmail.com>",
-  "<FF4A8CF2-83EC-42ED-84BD-1BDA7BDF8C7C@gmail.com>"
+  "<FF4A8CF2-83EC-42ED-84BD-1BDA7BDF8C7C@gmail.com>",
+  "<DD0366D5-364D-41A8-BD62-4C011EC889AB@gmail.com>",
+  "<DAC6D2BA-18E8-4482-B239-EA8E055270BA@gmail.com>",
+  "<41C48140-0FEB-440B-99EF-33B5346301D1@gmail.com>",
+  "<B6E9BD98-BDCA-4603-A682-71F5F4CE9013@gmail.com>",
+  "<5B5EA896-2D00-4903-BE51-F8F2DB05EE75@gmail.com>",
+  "<84C408E3-F8E5-40A6-925B-83CA6273535D@gmail.com>",
+  "<369C4014-DD32-45E9-A750-8C8C6FAA9F26@gmail.com>",
+  "<B3072905-7C1A-4761-A5D4-39EBFB8AB590@gmail.com>"
  ],
  "last_data_msgid": null,
  "commitments": [
@@ -373,7 +381,7 @@
   {
    "id": "under",
    "name": "Spend under salary this cycle",
-   "cur": 5727.63,
+   "cur": 10447.13,
    "tgt": 27932,
    "col": "#2dd4bf",
    "sub": "Stay below 27,932"
@@ -388,11 +396,11 @@
   }
  ],
  "spendCats": {
-  "shopping": 1.5,
-  "everyday": 1947.61,
+  "shopping": 154.0,
+  "everyday": 5014.61,
   "bnpl": 640.55,
   "phone": 1837.97,
-  "stc": 1300.0
+  "stc": 2800.0
  },
  "lastCycleCats": {
   "shopping": 3572.64,
@@ -1145,6 +1153,31 @@
    "2026-08-29T07:11:58Z",
    "bnpl",
    84.73
+  ],
+  [
+   "2026-08-29T19:05:35Z",
+   "everyday",
+   1500.0
+  ],
+  [
+   "2026-08-29T19:05:55Z",
+   "stc",
+   1500.0
+  ],
+  [
+   "2026-08-29T19:06:20Z",
+   "everyday",
+   1500.0
+  ],
+  [
+   "2026-08-30T06:38:43Z",
+   "shopping",
+   152.5
+  ],
+  [
+   "2026-08-30T08:20:25Z",
+   "everyday",
+   67.0
   ]
  ],
  "weekly": {
