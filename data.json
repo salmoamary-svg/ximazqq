@@ -1,10 +1,10 @@
 {
- "asOf": "2026-09-16 11:43 AM",
- "balance": 6721.37,
+ "asOf": "2026-09-17 11:46 AM",
+ "balance": 6457.37,
  "salary": 27932,
  "cushion": 200,
  "cycleStart": "2026-08-27",
- "cursor": "2026-09-16T07:09:40Z",
+ "cursor": "2026-09-16T14:18:55Z",
  "processed": [
   "<5EAFF906-932B-4BD3-A7FA-FA5AFAC19A06@gmail.com>",
   "<C03A81B9-3FDC-4975-9E4E-91BD029CB1B8@gmail.com>",
@@ -299,7 +299,11 @@
   "<2146E8B0-A5C5-43A4-8927-A5E70BCA9177@gmail.com>",
   "<E0EC452C-3023-498F-97FC-84B93AA2A8BF@gmail.com>",
   "<FCCB9D57-2935-4BCD-8DEF-3314BE89BDB1@gmail.com>",
-  "<63F051F0-AC12-4D5B-92E1-07C40D72A872@gmail.com>"
+  "<63F051F0-AC12-4D5B-92E1-07C40D72A872@gmail.com>",
+  "<927256E4-226D-4EEC-9A66-91F1A483B9BF@gmail.com>",
+  "<EE9DC219-F051-4002-A440-ED45FF32FDED@gmail.com>",
+  "<CFFBA493-CEEE-4E24-8797-F05AF6675391@gmail.com>",
+  "<B938B9F7-1E9C-4284-B831-3BE2D544F02F@gmail.com>"
  ],
  "last_data_msgid": null,
  "commitments": [
@@ -444,7 +448,7 @@
   {
    "id": "under",
    "name": "Spend under salary this cycle",
-   "cur": 18762.78,
+   "cur": 19026.78,
    "tgt": 27932,
    "col": "#2dd4bf",
    "sub": "Stay below 27,932"
@@ -459,8 +463,8 @@
   }
  ],
  "spendCats": {
-  "shopping": 1720.92,
-  "everyday": 9563.34,
+  "shopping": 1868.56,
+  "everyday": 9679.7,
   "bnpl": 640.55,
   "phone": 1837.97,
   "stc": 5000.0
@@ -1461,6 +1465,21 @@
    "2026-09-16T07:09:40Z",
    "shopping",
    1.5
+  ],
+  [
+   "2026-09-16T11:34:54Z",
+   "shopping",
+   1.5
+  ],
+  [
+   "2026-09-16T13:58:41Z",
+   "shopping",
+   146.14
+  ],
+  [
+   "2026-09-16T14:18:55Z",
+   "everyday",
+   116.36
   ]
  ],
  "weekly": {
