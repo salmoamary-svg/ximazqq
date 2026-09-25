@@ -1,10 +1,10 @@
 {
- "asOf": "2026-09-24 11:35 AM",
- "balance": 4592.93,
+ "asOf": "2026-09-25 11:57 AM",
+ "balance": 4099.55,
  "salary": 27932,
  "cushion": 200,
  "cycleStart": "2026-08-27",
- "cursor": "2026-09-23T15:56:21Z",
+ "cursor": "2026-09-24T20:12:05Z",
  "processed": [
   "<5EAFF906-932B-4BD3-A7FA-FA5AFAC19A06@gmail.com>",
   "<C03A81B9-3FDC-4975-9E4E-91BD029CB1B8@gmail.com>",
@@ -330,7 +330,14 @@
   "<E3FF9811-822D-4E1A-85AB-62BF4B278222@gmail.com>",
   "<9331DCF5-345B-4E23-B672-3BCC6B00B456@gmail.com>",
   "<AD0EF827-0D93-4A34-92BB-3BB696B071CD@gmail.com>",
-  "<F5CBC059-6180-4CAF-AA35-5B6CE7E9570E@gmail.com>"
+  "<F5CBC059-6180-4CAF-AA35-5B6CE7E9570E@gmail.com>",
+  "<78E3E56B-A9E1-4BEA-9FF9-3CCB5F4BDC78@gmail.com>",
+  "<CEEDC6A6-66BF-43F1-8CCE-9DE383C80301@gmail.com>",
+  "<5745910F-71B1-4776-A796-C1CC16A99455@gmail.com>",
+  "<5953C433-A25C-4B26-A818-BF6BB39E5040@gmail.com>",
+  "<29E2A6B8-5439-4205-9464-0AED82BB5213@gmail.com>",
+  "<FF8617E5-C50E-41AF-B45D-795F6E5B2938@gmail.com>",
+  "<393CC474-F74A-40F1-8B64-5EC0869D0AE7@gmail.com>"
  ],
  "last_data_msgid": null,
  "commitments": [
@@ -475,7 +482,7 @@
   {
    "id": "under",
    "name": "Spend under salary this cycle",
-   "cur": 20891.22,
+   "cur": 21384.6,
    "tgt": 27932,
    "col": "#2dd4bf",
    "sub": "Stay below 27,932"
@@ -490,8 +497,8 @@
   }
  ],
  "spendCats": {
-  "shopping": 2562.65,
-  "everyday": 10564.15,
+  "shopping": 2655.53,
+  "everyday": 10964.65,
   "bnpl": 640.55,
   "phone": 1837.97,
   "stc": 5000.0,
@@ -594,36 +601,6 @@
   ]
  ],
  "transactions": [
-  [
-   "2026-07-16T20:40:10Z",
-   "everyday",
-   69
-  ],
-  [
-   "2026-07-16T21:49:38Z",
-   "everyday",
-   61.06
-  ],
-  [
-   "2026-07-17T13:21:57Z",
-   "shopping",
-   239.55
-  ],
-  [
-   "2026-07-17T17:16:07Z",
-   "everyday",
-   119
-  ],
-  [
-   "2026-07-17T21:08:56Z",
-   "everyday",
-   75
-  ],
-  [
-   "2026-07-19T06:50:41Z",
-   "shopping",
-   1.5
-  ],
   [
    "2026-07-19T15:04:17Z",
    "shopping",
@@ -1593,6 +1570,36 @@
    "2026-09-23T15:56:21Z",
    "shopping",
    1.5
+  ],
+  [
+   "2026-09-24T12:37:39Z",
+   "everyday",
+   37.75
+  ],
+  [
+   "2026-09-24T12:37:39Z",
+   "everyday",
+   37.75
+  ],
+  [
+   "2026-09-24T13:25:09Z",
+   "everyday",
+   176.0
+  ],
+  [
+   "2026-09-24T17:45:09Z",
+   "shopping",
+   92.88
+  ],
+  [
+   "2026-09-24T19:50:39Z",
+   "everyday",
+   43.0
+  ],
+  [
+   "2026-09-24T20:12:05Z",
+   "everyday",
+   106.0
   ]
  ],
  "weekly": {
