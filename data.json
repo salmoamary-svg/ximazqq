@@ -1,10 +1,10 @@
 {
- "asOf": "2026-09-26 11:43 AM",
- "balance": 3887.55,
+ "asOf": "2026-09-27 12:23 PM",
+ "balance": 31685.05,
  "salary": 27932,
  "cushion": 200,
- "cycleStart": "2026-08-27",
- "cursor": "2026-09-25T19:49:53Z",
+ "cycleStart": "2026-09-27",
+ "cursor": "2026-09-27T06:04:30Z",
  "processed": [
   "<5EAFF906-932B-4BD3-A7FA-FA5AFAC19A06@gmail.com>",
   "<C03A81B9-3FDC-4975-9E4E-91BD029CB1B8@gmail.com>",
@@ -341,7 +341,13 @@
   "<29D43A9A-9DE2-4E0C-A892-0A5BD5A7DFA5@gmail.com>",
   "<1A5207FE-59DC-425A-A74D-8CA2DC34BEEC@gmail.com>",
   "<A80E164D-8BED-46F0-A1AC-6A0E15127C0C@gmail.com>",
-  "<7908CFE8-6795-4BBA-A2A3-F48FB603CE43@gmail.com>"
+  "<7908CFE8-6795-4BBA-A2A3-F48FB603CE43@gmail.com>",
+  "<9C18C045-F0C8-46B8-9710-0737C5885941@gmail.com>",
+  "<70DA9C66-1482-4F8A-9310-43433821E917@gmail.com>",
+  "<8A03CAC0-EEB2-4C52-B5CF-169851A9EF61@gmail.com>",
+  "<91880660-1746-4F5D-B326-BF31D67C9D4C@gmail.com>",
+  "<D5C148FE-3111-4351-8F21-3E3EF587F074@gmail.com>",
+  "<BE8C7889-B9F5-4FA8-8E2A-909C913D127A@gmail.com>"
  ],
  "last_data_msgid": null,
  "commitments": [
@@ -356,9 +362,8 @@
    "id": "phone",
    "name": "Phone / telecom",
    "amount": 1720,
-   "paid": true,
-   "grp": "commit",
-   "actual": 1837.97
+   "paid": false,
+   "grp": "commit"
   },
   {
    "id": "maid",
@@ -486,7 +491,7 @@
   {
    "id": "under",
    "name": "Spend under salary this cycle",
-   "cur": 21596.6,
+   "cur": 134.5,
    "tgt": 27932,
    "col": "#2dd4bf",
    "sub": "Stay below 27,932"
@@ -501,20 +506,15 @@
   }
  ],
  "spendCats": {
+  "shopping": 134.5
+ },
+ "lastCycleCats": {
   "shopping": 2749.53,
   "everyday": 11082.65,
   "bnpl": 640.55,
   "phone": 1837.97,
   "stc": 5000.0,
   "bills": 285.9
- },
- "lastCycleCats": {
-  "shopping": 3572.64,
-  "phone": 1771.4,
-  "everyday": 27402.69,
-  "stc": 5500,
-  "bnpl": 2589.88,
-  "maintenance": 669
  },
  "catMeta": [
   [
@@ -605,21 +605,6 @@
   ]
  ],
  "transactions": [
-  [
-   "2026-07-21T16:08:32Z",
-   "everyday",
-   108.5
-  ],
-  [
-   "2026-07-21T17:09:05Z",
-   "shopping",
-   135
-  ],
-  [
-   "2026-07-22T06:03:14Z",
-   "shopping",
-   1.5
-  ],
   [
    "2026-07-22T18:03:44Z",
    "everyday",
@@ -1604,6 +1589,21 @@
    "2026-09-25T19:49:53Z",
    "everyday",
    118.0
+  ],
+  [
+   "2026-09-26T13:41:37Z",
+   "shopping",
+   44.0
+  ],
+  [
+   "2026-09-26T22:42:14Z",
+   "shopping",
+   89.0
+  ],
+  [
+   "2026-09-27T06:04:30Z",
+   "shopping",
+   1.5
   ]
  ],
  "weekly": {
@@ -1646,6 +1646,6 @@
    "commit": null
   }
  },
- "bufferSaved": 2000,
- "carinsSaved": 310
+ "bufferSaved": 4000,
+ "carinsSaved": 620
 }
