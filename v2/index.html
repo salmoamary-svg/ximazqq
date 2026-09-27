@@ -94,7 +94,7 @@ background:var(--teal);color:var(--bg);font-weight:700;padding:12px 16px;border-
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
-const BUILD = "2026-09-27b";
+const BUILD = "2026-09-27c";
 const SB_URL = "https://ywdetjwnopnwcrnuoblp.supabase.co";
 const SB_KEY = "sb_publishable_bJyqlS50Bk4leVrxLyhZag_9wkkuYsN";   // publishable: safe in public code, RLS does the guarding
 const sb = supabase.createClient(SB_URL, SB_KEY);
@@ -284,7 +284,7 @@ function openTx(id) {
     ${chip(inflow ? "transfer_in" : "transfer_out", null, null, "My own account")}
     ${inflow ? chip("income", null, null, "Money in") + chip("salary", null, null, "Salary") : ""}
     ${chip("ignore", null, null, "Ignore")}</div>`;
-  if (t.counterparty) h += `<label class="toggle"><input type="checkbox" id="remember" checked> Always do this for “<bdi>${esc(t.counterparty)}</bdi>”</label>`;
+  if (t.counterparty) h += `<label class="toggle"><input type="checkbox" id="remember" ${/^Top-up/.test(t.counterparty) ? "" : "checked"}> Always do this for “<bdi>${esc(t.counterparty)}</bdi>”</label>`;
   if (t.source === "me") h += `<button class="pbtn ghost" onclick="delTx(${id})">Delete this entry</button>`;
   openSheet(h);
 }

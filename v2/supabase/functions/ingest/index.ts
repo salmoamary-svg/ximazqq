@@ -77,7 +77,8 @@ async function loadContext() {
 
 function systemPrompt(ctx: Awaited<ReturnType<typeof loadContext>>, receivedAt: string, sender: string | null) {
   const owner = (ctx.settings.owner_names as string[] | undefined)?.join(", ") ?? "";
-  const accounts = ctx.accounts.map((a) => `- ${a.id}: ${a.name} (${a.bank}); identified by any of: ${a.markers.join(", ")}`).join("\n");
+  const accounts = ctx.accounts.map((a) => `- ${a.id}: ${a.name} (${a.bank}); identified by any of: ${a.markers.join(", ")}${a.tracked === false ? " — NOT TRACKED (its SMS never reach us)" : ""}`).join("\n");
+  const untracked = ctx.accounts.filter((a) => a.tracked === false).map((a) => a.name);
   const budgets = ctx.budgets.map((b) => `- ${b.id}: ${b.name}`).join("\n");
   const commitments = ctx.commitments.map((c) => `- ${c.id}: ${c.name}, ~${c.amount} SAR/month${c.payee ? `, usually paid to "${c.payee}"` : ""}`).join("\n");
   const memory = ctx.memory.length
@@ -111,7 +112,7 @@ KINDS
 
 RULES
 - amount is the principal only; put any fee (رسوم) in fee. Amounts may be written "SAR 89.00", "SR250", "500 رس", "27932.0 SAR" — read them all.
-- Card purchases (شراء, مدى, Apple Pay) are spend unless the merchant is a listed commitment payee.
+${untracked.length ? `- Money sent from a tracked account to the owner's own ${untracked.join(" / ")} account is NOT a transfer: whatever it buys will never be seen, so record it as kind=spend at the moment it leaves, with account = the sending account, counterparty = "Top-up ${untracked.join(" / ")}", budget_id = null and confidence 0.5 so the owner is asked what it was for.\n` : ""}- Card purchases (شراء, مدى, Apple Pay) are spend unless the merchant is a listed commitment payee.
 - Pick the budget from the merchant: restaurants/coffee/delivery (Jahez, HungerStation, Starbucks) → food; airlines, hotels, Careem/Uber → travel; games, PlayStation, app stores → fun; Amazon/Noon/Jarir/clothes → shopping; unknown → other with lower confidence.
 - Dates: this SMS was received at ${receivedAt} (${TZ}). Bank date formats are inconsistent (DD-MM-YY and YY-MM-DD both occur). Choose the reading that lands within 3 days of the received time; if none does, return null. Output occurred_at as ISO-8601 with the +03:00 offset.
 - confidence: 0.95+ when the kind, account and destination are all unambiguous; 0.6–0.8 when you had to guess the budget or the payee is truncated/unknown; below 0.5 if the message is unclear.
