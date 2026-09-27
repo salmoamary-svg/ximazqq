@@ -1,0 +1,37 @@
+[
+  {
+    "name": "bsf-card-riyadh-air",
+    "sender": "BSF",
+    "received_at": "2026-09-27T01:42:30+03:00",
+    "expect": { "kind": "spend", "account": "bsf", "amount": 89, "budget_id": "travel" },
+    "text": "شراء إنترنت\nبـ SAR 89.00 SAR\nمن Riyadh Air\nمدى 8738* من خلال Apple Pay\nحساب 0125*\nفي26-09-27 01:42"
+  },
+  {
+    "name": "bsf-salary",
+    "sender": "BSF",
+    "received_at": "2026-09-27T00:28:40+03:00",
+    "expect": { "kind": "salary", "account": "bsf", "amount": 27932 },
+    "text": "حوالة واردة: راتب\nمبلغ: 27932.0 SAR \nإلى: ********************0125\nالتاريخ: 27-09-2026\nالوقت: 00:28"
+  },
+  {
+    "name": "bsf-card-jahez",
+    "sender": "BSF",
+    "received_at": "2026-09-24T16:24:10+03:00",
+    "expect": { "kind": "spend", "account": "bsf", "amount": 176, "budget_id": "food" },
+    "text": "شراء إنترنت\nبـ 176.00 SAR\nمن MYSR(Jahez\nمدى 8738*\nحساب 0125*\nفي24-09-26 16:24"
+  },
+  {
+    "name": "stc-transfer-out-alinma",
+    "sender": "STC Bank",
+    "received_at": "2026-09-26T21:48:20+03:00",
+    "expect": { "kind": "spend", "account": "stc", "amount": 250, "fee": 0.58, "needs_tap": true },
+    "text": "حوالة صادرة محلية\nSR250\nرسوم 0.58SR\nإلى مؤسسة رات\nإلىINMA\nإلى000\n26/09/26 21:48"
+  },
+  {
+    "name": "stc-transfer-in-almoamary",
+    "sender": "STC Bank",
+    "received_at": "2026-09-17T19:02:15+03:00",
+    "expect": { "account": "stc", "amount": 500 },
+    "text": "حوالة داخلية واردة\nبـ:500 رس\nمن:M ALMOAMARY\nمن:208\nفي:17/09/26 19:02"
+  }
+]
