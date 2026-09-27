@@ -94,7 +94,7 @@ background:var(--teal);color:var(--bg);font-weight:700;padding:12px 16px;border-
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
-const BUILD = "2026-09-27c";
+const BUILD = "2026-09-27d";
 const SB_URL = "https://ywdetjwnopnwcrnuoblp.supabase.co";
 const SB_KEY = "sb_publishable_bJyqlS50Bk4leVrxLyhZag_9wkkuYsN";   // publishable: safe in public code, RLS does the guarding
 const sb = supabase.createClient(SB_URL, SB_KEY);
@@ -185,7 +185,13 @@ function compute() {
   const paid = {};
   for (const t of D.cycTx) if (t.kind === "commitment" && t.commitment_id) (paid[t.commitment_id] ||= []).push(t);
   const review = D.txs.filter((t) => !t.confirmed);
-  return { weekStart, weekEnd, allowance, left, week, daysLeftWeek, pot, byBudget, paid, review, spentCycle: before + week };
+  // The month: what came in, what has gone out, and what the bills not yet paid will still take.
+  const salTx = D.cycTx.filter((t) => t.kind === "salary").reduce((s, t) => s + Number(t.amount), 0);
+  const income = (salTx || Number(D.settings.salary || 0)) + D.cycTx.filter((t) => t.kind === "income").reduce((s, t) => s + Number(t.amount), 0);
+  const out = D.cycTx.filter((t) => t.kind === "spend" || t.kind === "commitment").reduce((s, t) => s + Number(t.amount) + Number(t.fee || 0), 0);
+  const billsLeft = D.commitments.filter((c) => !paid[c.id]).reduce((s, c) => s + Number(c.amount), 0);
+  const month = { income, out, billsLeft, left: income - out, free: income - out - billsLeft, days: Math.max(1, Math.round((end - today) / DAY)) };
+  return { weekStart, weekEnd, allowance, left, week, daysLeftWeek, pot, byBudget, paid, review, month, spentCycle: before + week };
 }
 
 // ---------- render ----------
@@ -205,6 +211,13 @@ function render() {
     for (const t of C.review) h += txRow(t, true);
     h += `</div>`;
   }
+
+  const M = C.month, mtone = M.free < 0 ? "bad" : M.free < M.income * 0.05 ? "warn" : "good";
+  h += `<div class="card"><h2>Rest of the month <span>${M.days} day${M.days > 1 ? "s" : ""} to payday</span></h2>
+    <div class="big ${mtone}">${fmt(M.free)}<small>SAR free</small></div>
+    <div class="sub">after the ${fmt(M.billsLeft)} of bills still to pay · ≈ ${fmt(Math.max(0, M.free) / M.days)} a day</div>
+    <div class="bar"><i style="width:${M.income ? Math.min(100, (M.out / M.income) * 100) : 0}%;background:var(--teal)"></i></div>
+    <div class="sub" style="margin-top:8px;display:flex;justify-content:space-between"><span>In ${fmt(M.income)}</span><span>Out ${fmt(M.out)}</span><span>Left ${fmt(M.left)}</span></div></div>`;
 
   h += `<div class="card"><h2>This week <span>${dshort(C.weekStart)} – ${dshort(addDays(C.weekEnd, -1))}</span></h2>
     <div class="big ${tone}">${fmt(C.left)}<small>SAR left</small></div>
