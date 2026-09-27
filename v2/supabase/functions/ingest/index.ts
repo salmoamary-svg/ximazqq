@@ -47,7 +47,7 @@ const SCHEMA = {
     budget_id: { type: ["string","null"] },
     commitment_id: { type: ["string","null"] },
     occurred_at: { type: ["string","null"], description: "ISO-8601 with offset, or null if the SMS has no usable date" },
-    confidence: { type: "number", minimum: 0, maximum: 1 },
+    confidence: { type: "number", description: "0 to 1" },
     reason: { type: "string", description: "one short sentence" },
   },
 };
@@ -75,7 +75,7 @@ async function loadContext() {
   return { accounts: accounts.data ?? [], budgets: budgets.data ?? [], commitments: commitments.data ?? [], memory: memory.data ?? [], settings: st };
 }
 
-function systemPrompt(ctx: Awaited<ReturnType<typeof loadContext>>, receivedAt: string) {
+function systemPrompt(ctx: Awaited<ReturnType<typeof loadContext>>, receivedAt: string, sender: string | null) {
   const owner = (ctx.settings.owner_names as string[] | undefined)?.join(", ") ?? "";
   const accounts = ctx.accounts.map((a) => `- ${a.id}: ${a.name} (${a.bank}); identified by any of: ${a.markers.join(", ")}`).join("\n");
   const budgets = ctx.budgets.map((b) => `- ${b.id}: ${b.name}`).join("\n");
@@ -85,6 +85,7 @@ function systemPrompt(ctx: Awaited<ReturnType<typeof loadContext>>, receivedAt: 
     : "(none yet)";
 
   return `You classify one Saudi bank SMS alert for a personal budgeting app. The owner of every account is one person; their name appears in transfers as: ${owner}.
+${sender ? `This SMS was sent by "${sender}" — that is the bank whose account it concerns, even if the text carries no account marker.` : ""}
 
 ACCOUNTS
 ${accounts}
@@ -117,18 +118,27 @@ RULES
 - Return only the JSON object.`;
 }
 
-async function classify(text: string, receivedAt: string, ctx: Awaited<ReturnType<typeof loadContext>>): Promise<Classified> {
+// The Shortcut tells us which bank sent the SMS; that decides the account when the text itself doesn't.
+function accountFromSender(sender: string | null, ctx: Awaited<ReturnType<typeof loadContext>>) {
+  if (!sender) return null;
+  const s = sender.toLowerCase().replace(/\s+/g, "");
+  return ctx.accounts.find((a) => s.includes(a.name.toLowerCase().replace(/\s+/g, "")) || s.includes(a.id))?.id ?? null;
+}
+
+async function classify(text: string, receivedAt: string, sender: string | null, ctx: Awaited<ReturnType<typeof loadContext>>): Promise<Classified> {
   const res = await anthropic.messages.create({
     model: MODEL,
     max_tokens: 1024,
-    system: systemPrompt(ctx, receivedAt),
+    system: systemPrompt(ctx, receivedAt, sender),
     messages: [{ role: "user", content: text }],
     output_config: { effort: "medium", format: { type: "json_schema", schema: SCHEMA } },
   });
   if (res.stop_reason === "refusal") throw new Error("classifier refused: " + (res.stop_details?.explanation ?? ""));
   const block = res.content.find((b) => b.type === "text");
   if (!block || block.type !== "text") throw new Error("classifier returned no text (stop_reason=" + res.stop_reason + ")");
-  return JSON.parse(block.text) as Classified;
+  const c = JSON.parse(block.text) as Classified;
+  if (!ctx.accounts.some((a) => a.id === c.account)) c.account = accountFromSender(sender, ctx);
+  return c;
 }
 
 // A payee the owner has already labelled always wins over the model's guess.
@@ -189,7 +199,7 @@ Deno.serve(async (req) => {
   const ctx = await loadContext();
 
   if (dry) {
-    const c = applyMemory(await classify(text, receivedAt, ctx), ctx);
+    const c = applyMemory(await classify(text, receivedAt, sender, ctx), ctx);
     return Response.json({ dry: true, ...c, needs_tap: needsTap(c) });
   }
 
@@ -202,7 +212,7 @@ Deno.serve(async (req) => {
   const rawId = ins.data.id;
 
   try {
-    const c = applyMemory(await classify(text, receivedAt, ctx), ctx);
+    const c = applyMemory(await classify(text, receivedAt, sender, ctx), ctx);
     const row = {
       raw_id: rawId,
       kind: c.kind,
