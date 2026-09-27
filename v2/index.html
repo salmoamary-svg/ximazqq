@@ -1,0 +1,441 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Saad Money">
+<meta name="theme-color" content="#0d1520">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="../icon-180.png">
+<title>Saad Money</title>
+<style>
+:root{--bg:#0d1520;--card:#172433;--card2:#1d2d40;--ink:#eaf1f8;--sub:#9fb2c4;--line:#28394d;
+--teal:#2dd4bf;--red:#f87171;--amber:#fbbf24;--green:#34d399}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--bg)}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color:var(--ink);
+line-height:1.45;max-width:520px;margin:0 auto;padding-bottom:calc(24px + env(safe-area-inset-bottom))}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+input{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:12px;
+padding:12px;width:100%;font-size:16px}
+.top{display:flex;justify-content:space-between;align-items:center;padding:calc(14px + env(safe-area-inset-top)) 16px 8px}
+.top h1{font-size:20px;font-weight:750}
+.top .cyc{font-size:12px;color:var(--sub)}
+.icons{display:flex;gap:8px}
+.ibtn{width:40px;height:40px;border-radius:50%;background:var(--card);border:1px solid var(--line);font-size:18px;
+display:grid;place-items:center}
+.ibtn:active{transform:scale(.94)}
+.wrap{padding:8px 16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:14px;
+box-shadow:0 2px 10px rgba(0,0,0,.22)}
+.card h2{font-size:13px;font-weight:650;color:var(--sub);text-transform:uppercase;letter-spacing:.04em;margin-bottom:10px;
+display:flex;justify-content:space-between}
+.card h2 span{text-transform:none;letter-spacing:0;font-weight:500}
+.review{border-color:var(--amber)}
+.review h2{color:var(--amber)}
+.big{font-size:44px;font-weight:800;letter-spacing:-.02em;line-height:1.1}
+.big small{font-size:16px;font-weight:600;color:var(--sub);margin-left:4px}
+.sub{color:var(--sub);font-size:14px}
+.good{color:var(--green)}.warn{color:var(--amber)}.bad{color:var(--red)}
+.bar{height:8px;border-radius:6px;background:var(--line);overflow:hidden;margin-top:8px}
+.bar>i{display:block;height:100%;border-radius:6px;background:var(--green);transition:width .4s}
+.bar.thin{height:4px;margin-top:6px}
+.row{display:flex;align-items:center;gap:12px;padding:10px 4px;border-radius:12px}
+.row+.row{border-top:1px solid var(--line)}
+.row:active{background:var(--card2)}
+.row .l{flex:1;min-width:0}
+.row .t{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .s{font-size:12px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .r{text-align:right;font-variant-numeric:tabular-nums;font-size:15px;font-weight:600}
+.ico{width:34px;height:34px;border-radius:10px;background:var(--card2);display:grid;place-items:center;font-size:17px;flex:0 0 auto}
+.chk{width:26px;height:26px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;flex:0 0 auto;
+font-size:14px;font-weight:800;color:var(--bg)}
+.chk.on{background:var(--green);border-color:var(--green)}
+.chk.auto{background:var(--teal);border-color:var(--teal)}
+.done .t{color:var(--sub)}
+.more{display:block;width:100%;text-align:center;color:var(--teal);font-size:14px;padding:10px 0 2px}
+.minor{opacity:.6}
+/* sheet */
+.veil{position:fixed;inset:0;background:rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:opacity .2s;z-index:10}
+.veil.on{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:0;right:0;bottom:0;max-width:520px;margin:0 auto;background:var(--card);border-radius:22px 22px 0 0;
+border:1px solid var(--line);padding:18px 16px calc(20px + env(safe-area-inset-bottom));transform:translateY(105%);
+transition:transform .25s;z-index:11;max-height:88vh;overflow:auto}
+.sheet.on{transform:none}
+.sheet h3{font-size:18px;margin-bottom:4px}
+.sheet .sms{white-space:pre-wrap;direction:rtl;text-align:right;background:var(--bg);border-radius:12px;padding:12px;
+font-size:13px;color:var(--sub);margin:10px 0}
+.lbl{font-size:12px;color:var(--sub);text-transform:uppercase;letter-spacing:.04em;margin:14px 0 6px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:9px 13px;border-radius:999px;background:var(--card2);border:1px solid var(--line);font-size:14px}
+.chip:active,.chip.sel{background:var(--teal);color:var(--bg);border-color:var(--teal)}
+.toggle{display:flex;align-items:center;gap:10px;margin-top:14px;font-size:14px;color:var(--sub)}
+.toggle input{width:20px;height:20px}
+.pbtn{display:block;width:100%;padding:14px;border-radius:14px;background:var(--teal);color:var(--bg);font-weight:700;
+font-size:16px;margin-top:16px}
+.pbtn:active{transform:scale(.98)}
+.pbtn.ghost{background:var(--card2);color:var(--ink);border:1px solid var(--line)}
+.grid2{display:grid;grid-template-columns:1fr 110px;gap:8px;margin-bottom:8px}
+.login{padding:calc(60px + env(safe-area-inset-top)) 24px}
+.login h1{font-size:28px;margin-bottom:6px}
+.login input{margin-top:12px}
+.msg{margin-top:14px;font-size:14px;color:var(--amber);min-height:20px}
+.banner{position:fixed;top:calc(8px + env(safe-area-inset-top));left:16px;right:16px;max-width:488px;margin:0 auto;
+background:var(--teal);color:var(--bg);font-weight:700;padding:12px 16px;border-radius:14px;z-index:20;text-align:center}
+.empty{color:var(--sub);font-size:14px;padding:6px 4px}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div class="veil" id="veil" onclick="closeSheet()"></div>
+<div class="sheet" id="sheet"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+const BUILD = "2026-09-27a";
+const SB_URL = "https://ywdetjwnopnwcrnuoblp.supabase.co";
+const SB_KEY = "sb_publishable_bJyqlS50Bk4leVrxLyhZag_9wkkuYsN";   // publishable: safe in public code, RLS does the guarding
+const sb = supabase.createClient(SB_URL, SB_KEY);
+const DAY = 86400000;
+
+let D = null;            // loaded data
+let showAll = false;     // activity expanded
+
+// ---------- helpers ----------
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const fmt = (n, d = 0) => Number(n || 0).toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d });
+const money = (n) => (Math.abs(n) < 100 && n % 1 ? fmt(n, 2) : fmt(n));
+const midnight = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+const addDays = (d, n) => new Date(d.getTime() + n * DAY);
+const dshort = (d) => d.toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+const normPayee = (s) => String(s || "").toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim(); // same as ingest
+const INFLOW = ["salary", "income", "transfer_in"];
+
+// Payday on the given day-of-month, moved off the weekend (Fri → Thu, Sat → Sun) — same rule as v1.
+function paydayIn(y, m, day) {
+  let p = new Date(y, m, day);
+  if (p.getDay() === 5) p = new Date(y, m, day - 1);
+  if (p.getDay() === 6) p = new Date(y, m, day + 1);
+  return p;
+}
+function lastPayday(d, day) {
+  let p = paydayIn(d.getFullYear(), d.getMonth(), day);
+  if (p > d) p = paydayIn(d.getFullYear(), d.getMonth() - 1, day);
+  return p;
+}
+function nextPayday(d, day) {
+  let p = paydayIn(d.getFullYear(), d.getMonth(), day);
+  if (p <= d) p = paydayIn(d.getFullYear(), d.getMonth() + 1, day);
+  return p;
+}
+
+// The cycle starts at the salary when it has landed (even a few days early or late), else on the nominal payday.
+function cycle(txs, day) {
+  const today = midnight(new Date());
+  let start = lastPayday(today, day);
+  const sal = txs.filter((t) => t.kind === "salary").map((t) => midnight(new Date(t.occurred_at))).sort((a, b) => b - a)[0];
+  if (sal && sal >= addDays(start, -7) && sal <= today) start = sal;
+  const end = nextPayday(addDays(start, 8), day);
+  return { start, end, today };
+}
+
+const spendOf = (t) => (t.kind === "spend" ? Number(t.amount) + Number(t.fee || 0) : 0);
+
+// ---------- data ----------
+async function load() {
+  const since = addDays(new Date(), -70).toISOString();
+  const [acc, bud, com, set, tx] = await Promise.all([
+    sb.from("accounts").select("*").order("sort"),
+    sb.from("budgets").select("*").order("sort"),
+    sb.from("commitments").select("*").order("sort"),
+    sb.from("settings").select("*"),
+    sb.from("transactions").select("*, raw_alerts(text)").gte("occurred_at", since).order("occurred_at", { ascending: false }),
+  ]);
+  const err = acc.error || bud.error || com.error || set.error || tx.error;
+  if (err) throw err;
+  const settings = {};
+  for (const r of set.data) settings[r.key] = r.value;
+  D = { accounts: acc.data, budgets: bud.data, commitments: com.data, settings, txs: tx.data };
+  D.cyc = cycle(D.txs, Number(settings.payday_day || 27));
+  D.cycTx = D.txs.filter((t) => new Date(t.occurred_at) >= D.cyc.start);
+}
+
+function compute() {
+  const { start, end, today } = D.cyc;
+  const weekIdx = Math.floor((today - start) / DAY / 7);
+  const weekStart = addDays(start, weekIdx * 7);
+  const daysToEnd = Math.max(1, Math.round((end - weekStart) / DAY));
+  const weekLen = Math.min(7, daysToEnd);
+  const weekEnd = addDays(weekStart, weekLen);
+  const pot = D.budgets.reduce((s, b) => s + Number(b.cap), 0);
+  let before = 0, week = 0;
+  for (const t of D.cycTx) {
+    const d = new Date(t.occurred_at), v = spendOf(t);
+    if (d < weekStart) before += v; else week += v;
+  }
+  // Whatever is left of the month's budget, spread evenly over the days remaining; overspend carries forward.
+  const allowance = Math.max(0, pot - before) * weekLen / daysToEnd;
+  const left = allowance - week;
+  const daysLeftWeek = Math.max(1, Math.round((weekEnd - today) / DAY));
+  const byBudget = {};
+  for (const t of D.cycTx) if (t.kind === "spend") byBudget[t.budget_id || "_"] = (byBudget[t.budget_id || "_"] || 0) + spendOf(t);
+  const paid = {};
+  for (const t of D.cycTx) if (t.kind === "commitment" && t.commitment_id) (paid[t.commitment_id] ||= []).push(t);
+  const review = D.txs.filter((t) => !t.confirmed);
+  return { weekStart, weekEnd, allowance, left, week, daysLeftWeek, pot, byBudget, paid, review, spentCycle: before + week };
+}
+
+// ---------- render ----------
+function render() {
+  const C = compute();
+  const { start, end } = D.cyc;
+  const tone = C.left <= 0 ? "bad" : C.left < C.allowance * 0.35 ? "warn" : "good";
+  const pct = C.allowance ? Math.min(100, (C.week / C.allowance) * 100) : 100;
+  const bcol = { good: "var(--green)", warn: "var(--amber)", bad: "var(--red)" }[tone];
+
+  let h = `<div class="top"><div><h1>Saad Money</h1><div class="cyc">${dshort(start)} – ${dshort(addDays(end, -1))}</div></div>
+    <div class="icons"><button class="ibtn" onclick="openAdd()" aria-label="Add spend">＋</button>
+    <button class="ibtn" onclick="openSettings()" aria-label="Settings">⚙︎</button></div></div><div class="wrap">`;
+
+  if (C.review.length) {
+    h += `<div class="card review"><h2>Needs a tap <span>${C.review.length}</span></h2>`;
+    for (const t of C.review) h += txRow(t, true);
+    h += `</div>`;
+  }
+
+  h += `<div class="card"><h2>This week <span>${dshort(C.weekStart)} – ${dshort(addDays(C.weekEnd, -1))}</span></h2>
+    <div class="big ${tone}">${fmt(C.left)}<small>SAR left</small></div>
+    <div class="sub">${C.left > 0 ? `≈ ${fmt(C.left / C.daysLeftWeek)} a day for ${C.daysLeftWeek} day${C.daysLeftWeek > 1 ? "s" : ""}` : "Over for this week — it comes out of the next ones"}
+    · spent ${fmt(C.week)} of ${fmt(C.allowance)}</div>
+    <div class="bar"><i style="width:${pct}%;background:${bcol}"></i></div></div>`;
+
+  h += `<div class="card"><h2>Budgets <span>${fmt(C.spentCycle)} of ${fmt(C.pot)}</span></h2>`;
+  for (const b of D.budgets) {
+    const s = C.byBudget[b.id] || 0, p = b.cap ? s / b.cap : 0;
+    const col = p >= 1 ? "var(--red)" : p >= 0.8 ? "var(--amber)" : "var(--green)";
+    h += `<div class="row" onclick="openBudget('${b.id}')"><div class="ico">${esc(b.icon || "•")}</div><div class="l">
+      <div class="t">${esc(b.name)}</div><div class="bar thin"><i style="width:${Math.min(100, p * 100)}%;background:${col}"></i></div></div>
+      <div class="r">${fmt(s)}<div class="s">of ${fmt(b.cap)}</div></div></div>`;
+  }
+  if (C.byBudget._) h += `<div class="row" onclick="openBudget('_')"><div class="ico">❔</div><div class="l"><div class="t">Unsorted</div></div><div class="r">${fmt(C.byBudget._)}</div></div>`;
+  h += `</div>`;
+
+  const nPaid = D.commitments.filter((c) => C.paid[c.id]).length;
+  h += `<div class="card"><h2>Commitments <span>${nPaid} of ${D.commitments.length} paid</span></h2>`;
+  for (const c of D.commitments) {
+    const ps = C.paid[c.id] || [];
+    const sum = ps.reduce((s, t) => s + Number(t.amount), 0);
+    const auto = ps.some((t) => t.source !== "me");
+    h += `<div class="row ${ps.length ? "done" : ""}" onclick="tapCommit('${c.id}')">
+      <div class="chk ${ps.length ? (auto ? "auto" : "on") : ""}">${ps.length ? "✓" : ""}</div>
+      <div class="l"><div class="t">${esc(c.name)}</div>${ps.length ? `<div class="s">${auto ? "from bank" : "marked by you"}${ps.length > 1 ? ` · ${ps.length} payments` : ""}</div>` : ""}</div>
+      <div class="r">${ps.length ? fmt(sum) : `<span class="sub">${fmt(c.amount)}</span>`}</div></div>`;
+  }
+  h += `</div>`;
+
+  const act = D.cycTx;
+  h += `<div class="card"><h2>Activity <span>${act.length} this cycle</span></h2>`;
+  if (!act.length) h += `<div class="empty">Nothing yet. New bank SMS appear here within seconds.</div>`;
+  for (const t of showAll ? act : act.slice(0, 8)) h += txRow(t, false);
+  if (act.length > 8) h += `<button class="more" onclick="showAll=!showAll;render()">${showAll ? "Show less" : `Show all ${act.length}`}</button>`;
+  h += `</div></div>`;
+
+  $("app").innerHTML = h;
+}
+
+function label(t) {
+  if (t.kind === "spend") return D.budgets.find((b) => b.id === t.budget_id)?.name || "Unsorted";
+  if (t.kind === "commitment") return D.commitments.find((c) => c.id === t.commitment_id)?.name || "Commitment";
+  return { salary: "Salary", income: "Money in", transfer_out: "To own account", transfer_in: "From own account", ignore: "Ignored" }[t.kind];
+}
+function txRow(t, reviewing) {
+  const d = new Date(t.occurred_at);
+  const inflow = INFLOW.includes(t.kind);
+  const amt = Number(t.amount) + (t.kind === "spend" ? Number(t.fee || 0) : 0);
+  const acc = D.accounts.find((a) => a.id === t.account_id)?.name || "";
+  const minor = !reviewing && (["transfer_out", "transfer_in", "ignore"].includes(t.kind) || amt < 10);
+  return `<div class="row ${minor ? "minor" : ""}" onclick="openTx(${t.id})"><div class="l">
+    <div class="t"><bdi>${esc(t.counterparty || label(t))}</bdi></div>
+    <div class="s">${reviewing ? "Guess: " : ""}${esc(label(t))} · ${acc} · ${dshort(d)} ${d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}</div></div>
+    <div class="r ${inflow ? "good" : ""}">${inflow ? "+" : ""}${money(amt)}</div></div>`;
+}
+
+// ---------- sheets ----------
+function openSheet(html) { $("sheet").innerHTML = html; $("sheet").classList.add("on"); $("veil").classList.add("on"); }
+function closeSheet() { $("sheet").classList.remove("on"); $("veil").classList.remove("on"); }
+
+function openTx(id) {
+  const t = D.txs.find((x) => x.id === id);
+  if (!t) return;
+  const inflow = INFLOW.includes(t.kind);
+  const chip = (k, b, c, txt) => `<button class="chip ${t.kind === k && (t.budget_id || null) === b && (t.commitment_id || null) === c ? "sel" : ""}"
+    onclick="relabel(${id},'${k}',${b ? `'${b}'` : null},${c ? `'${c}'` : null})">${txt}</button>`;
+  let h = `<h3><bdi>${esc(t.counterparty || label(t))}</bdi> · ${inflow ? "+" : ""}${money(Number(t.amount))} SAR</h3>
+    <div class="sub">${esc(label(t))}${t.fee > 0 ? ` · fee ${t.fee}` : ""}${t.note ? ` — ${esc(t.note)}` : ""}</div>`;
+  if (t.raw_alerts?.text) h += `<div class="sms">${esc(t.raw_alerts.text)}</div>`;
+  if (!inflow) {
+    h += `<div class="lbl">Spent on</div><div class="chips">${D.budgets.map((b) => chip("spend", b.id, null, `${esc(b.icon || "")} ${esc(b.name)}`)).join("")}</div>`;
+    h += `<div class="lbl">Paid a commitment</div><div class="chips">${D.commitments.map((c) => chip("commitment", null, c.id, esc(c.name))).join("")}</div>`;
+  }
+  h += `<div class="lbl">Other</div><div class="chips">
+    ${chip(inflow ? "transfer_in" : "transfer_out", null, null, "My own account")}
+    ${inflow ? chip("income", null, null, "Money in") + chip("salary", null, null, "Salary") : ""}
+    ${chip("ignore", null, null, "Ignore")}</div>`;
+  if (t.counterparty) h += `<label class="toggle"><input type="checkbox" id="remember" checked> Always do this for “<bdi>${esc(t.counterparty)}</bdi>”</label>`;
+  if (t.source === "me") h += `<button class="pbtn ghost" onclick="delTx(${id})">Delete this entry</button>`;
+  openSheet(h);
+}
+
+async function relabel(id, kind, budget_id, commitment_id) {
+  const t = D.txs.find((x) => x.id === id);
+  const remember = $("remember")?.checked;
+  closeSheet();
+  const { error } = await sb.from("transactions").update({ kind, budget_id, commitment_id, confirmed: true, confidence: 1 }).eq("id", id);
+  if (error) return alert("Couldn't save: " + error.message);
+  if (remember && t.counterparty) {
+    await sb.from("payee_memory").upsert({ payee: normPayee(t.counterparty), kind, budget_id, commitment_id, taught_at: new Date().toISOString() });
+  }
+  refresh();
+}
+async function delTx(id) {
+  closeSheet();
+  await sb.from("transactions").delete().eq("id", id).eq("source", "me");
+  refresh();
+}
+
+function openBudget(id) {
+  const name = id === "_" ? "Unsorted" : D.budgets.find((b) => b.id === id)?.name;
+  const list = D.cycTx.filter((t) => t.kind === "spend" && (t.budget_id || "_") === id);
+  openSheet(`<h3>${esc(name)}</h3><div class="sub">${list.length} this cycle · tap one to move it</div><div style="margin-top:8px">
+    ${list.map((t) => txRow(t, false)).join("") || `<div class="empty">Nothing yet.</div>`}</div>`);
+}
+
+function tapCommit(id) {
+  const c = D.commitments.find((x) => x.id === id);
+  const ps = D.cycTx.filter((t) => t.kind === "commitment" && t.commitment_id === id);
+  if (!ps.length) {
+    openSheet(`<h3>${esc(c.name)}</h3><div class="sub">Mark as paid this cycle. Use this for cash or anything the bank didn't text about.</div>
+      <div class="lbl">Amount</div><input id="camt" type="number" inputmode="decimal" value="${c.amount}">
+      <button class="pbtn" onclick="markPaid('${id}')">Mark paid</button>`);
+    return;
+  }
+  const mine = ps.every((t) => t.source === "me");
+  openSheet(`<h3>${esc(c.name)}</h3><div class="sub">Paid ${fmt(ps.reduce((s, t) => s + Number(t.amount), 0))} of ${fmt(c.amount)} planned</div>
+    <div style="margin-top:8px">${ps.map((t) => txRow(t, false)).join("")}</div>
+    ${mine ? `<button class="pbtn ghost" onclick="unmark('${id}')">Untick</button>` : `<div class="sub" style="margin-top:12px">Came from the bank — tap the payment above to move it if it's wrong.</div>`}`);
+}
+async function markPaid(id) {
+  const amount = Number($("camt").value);
+  closeSheet();
+  if (!(amount > 0)) return;
+  await sb.from("transactions").insert({ kind: "commitment", commitment_id: id, amount, source: "me", confirmed: true, counterparty: "Marked paid", occurred_at: new Date().toISOString() });
+  refresh();
+}
+async function unmark(id) {
+  closeSheet();
+  await sb.from("transactions").delete().eq("kind", "commitment").eq("commitment_id", id).eq("source", "me").gte("occurred_at", D.cyc.start.toISOString());
+  refresh();
+}
+
+let addBudget = null;
+function openAdd() {
+  addBudget = D.budgets[0]?.id;
+  openSheet(`<h3>Add a spend</h3><div class="sub">For cash or anything the bank didn't text about.</div>
+    <div class="lbl">Amount</div><input id="aamt" type="number" inputmode="decimal" placeholder="0">
+    <div class="lbl">What</div><input id="anote" placeholder="e.g. Coffee">
+    <div class="lbl">Budget</div><div class="chips" id="abud">${D.budgets.map((b) =>
+      `<button class="chip ${b.id === addBudget ? "sel" : ""}" onclick="addBudget='${b.id}';document.querySelectorAll('#abud .chip').forEach(e=>e.classList.remove('sel'));this.classList.add('sel')">${esc(b.icon || "")} ${esc(b.name)}</button>`).join("")}</div>
+    <button class="pbtn" onclick="saveAdd()">Add</button>`);
+  setTimeout(() => $("aamt").focus(), 250);
+}
+async function saveAdd() {
+  const amount = Number($("aamt").value), note = $("anote").value.trim();
+  if (!(amount > 0)) return;
+  closeSheet();
+  await sb.from("transactions").insert({ kind: "spend", amount, budget_id: addBudget, counterparty: note || null, source: "me", confirmed: true, occurred_at: new Date().toISOString() });
+  refresh();
+}
+
+function openSettings() {
+  const sal = Number(D.settings.salary || 0);
+  const com = D.commitments.reduce((s, c) => s + Number(c.amount), 0);
+  const bud = D.budgets.reduce((s, b) => s + Number(b.cap), 0);
+  const free = sal - com - bud;
+  openSheet(`<h3>Settings</h3>
+    <div class="lbl">Salary</div><input id="s_salary" type="number" inputmode="decimal" value="${sal}">
+    <div class="lbl">Budgets (monthly)</div>
+    ${D.budgets.map((b) => `<div class="grid2"><input id="bn_${b.id}" value="${esc(b.name)}"><input id="bc_${b.id}" type="number" inputmode="decimal" value="${Number(b.cap)}"></div>`).join("")}
+    <div class="lbl">Commitments (monthly)</div>
+    ${D.commitments.map((c) => `<div class="grid2"><input id="cn_${c.id}" value="${esc(c.name)}"><input id="ca_${c.id}" type="number" inputmode="decimal" value="${Number(c.amount)}"></div>`).join("")}
+    <div class="sub" style="margin-top:10px">Salary ${fmt(sal)} − commitments ${fmt(com)} − budgets ${fmt(bud)} = <b class="${free < 0 ? "bad" : "good"}">${fmt(free)}</b> ${free < 0 ? "over-planned" : "left unplanned (savings)"}</div>
+    <button class="pbtn" onclick="saveSettings()">Save</button>
+    <button class="pbtn ghost" onclick="sb.auth.signOut().then(()=>location.reload())">Sign out</button>
+    <div class="sub" style="margin-top:12px;text-align:center">Build ${BUILD}</div>`);
+}
+async function saveSettings() {
+  const num = (id) => Number($(id).value);
+  const ops = [sb.from("settings").upsert({ key: "salary", value: num("s_salary") })];
+  for (const b of D.budgets) ops.push(sb.from("budgets").update({ name: $("bn_" + b.id).value.trim() || b.name, cap: num("bc_" + b.id) }).eq("id", b.id));
+  for (const c of D.commitments) ops.push(sb.from("commitments").update({ name: $("cn_" + c.id).value.trim() || c.name, amount: num("ca_" + c.id) }).eq("id", c.id));
+  const res = await Promise.all(ops);
+  const err = res.find((r) => r.error);
+  if (err) return alert("Couldn't save: " + err.error.message);
+  closeSheet();
+  refresh();
+}
+
+// ---------- auth ----------
+function renderLogin(msg = "") {
+  $("app").innerHTML = `<div class="login"><h1>Saad Money</h1><div class="sub">Sign in to see your numbers.</div>
+    <input id="em" type="email" autocomplete="username" placeholder="Email">
+    <input id="pw" type="password" autocomplete="current-password" placeholder="Password">
+    <button class="pbtn" onclick="signIn()">Sign in</button>
+    <button class="pbtn ghost" onclick="signUp()">First time? Create account</button>
+    <div class="msg" id="msg">${esc(msg)}</div></div>`;
+}
+async function signIn() {
+  const { error } = await sb.auth.signInWithPassword({ email: $("em").value.trim(), password: $("pw").value });
+  if (error) return ($("msg").textContent = error.message);
+  start();
+}
+async function signUp() {
+  const { error } = await sb.auth.signUp({ email: $("em").value.trim(), password: $("pw").value });
+  $("msg").textContent = error ? error.message : "Account created. Confirm it from the email (or ask Claude to), then sign in.";
+}
+
+// ---------- boot ----------
+let refreshing = false;
+async function refresh() {
+  if (refreshing) return;
+  refreshing = true;
+  try { await load(); if (!D.accounts.length) return renderLogin("This login has no access."); render(); }
+  catch (e) { console.error(e); }
+  finally { refreshing = false; }
+}
+async function start() {
+  const { data } = await sb.auth.getSession();
+  if (!data.session) return renderLogin();
+  $("app").innerHTML = `<div class="login"><div class="sub">Loading…</div></div>`;
+  await refresh();
+  sb.channel("tx").on("postgres_changes", { event: "*", schema: "public", table: "transactions" }, () => refresh()).subscribe();
+}
+document.addEventListener("visibilitychange", () => { if (!document.hidden && D) { refresh(); checkBuild(); } });
+
+// A home-screen app keeps its old HTML forever; tell the user when a newer build is live.
+async function checkBuild() {
+  try {
+    const src = await (await fetch("index.html?_=" + Date.now(), { cache: "no-store" })).text();
+    const live = src.match(/^const BUILD = "([^"]+)"/m)?.[1];
+    if (live && live !== BUILD && !$("upd")) {
+      document.body.insertAdjacentHTML("beforeend", `<button id="upd" class="banner" onclick="location.href='./?v='+Date.now()">New version — tap to update</button>`);
+    }
+  } catch {}
+}
+start();
+checkBuild();
+</script>
+</body>
+</html>

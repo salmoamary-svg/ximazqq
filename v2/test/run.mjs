@@ -22,11 +22,11 @@ for (const s of samples) {
   });
   const out = await r.json();
   const bad = Object.entries(s.expect ?? {}).filter(([k, v]) => {
-    const got = k === "needs_tap" ? out.needs_tap ?? !out.confirmed : out[k];
+    const got = k === "needs_tap" ? out.needs_tap ?? !out.confirmed : k === "account" ? out.account ?? out.account_id : out[k];
     return got !== v;
   });
   if (bad.length) fails++;
-  console.log(`${bad.length ? "✗" : "✓"} ${s.name.padEnd(30)} ${String(out.kind).padEnd(13)} ${String(out.account).padEnd(4)} ${String(out.amount).padStart(9)}${out.fee ? ` +${out.fee}` : ""}  ${out.counterparty ?? "-"}  → ${out.budget_id ?? out.commitment_id ?? "-"}  conf ${out.confidence}${(out.needs_tap ?? !out.confirmed) ? "  [TAP]" : ""}`);
+  console.log(`${bad.length ? "✗" : "✓"} ${s.name.padEnd(30)} ${String(out.kind).padEnd(13)} ${String(out.account ?? out.account_id).padEnd(4)} ${String(out.amount).padStart(9)}${out.fee ? ` +${out.fee}` : ""}  ${out.counterparty ?? "-"}  → ${out.budget_id ?? out.commitment_id ?? "-"}  conf ${out.confidence}${(out.needs_tap ?? !out.confirmed) ? "  [TAP]" : ""}`);
   console.log(`    ${out.occurred_at ?? ""}  ${out.reason ?? out.error ?? ""}`);
   for (const [k, v] of bad) console.log(`    expected ${k}=${JSON.stringify(v)}, got ${JSON.stringify(out[k])}`);
 }

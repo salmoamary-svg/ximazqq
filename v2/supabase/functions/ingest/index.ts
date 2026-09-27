@@ -193,7 +193,7 @@ Deno.serve(async (req) => {
   } else {
     text = await req.text();
   }
-  text = normalize(text);
+  text = text.replace(/\r\n?/g, "\n").trim();   // keep line breaks for display; hash the normalized form
   if (!text) return Response.json({ error: "empty text" }, { status: 400 });
 
   const ctx = await loadContext();
@@ -203,7 +203,7 @@ Deno.serve(async (req) => {
     return Response.json({ dry: true, ...c, needs_tap: needsTap(c) });
   }
 
-  const hash = await sha256(text);
+  const hash = await sha256(normalize(text));
   const ins = await sb.from("raw_alerts").insert({ hash, text, sender, received_at: receivedAt }).select("id").single();
   if (ins.error) {
     if (ins.error.code === "23505") return Response.json({ duplicate: true });
