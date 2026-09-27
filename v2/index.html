@@ -94,7 +94,7 @@ background:var(--teal);color:var(--bg);font-weight:700;padding:12px 16px;border-
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
-const BUILD = "2026-09-27a";
+const BUILD = "2026-09-27b";
 const SB_URL = "https://ywdetjwnopnwcrnuoblp.supabase.co";
 const SB_KEY = "sb_publishable_bJyqlS50Bk4leVrxLyhZag_9wkkuYsN";   // publishable: safe in public code, RLS does the guarding
 const sb = supabase.createClient(SB_URL, SB_KEY);
@@ -372,6 +372,7 @@ function openSettings() {
     ${D.commitments.map((c) => `<div class="grid2"><input id="cn_${c.id}" value="${esc(c.name)}"><input id="ca_${c.id}" type="number" inputmode="decimal" value="${Number(c.amount)}"></div>`).join("")}
     <div class="sub" style="margin-top:10px">Salary ${fmt(sal)} − commitments ${fmt(com)} − budgets ${fmt(bud)} = <b class="${free < 0 ? "bad" : "good"}">${fmt(free)}</b> ${free < 0 ? "over-planned" : "left unplanned (savings)"}</div>
     <button class="pbtn" onclick="saveSettings()">Save</button>
+    <button class="pbtn ghost" onclick="changePassword()">Change password</button>
     <button class="pbtn ghost" onclick="sb.auth.signOut().then(()=>location.reload())">Sign out</button>
     <div class="sub" style="margin-top:12px;text-align:center">Build ${BUILD}</div>`);
 }
@@ -385,6 +386,13 @@ async function saveSettings() {
   if (err) return alert("Couldn't save: " + err.error.message);
   closeSheet();
   refresh();
+}
+
+async function changePassword() {
+  const pw = prompt("New password (at least 6 characters)");
+  if (!pw) return;
+  const { error } = await sb.auth.updateUser({ password: pw });
+  alert(error ? "Couldn't change it: " + error.message : "Password changed.");
 }
 
 // ---------- auth ----------
