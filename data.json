@@ -1,10 +1,10 @@
 {
- "asOf": "2026-09-27 12:23 PM",
- "balance": 31685.05,
+ "asOf": "2026-09-28 12:59 PM",
+ "balance": 20982.4,
  "salary": 27932,
  "cushion": 200,
  "cycleStart": "2026-09-27",
- "cursor": "2026-09-27T06:04:30Z",
+ "cursor": "2026-09-28T05:52:42Z",
  "processed": [
   "<5EAFF906-932B-4BD3-A7FA-FA5AFAC19A06@gmail.com>",
   "<C03A81B9-3FDC-4975-9E4E-91BD029CB1B8@gmail.com>",
@@ -347,7 +347,21 @@
   "<8A03CAC0-EEB2-4C52-B5CF-169851A9EF61@gmail.com>",
   "<91880660-1746-4F5D-B326-BF31D67C9D4C@gmail.com>",
   "<D5C148FE-3111-4351-8F21-3E3EF587F074@gmail.com>",
-  "<BE8C7889-B9F5-4FA8-8E2A-909C913D127A@gmail.com>"
+  "<BE8C7889-B9F5-4FA8-8E2A-909C913D127A@gmail.com>",
+  "<B2CE5FD2-B24C-459E-9F03-ECC8C25C38D1@gmail.com>",
+  "<334330FB-954E-43DB-8E19-69A313B724E9@gmail.com>",
+  "<8DD7E107-085B-4E8D-828C-0ECADD084FCC@gmail.com>",
+  "<F35F01D4-6AA1-4E97-9232-2D1C94CBFA4F@gmail.com>",
+  "<B8CB153E-1045-44DE-A675-DE90666B2C78@gmail.com>",
+  "<7CAB6518-B6CE-489D-9033-BAF98C268F3C@gmail.com>",
+  "<014836CE-A4BA-4D5C-991B-1D30959BC43D@gmail.com>",
+  "<5413794F-752F-42C0-82D5-12F3A2D2B07A@gmail.com>",
+  "<49129FE2-E4AA-42F3-A05D-958872819BE5@gmail.com>",
+  "<1DB76073-32CA-423E-919F-1A8D4E8AFC58@gmail.com>",
+  "<F535F736-9125-40B4-876C-2729FA9271F3@gmail.com>",
+  "<DCC0956D-8361-438E-82CE-D93AB4484CDB@gmail.com>",
+  "<94529DBD-C0A4-458F-A219-7D1D3C2348A8@gmail.com>",
+  "<C2C562F2-EF3F-400C-B241-B98A901C8EBA@gmail.com>"
  ],
  "last_data_msgid": null,
  "commitments": [
@@ -491,7 +505,7 @@
   {
    "id": "under",
    "name": "Spend under salary this cycle",
-   "cur": 134.5,
+   "cur": 10837.15,
    "tgt": 27932,
    "col": "#2dd4bf",
    "sub": "Stay below 27,932"
@@ -506,7 +520,10 @@
   }
  ],
  "spendCats": {
-  "shopping": 134.5
+  "shopping": 515.74,
+  "bnpl": 2312.74,
+  "stc": 5456.04,
+  "everyday": 2552.63
  },
  "lastCycleCats": {
   "shopping": 2749.53,
@@ -605,66 +622,6 @@
   ]
  ],
  "transactions": [
-  [
-   "2026-07-22T18:03:44Z",
-   "everyday",
-   45
-  ],
-  [
-   "2026-07-22T21:10:46Z",
-   "everyday",
-   100
-  ],
-  [
-   "2026-07-23T04:50:10Z",
-   "shopping",
-   7.75
-  ],
-  [
-   "2026-07-23T11:38:39Z",
-   "shopping",
-   3
-  ],
-  [
-   "2026-07-23T15:37:07Z",
-   "everyday",
-   101
-  ],
-  [
-   "2026-07-24T12:33:41Z",
-   "shopping",
-   15
-  ],
-  [
-   "2026-07-24T18:36:28Z",
-   "everyday",
-   39.91
-  ],
-  [
-   "2026-07-24T19:05:52Z",
-   "everyday",
-   73
-  ],
-  [
-   "2026-07-26T09:46:44Z",
-   "shopping",
-   1.5
-  ],
-  [
-   "2026-07-27T05:59:01Z",
-   "shopping",
-   1.5
-  ],
-  [
-   "2026-07-27T16:57:55Z",
-   "phone",
-   908.9
-  ],
-  [
-   "2026-07-27T16:58:24Z",
-   "phone",
-   402.5
-  ],
   [
    "2026-07-27T16:58:53Z",
    "phone",
@@ -1602,6 +1559,66 @@
   ],
   [
    "2026-09-27T06:04:30Z",
+   "shopping",
+   1.5
+  ],
+  [
+   "2026-09-27T11:45:36Z",
+   "bnpl",
+   277.91
+  ],
+  [
+   "2026-09-27T11:46:09Z",
+   "bnpl",
+   318.38
+  ],
+  [
+   "2026-09-27T11:47:04Z",
+   "bnpl",
+   1716.45
+  ],
+  [
+   "2026-09-27T11:48:31Z",
+   "stc",
+   1053.54
+  ],
+  [
+   "2026-09-27T11:49:13Z",
+   "stc",
+   402.5
+  ],
+  [
+   "2026-09-27T13:45:43Z",
+   "stc",
+   1000.0
+  ],
+  [
+   "2026-09-27T14:56:47Z",
+   "shopping",
+   150.0
+  ],
+  [
+   "2026-09-27T15:40:44Z",
+   "shopping",
+   229.74
+  ],
+  [
+   "2026-09-27T16:18:29Z",
+   "everyday",
+   552.63
+  ],
+  [
+   "2026-09-27T17:32:01Z",
+   "stc",
+   3000.0
+  ],
+  [
+   "2026-09-27T19:56:48Z",
+   "everyday",
+   2000.0
+  ],
+  [
+   "2026-09-28T05:52:42Z",
    "shopping",
    1.5
   ]
