@@ -26,6 +26,60 @@ SHA-checked write, the same conflict-safe shape `saveData()` itself uses. Diff t
 before sending, not just the field being changed — a same-content mistake here once wiped several
 top-level keys (see the "near-miss" note under "overnight pass").
 
+## 2026-09-29 — salmoamary-svg — v2: a new app on Supabase, fed straight from bank SMS
+
+### What changed
+The v1 pipeline (SMS → Shortcut → email → nightly regex robot → public `data.json`) is being
+replaced, not patched. Everything new lives under `v2/` and never touches the v1 files:
+
+- **Storage: private Supabase project `saad-money`** (`ywdetjwnopnwcrnuoblp`, ap-south-1). Tables
+  `accounts`, `budgets`, `commitments`, `settings`, `raw_alerts` (every SMS verbatim), `transactions`,
+  `payee_memory`. RLS allows only the email in `private.owner` (the account holder) plus the service
+  role. Schema is in `v2/supabase/migrations/0001…0006`, applied in order via the Supabase MCP.
+- **Ingest: edge function `v2/supabase/functions/ingest/index.ts`.** The iPhone Shortcut POSTs each
+  BSF SMS (`{text, sender}` + header `x-ingest-key`) within seconds. The function dedupes on a hash,
+  stores the text, and classifies it with `claude-opus-5` (structured JSON: kind / account / amount /
+  fee / counterparty / budget or commitment / confidence). A payee the owner has labelled once
+  (`payee_memory`) always wins over the model; anything under 0.8 confidence lands in the app's
+  "needs a tap" queue. Own-account transfers are paired by amount within 30 min. Only BSF is
+  tracked — STC Bank's alphanumeric sender can't drive an iOS message automation — so a BSF → STC
+  top-up is recorded as **spend at the moment it leaves** and asks what it was for.
+- **App: `v2/index.html`**, live at `https://salmoamary-svg.github.io/ximazqq/v2/`, redesigned from a
+  Figma mock (`figma.com/design/Kg869LJfoa00Iiwp054Vp8`). Tabs Home / Activity / Budgets / Settings;
+  hero "left this week" card, rest-of-month strip, budget tiles, commitments checklist, day-grouped
+  activity with a cycle picker and search, last-cycle comparison per budget, undo toast on every edit,
+  pull to refresh, iOS haptic tick (via a `switch` checkbox), "synced N ago". Login is Supabase
+  email + password; `BUILD` constant + `checkBuild()` banner carried over from v1.
+- **Data decisions taken with the owner this cycle:** groceries are a spending budget (not a
+  transfer); `Coffee & daily` + `Groceries` split; BNPL (Tabby/Tamara) is a 2,313/mo commitment;
+  credit card paid off and removed; Sister E.'s remaining payoff is held in a separate account and
+  is *not* a monthly line (transfers to her are `ignore`d); loan installment 9,300 from October;
+  domestic helper 1,500.
+
+### What's next
+- **Shadow week.** v1 (email robot, `data.json`, `update.yml`) is still running alongside. After ~7
+  clean days, disable the cron, delete the email Shortcut, and archive the v1 app.
+- Mueen 3,476 is filed under budget *Other* ("Monthly domestic helper"); if it's the helper's pay it
+  belongs on the Domestic helper commitment — owner to decide; it currently drives the week red.
+- No SMS is received for the loan deposit or (reliably) card settlements; both can be pasted in by
+  hand and run through `ingest` with `received_at` set.
+- Optional later: Mac fallback that sweeps Messages for anything the Shortcut missed; local model on
+  the PC instead of the API.
+
+### What the other dev must know
+- **Secrets (Supabase → Edge Functions → Secrets):** `ANTHROPIC_API_KEY` (console.anthropic.com key,
+  ~1 SAR/month at this volume), `INGEST_KEY` (shared secret the Shortcut sends; rotate here and in
+  the Shortcut together). `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` are platform-injected. No
+  Vercel, no `.env`, nothing in the repo. The publishable key in `index.html` is meant to be public.
+- **Supabase Auth → URL Configuration:** set Site URL / redirect to
+  `https://salmoamary-svg.github.io/ximazqq/v2/` (it still defaults to `localhost:3000`; the owner's
+  account was confirmed by hand so it hasn't mattered yet). The free tier allows ~2 auth emails/hour.
+- Redeploy the function with the Supabase MCP `deploy_edge_function` (`verify_jwt: false` — auth is
+  the `x-ingest-key` header). Test with `INGEST_URL=… INGEST_KEY=… node v2/test/run.mjs` (dry mode,
+  writes nothing) against `v2/test/samples.json`.
+- Owner's hardware, for future options: iPhone (the trigger), MacBook, iPad, and an always-available
+  powerful PC.
+
 ## 2026-07-31 — salmoamary-svg — maintenance category, and car insurance moves from a tick to an automatic goal
 
 ### What changed
