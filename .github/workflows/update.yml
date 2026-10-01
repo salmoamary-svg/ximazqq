@@ -1,7 +1,7 @@
 name: Update Saad Money
+# Retired 2026-10-01: the v2 app (v2/) is fed directly from bank SMS via Supabase.
+# The nightly Gmail sync no longer runs on a schedule; it can still be fired by hand if ever needed.
 on:
-  schedule:
-    - cron: "30 3 * * *"
   workflow_dispatch: {}
 permissions:
   contents: write
