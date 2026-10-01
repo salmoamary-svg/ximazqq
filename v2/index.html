@@ -150,7 +150,7 @@ border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:12px;z-
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
-const BUILD = "2026-09-28a";
+const BUILD = "2026-10-01a";
 const SB_URL = "https://ywdetjwnopnwcrnuoblp.supabase.co";
 const SB_KEY = "sb_publishable_bJyqlS50Bk4leVrxLyhZag_9wkkuYsN";   // publishable: safe in public code, RLS does the guarding
 const sb = supabase.createClient(SB_URL, SB_KEY);
@@ -258,6 +258,20 @@ function compute() {
   // Whatever is left of the month's budget, spread evenly over the days remaining; overspend carries forward.
   const allowance = Math.max(0, pot - before) * weekLen / daysToEnd;
   const left = allowance - week;
+  // Week-by-week view of the same rule: each week gets an even share of whatever is still unspent,
+  // so under-spending one week flows into the next ones and over-spending is paid back the same way.
+  const totalDays = Math.max(1, Math.round((end - start) / DAY));
+  const weeks = [];
+  let spentBefore = 0;
+  for (let i = 0; i < Math.ceil(totalDays / 7); i++) {
+    const ws = addDays(start, i * 7), daysFrom = Math.max(1, Math.round((end - ws) / DAY)), len = Math.min(7, daysFrom), we = addDays(ws, len);
+    const spent = D.cycTx.reduce((s, t) => { const d = new Date(t.occurred_at); return d >= ws && d < we ? s + spendOf(t) : s; }, 0);
+    const allow = Math.max(0, pot - spentBefore) * len / daysFrom;
+    weeks.push({ no: i + 1, ws, we, len, allow, spent, left: allow - spent, current: i === weekIdx, future: ws > today });
+    spentBefore += spent;
+  }
+  const base = pot * weekLen / totalDays;   // what this week would get with no carry-over at all
+  const carry = allowance - base;
   const daysLeftWeek = Math.max(1, Math.round((weekEnd - today) / DAY));
   const byBudget = {};
   for (const t of D.cycTx) if (t.kind === "spend") byBudget[t.budget_id || "_"] = (byBudget[t.budget_id || "_"] || 0) + spendOf(t);
@@ -270,7 +284,7 @@ function compute() {
   const billsLeft = D.commitments.filter((c) => !paid[c.id]).reduce((s, c) => s + Number(c.amount), 0);
   const month = { income, out, billsLeft, left: income - out, free: income - out - billsLeft, days: Math.max(1, Math.round((end - today) / DAY)) };
   const weekNo = weekIdx + 1;
-  return { weekStart, weekEnd, weekNo, allowance, left, week, daysLeftWeek, pot, byBudget, paid, review, month, spentCycle: before + week };
+  return { weekStart, weekEnd, weekNo, allowance, left, week, daysLeftWeek, pot, byBudget, paid, review, month, weeks, base, carry, spentCycle: before + week };
 }
 
 // ---------- render ----------
@@ -304,6 +318,7 @@ function renderHome(C) {
   h += `<div class="card hero" onclick="openWeek()"><div class="hh"><span class="eyebrow">Left this week</span><span class="chip">Week ${C.weekNo} · ${dshort(C.weekStart)} – ${dshort(addDays(C.weekEnd, -1))}</span></div>
     <div class="big"><b class="${tone}">${fmt(C.left)}</b><span>SAR</span></div>
     <div class="bar h10"><i style="width:${pct}%;background:${bcol}"></i></div>
+    ${Math.abs(C.carry) >= 1 ? `<div class="sub" style="font-size:12px;color:var(--sub);margin-top:8px">Base ${fmt(C.base)} ${C.carry > 0 ? `<b class="good">+ ${fmt(C.carry)}</b> carried over from earlier weeks` : `<b class="bad">− ${fmt(-C.carry)}</b> paid back for earlier weeks`}</div>` : ""}
     <div class="stats"><div class="stat"><b>${C.left > 0 ? fmt(C.left / C.daysLeftWeek) : "0"}</b><span>per day</span></div>
     <div class="stat"><b>${C.daysLeftWeek}</b><span>day${C.daysLeftWeek > 1 ? "s" : ""} left</span></div>
     <div class="stat"><b>${fmt(C.week)}</b><span>spent of ${fmt(C.allowance)}</span></div></div></div>`;
@@ -510,8 +525,18 @@ function openReview() {
 function openWeek() {
   const C = compute();
   const list = D.cycTx.filter((t) => t.kind === "spend" && new Date(t.occurred_at) >= C.weekStart);
-  openSheet(`<div class="title"><div class="l"><h3>This week's spending</h3><div class="sub">${dshort(C.weekStart)} – ${dshort(addDays(C.weekEnd, -1))} · ${fmt(C.week)} of ${fmt(C.allowance)} · ${C.left >= 0 ? "" : "over by " + fmt(-C.left) + " — it comes out of the next weeks"}</div></div></div>
-    <div style="margin-top:8px">${grouped(list, "Nothing spent yet this week.")}</div>`);
+  const wk = C.weeks.map((w) => {
+    const tone = w.future ? "" : w.left < 0 ? "bad" : w.left < w.allow * 0.2 ? "warn" : "good";
+    const right = w.future ? `<span style="color:var(--sub)">≈ ${fmt(w.allow)}</span>` : `<span class="${tone}">${w.left >= 0 ? fmt(w.left) + " left" : fmt(-w.left) + " over"}</span>`;
+    return `<div class="row" style="padding:9px 0"><div class="l"><div class="t" style="font-weight:${w.current ? 700 : 500}">Week ${w.no}${w.current ? " · now" : ""}</div>
+      <div class="s">${dshort(w.ws)} – ${dshort(addDays(w.we, -1))}${w.future ? " · if you spend nothing more before then" : ` · ${fmt(w.spent)} of ${fmt(w.allow)}`}</div></div><div class="r">${right}</div></div>`;
+  }).join("");
+  openSheet(`<div class="title"><div class="l"><h3>This week's spending</h3><div class="sub">${dshort(C.weekStart)} – ${dshort(addDays(C.weekEnd, -1))} · ${fmt(C.week)} of ${fmt(C.allowance)}${C.left >= 0 ? "" : " · over by " + fmt(-C.left)}</div></div></div>
+    <div class="lbl">How the month is spread</div>
+    <div class="sub" style="font-size:12px;margin:-4px 0 6px">Each week gets an even share of what's still unspent. Spend less and the rest flows into the next weeks; overspend and they absorb it.</div>
+    <div style="margin:0 -2px">${wk}</div>
+    <div class="lbl">This week</div>
+    <div>${grouped(list, "Nothing spent yet this week.")}</div>`);
 }
 function openBudget(id) {
   const b = id === "_" ? { name: "Unsorted", icon: "❔" } : D.budgets.find((x) => x.id === id);
